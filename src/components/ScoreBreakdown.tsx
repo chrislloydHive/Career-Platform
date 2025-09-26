@@ -41,10 +41,10 @@ export function ScoreBreakdown({ breakdown, showDetails = true }: ScoreBreakdown
     <div className="space-y-3">
       {showDetails && (
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+          <span className="text-xs font-semibold text-gray-300 uppercase tracking-wide">
             Score Breakdown
           </span>
-          <span className="text-lg font-bold text-gray-900">
+          <span className="text-lg font-bold text-gray-100">
             {breakdown.total.toFixed(1)}
           </span>
         </div>
@@ -53,12 +53,12 @@ export function ScoreBreakdown({ breakdown, showDetails = true }: ScoreBreakdown
       {components.map(({ label, data, color, lightColor }) => (
         <div key={label}>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-600">{label}</span>
+            <span className="text-xs font-medium text-gray-400">{label}</span>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-400">
                 {data.score.toFixed(0)}/100 × {(data.weight * 100).toFixed(0)}%
               </span>
-              <span className="text-xs font-semibold text-gray-700">
+              <span className="text-xs font-semibold text-gray-300">
                 = {data.weighted.toFixed(1)}
               </span>
             </div>

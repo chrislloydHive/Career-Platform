@@ -95,7 +95,7 @@ export function exportToJSON(data: ExportData, options: ExportOptions): void {
             jobData.jobType = job.jobType;
             break;
           case 'matchReasons':
-            jobData.matchReasons = job.metadata?.enhancedScoreBreakdown?.topReasons;
+            jobData.matchReasons = (job.metadata?.enhancedScoreBreakdown as { topReasons?: string[] })?.topReasons;
             break;
         }
       });

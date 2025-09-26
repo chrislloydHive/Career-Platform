@@ -1,5 +1,5 @@
 import { getJson } from 'serpapi';
-import { RawJob, JobSource, ScraperConfig } from '@/types';
+import { RawJob, JobSource, ScraperConfig, JobType } from '@/types';
 import { ScraperErrorClass as ScraperError, ErrorCode } from '@/types';
 import { normalizeSalary, normalizeLocation, generateJobId } from '../utils/normalize';
 
@@ -54,7 +54,7 @@ export class SerpApiScraper {
       errors.push({
         source: this.getSourceName(),
         message: 'SERPAPI_KEY not configured. Get your free API key at https://serpapi.com/users/sign_up',
-        code: ErrorCode.SCRAPER_CONFIG_ERROR,
+        code: ErrorCode.SCRAPER_INVALID_CONFIG,
         timestamp: new Date(),
       });
 
@@ -190,7 +190,7 @@ export class SerpApiScraper {
       description,
       url: applyLink,
       source: this.getSourceName(),
-      jobType: serpJob.detected_extensions?.schedule_type?.toLowerCase(),
+      jobType: serpJob.detected_extensions?.schedule_type?.toLowerCase() as JobType | undefined,
       postedDate,
       scrapedAt: new Date(),
       metadata: {

@@ -135,12 +135,12 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Export Jobs</h2>
+      <div className="bg-gray-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-gray-900 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-100">Export Jobs</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-200 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -152,7 +152,7 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
           {!showEmailForm ? (
             <>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-gray-300 mb-3">
                   Export Format
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -166,8 +166,8 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
                       onClick={() => setFormat(value)}
                       className={`p-4 border-2 rounded-lg transition-all ${
                         format === value
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-gray-300 hover:border-blue-400'
+                          ? 'border-blue-600 bg-blue-900/50'
+                          : 'border-gray-600 hover:border-blue-400'
                       }`}
                     >
                       <div className="text-2xl mb-1">{icon}</div>
@@ -197,11 +197,11 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto border border-gray-700 rounded-lg p-3">
                   {ALL_FIELDS.map(field => (
                     <label
                       key={field}
-                      className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                      className="flex items-center gap-2 p-2 hover:bg-gray-800 rounded cursor-pointer"
                     >
                       <input
                         type="checkbox"
@@ -209,17 +209,17 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
                         onChange={() => toggleField(field)}
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
-                      <span className="text-sm text-gray-700">{FIELD_LABELS[field]}</span>
+                      <span className="text-sm text-gray-300">{FIELD_LABELS[field]}</span>
                     </label>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-400 mt-2">
                   {selectedFields.length} field{selectedFields.length !== 1 ? 's' : ''} selected
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-gray-300 mb-3">
                   Date Format
                 </label>
                 <div className="flex gap-3">
@@ -233,8 +233,8 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
                       onClick={() => setDateFormat(value)}
                       className={`flex-1 px-4 py-2 text-sm border rounded-lg transition-all ${
                         dateFormat === value
-                          ? 'border-blue-600 bg-blue-50 text-blue-700'
-                          : 'border-gray-300 hover:border-blue-400'
+                          ? 'border-blue-600 bg-blue-900/50 text-blue-400'
+                          : 'border-gray-600 hover:border-blue-400 text-gray-300'
                       }`}
                     >
                       {label}
@@ -245,7 +245,7 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
 
               {format === 'excel' && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  <label className="block text-sm font-semibold text-gray-300 mb-3">
                     Additional Excel Sheets
                   </label>
                   <div className="space-y-2">
@@ -281,7 +281,7 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
               )}
 
               <div>
-                <label htmlFor="filename" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="filename" className="block text-sm font-semibold text-gray-300 mb-2">
                   Custom Filename (optional)
                 </label>
                 <input
@@ -290,9 +290,9 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
                   value={customFilename}
                   onChange={(e) => setCustomFilename(e.target.value)}
                   placeholder="job-search-results"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   Leave blank for default name with timestamp
                 </p>
               </div>
@@ -300,7 +300,7 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
           ) : (
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">
                   Email Recipient
                 </label>
                 <input
@@ -309,12 +309,12 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
                   value={emailRecipient}
                   onChange={(e) => setEmailRecipient(e.target.value)}
                   placeholder="recipient@example.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="message" className="block text-sm font-semibold text-gray-300 mb-2">
                   Message (optional)
                 </label>
                 <textarea
@@ -323,11 +323,11 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
                   onChange={(e) => setEmailMessage(e.target.value)}
                   placeholder="Add a personal message..."
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
+              <div className="bg-blue-900/50 border border-blue-700 rounded-lg p-4">
+                <p className="text-sm text-blue-400">
                   This will open your default email client with a summary of the top 5 jobs.
                   You can attach the exported file manually after sending.
                 </p>
@@ -336,12 +336,12 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
           )}
         </div>
 
-        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-between gap-3">
+        <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 px-6 py-4 flex items-center justify-between gap-3">
           {!showEmailForm ? (
             <>
               <button
                 onClick={() => setShowEmailForm(true)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-900 border border-gray-600 rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -351,7 +351,7 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
               <div className="flex gap-3">
                 <button
                   onClick={onClose}
-                  className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-2 text-sm font-medium text-gray-300 bg-gray-900 border border-gray-600 rounded-lg hover:bg-gray-800 transition-colors"
                 >
                   Cancel
                 </button>
@@ -390,7 +390,7 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
               <div className="flex gap-3">
                 <button
                   onClick={onClose}
-                  className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-2 text-sm font-medium text-gray-300 bg-gray-900 border border-gray-600 rounded-lg hover:bg-gray-800 transition-colors"
                 >
                   Cancel
                 </button>

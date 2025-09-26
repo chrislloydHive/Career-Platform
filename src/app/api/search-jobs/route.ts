@@ -59,8 +59,8 @@ export async function POST(request: NextRequest) {
         sources: searchCriteria.sources || ['google_jobs'],
         durationMs: Date.now() - startTime,
         jobsFound: cachedResult.jobs.length,
-        successfulSources: cachedResult.metadata.successfulSources as any[],
-        failedSources: cachedResult.metadata.failedSources as any[],
+        successfulSources: cachedResult.metadata.successfulSources,
+        failedSources: cachedResult.metadata.failedSources,
         errors: 0,
         cached: true,
       });
@@ -156,9 +156,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let filteredJobs = searchResult.jobs;
+
+    if (searchCriteria.salary) {
+      const { min, max } = searchCriteria.salary;
+      filteredJobs = filteredJobs.filter(job => {
+        if (!job.salary) return true;
+
+        const jobSalary = job.salary;
+        const jobMin = jobSalary.min || 0;
+        const jobMax = jobSalary.max || jobMin;
+
+        let annualMin = jobMin;
+        let annualMax = jobMax;
+
+        if (jobSalary.period === 'hourly') {
+          annualMin = jobMin * 2080;
+          annualMax = jobMax * 2080;
+        } else if (jobSalary.period === 'monthly') {
+          annualMin = jobMin * 12;
+          annualMax = jobMax * 12;
+        }
+
+        if (max !== undefined && annualMin > max) return false;
+        if (min !== undefined && annualMax < min) return false;
+
+        return true;
+      });
+    }
+
     const scoringCriteria = createScoringCriteriaFromSearch(searchCriteria);
     const scorer = new JobScorer(undefined, scoringCriteria);
-    const scoredJobs = scorer.scoreJobs(searchResult.jobs);
+    const scoredJobs = scorer.scoreJobs(filteredJobs);
 
     const responseData = {
       jobs: scoredJobs,

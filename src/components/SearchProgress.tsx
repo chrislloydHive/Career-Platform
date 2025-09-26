@@ -19,7 +19,7 @@ export function SearchProgress({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+      <div className="bg-gray-900 rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
         <div className="text-center">
           <div className="mb-4">
             <svg
@@ -44,21 +44,21 @@ export function SearchProgress({
             </svg>
           </div>
 
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-gray-100 mb-2">
             Searching for Jobs...
           </h3>
 
           {message && (
-            <p className="text-sm text-gray-600 mb-4">{message}</p>
+            <p className="text-sm text-gray-400 mb-4">{message}</p>
           )}
 
           {currentSource && (
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-400 mb-4">
               Scanning <span className="font-medium capitalize">{currentSource}</span>
             </p>
           )}
 
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+          <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -68,15 +68,15 @@ export function SearchProgress({
           <div className="flex items-center justify-center gap-6 text-sm">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{jobsFound}</div>
-              <div className="text-gray-600">Jobs Found</div>
+              <div className="text-gray-400">Jobs Found</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{progress}%</div>
-              <div className="text-gray-600">Complete</div>
+              <div className="text-gray-400">Complete</div>
             </div>
           </div>
 
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="text-xs text-gray-400 mt-4">
             This may take 30-60 seconds...
           </p>
         </div>

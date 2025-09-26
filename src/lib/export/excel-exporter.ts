@@ -124,7 +124,7 @@ function createMatchReasonsSheet(
   const headers = ['Rank', 'Job Title', 'Company', 'Match Reasons'];
 
   const rows = data.jobs.map((job, index) => {
-    const enhanced = job.metadata?.enhancedScoreBreakdown;
+    const enhanced = job.metadata?.enhancedScoreBreakdown as { topReasons?: string[] } | undefined;
     const reasons = enhanced?.topReasons?.join('\n') || 'N/A';
 
     return [index + 1, job.title, job.company, reasons];

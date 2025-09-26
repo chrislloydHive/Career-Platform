@@ -1,7 +1,9 @@
 {
   "extends": "next/core-web-vitals",
+  "ignorePatterns": ["src/__tests__/**/*.ts", "src/__tests__/**/*.tsx"],
   "rules": {
     "@typescript-eslint/no-require-imports": "off",
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

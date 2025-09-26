@@ -58,3 +58,16 @@ export {
   assertRawJob,
   assertScoringWeights,
 } from './guards';
+
+export type {
+  CareerCategory,
+  ExperienceLevel,
+  DailyTask,
+  SkillRequirement,
+  SalaryRange as CareerSalaryRange,
+  CareerProgression,
+  IndustryInsight,
+  JobCategory,
+  CareerResearchQuery,
+  CareerMatch,
+} from './career';

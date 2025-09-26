@@ -1,4 +1,4 @@
-import { RawJob, SearchCriteria } from '@/types';
+import { RawJob, SearchCriteria, JobSource } from '@/types';
 
 export interface CacheEntry<T> {
   data: T;
@@ -12,8 +12,8 @@ export interface SearchCacheResult {
     totalJobsFound: number;
     uniqueJobs: number;
     duplicatesRemoved: number;
-    successfulSources: string[];
-    failedSources: string[];
+    successfulSources: JobSource[];
+    failedSources: JobSource[];
     partialResults: boolean;
     searchDurationMs: number;
   };

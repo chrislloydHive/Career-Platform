@@ -147,7 +147,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
       <SearchProgress
@@ -167,14 +167,24 @@ export default function Home() {
         />
       )}
 
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+      <header className="bg-gray-900 border-b border-gray-700 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Job Search Platform</h1>
-              <p className="text-sm text-gray-600">Find your next opportunity with AI-powered matching</p>
+              <h1 className="text-2xl font-bold text-gray-100">Job Search Platform</h1>
+              <p className="text-sm text-gray-400">Louisa&apos;s career starts here!</p>
             </div>
-            {jobs.length > 0 && (
+            <div className="flex items-center gap-3">
+              <a
+                href="/careers"
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Explore Careers
+              </a>
+              {jobs.length > 0 && (
               <button
                 onClick={() => setShowExportDialog(true)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
@@ -184,7 +194,8 @@ export default function Home() {
                 </svg>
                 Export Results
               </button>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -207,28 +218,28 @@ export default function Home() {
             )}
 
             {jobs.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Search Summary</h3>
+              <div className="bg-gray-800 rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-100 mb-3">Search Summary</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Total Jobs:</span>
-                    <span className="font-medium">{jobs.length}</span>
+                    <span className="text-gray-400">Total Jobs:</span>
+                    <span className="font-medium text-gray-100">{jobs.length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Avg Score:</span>
-                    <span className="font-medium">
+                    <span className="text-gray-400">Avg Score:</span>
+                    <span className="font-medium text-gray-100">
                       {(jobs.reduce((sum, j) => sum + j.score, 0) / jobs.length).toFixed(1)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">High Matches:</span>
-                    <span className="font-medium text-green-600">
+                    <span className="text-gray-400">High Matches:</span>
+                    <span className="font-medium text-green-400">
                       {jobs.filter(j => j.score >= 80).length}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Saved Jobs:</span>
-                    <span className="font-medium text-yellow-600">
+                    <span className="text-gray-400">Saved Jobs:</span>
+                    <span className="font-medium text-yellow-400">
                       {savedJobIds.length}
                     </span>
                   </div>
@@ -246,20 +257,20 @@ export default function Home() {
                 savedJobIds={savedJobIds}
               />
             ) : (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+              <div className="bg-gray-800 rounded-lg shadow-md p-12 text-center">
                 <svg className="w-20 h-20 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Start Your Job Search</h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                <h3 className="text-2xl font-bold text-gray-100 mb-2">Start Your Job Search</h3>
+                <p className="text-gray-400 mb-6 max-w-md mx-auto">
                   Enter your job preferences to find opportunities from LinkedIn and Indeed,
                   ranked by AI-powered matching scores.
                 </p>
-                <div className="flex flex-wrap gap-2 justify-center text-sm text-gray-500">
-                  <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full">Smart Scoring</span>
-                  <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full">Multiple Sources</span>
-                  <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full">Export to Excel</span>
-                  <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full">Save & Track</span>
+                <div className="flex flex-wrap gap-2 justify-center text-sm">
+                  <span className="px-3 py-1 bg-blue-900/50 text-blue-400 rounded-full">Smart Scoring</span>
+                  <span className="px-3 py-1 bg-green-900/50 text-green-400 rounded-full">Multiple Sources</span>
+                  <span className="px-3 py-1 bg-purple-900/50 text-purple-400 rounded-full">Export to Excel</span>
+                  <span className="px-3 py-1 bg-yellow-900/50 text-yellow-400 rounded-full">Save & Track</span>
                 </div>
               </div>
             )}

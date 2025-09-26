@@ -10,3 +10,7 @@ export { ExportDialog } from './ExportDialog';
 export { SearchProgress } from './SearchProgress';
 export { RecentSearches } from './RecentSearches';
 export { ToastContainer, createToast, type Toast, type ToastType } from './Toast';
+export { CareerExplorer } from './CareerExplorer';
+export { CareerDetailModal } from './CareerDetailModal';
+export { CareerMatchResults } from './CareerMatchResults';
+export { CareerComparisonTool } from './CareerComparisonTool';

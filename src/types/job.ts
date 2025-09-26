@@ -30,13 +30,7 @@ export interface ScoredJob extends RawJob {
   score: number;
   scoreBreakdown: ScoreBreakdown;
   rank?: number;
-  metadata?: {
-    enhancedScoreBreakdown?: {
-      topReasons?: string[];
-      [key: string]: unknown;
-    };
-    [key: string]: unknown;
-  };
+  metadata?: Record<string, unknown>;
 }
 
 export interface ScoreBreakdown {

@@ -5,6 +5,7 @@ import { ScraperErrorClass, ErrorCode } from '@/types';
 export interface IScraper {
   scrape(config: ScraperConfig): Promise<ScraperResult>;
   getSourceName(): JobSource;
+  close?(): Promise<void>;
 }
 
 export abstract class BaseScraper implements IScraper {
@@ -68,11 +69,11 @@ export abstract class BaseScraper implements IScraper {
   }
 
   protected async getBrowser(): Promise<Browser> {
-    if (this.browser && this.browser.connected) {
+    if (this.browser && this.browser.isConnected()) {
       return this.browser;
     }
 
-    const puppeteer = require('puppeteer');
+    const puppeteer = await import('puppeteer');
 
     this.browser = await puppeteer.launch({
       headless: true,
@@ -133,7 +134,7 @@ export abstract class BaseScraper implements IScraper {
 
       Object.defineProperty(navigator, 'maxTouchPoints', { get: () => 0 });
 
-      (window as any).chrome = {
+      (window as unknown as { chrome: Record<string, unknown> }).chrome = {
         runtime: {},
         loadTimes: function() {},
         csi: function() {},

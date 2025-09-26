@@ -52,9 +52,6 @@ const SALARY_RANGES = [
   { min: 60000, max: 80000, label: '60k-80k' },
   { min: 80000, max: 100000, label: '80k-100k' },
   { min: 100000, max: 120000, label: '100k-120k' },
-  { min: 120000, max: 150000, label: '120k-150k' },
-  { min: 150000, max: 200000, label: '150k-200k' },
-  { min: 200000, max: 999999, label: '200k+' },
 ];
 
 export function EnhancedSearchForm({
@@ -65,7 +62,7 @@ export function EnhancedSearchForm({
   initialValues,
 }: EnhancedSearchFormProps) {
   const [query, setQuery] = useState(initialValues?.query || '');
-  const [location, setLocation] = useState(initialValues?.location || '');
+  const [location, setLocation] = useState(initialValues?.location || 'Seattle, WA');
   const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
   const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
   const [selectedSources, setSelectedSources] = useState<JobSource[]>(
@@ -201,7 +198,7 @@ export function EnhancedSearchForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-6 space-y-6">
+    <form onSubmit={handleSubmit} className="bg-gray-900 rounded-lg shadow-lg p-6 space-y-6">
       {(error || validationErrors.length > 0) && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex items-start">
@@ -225,7 +222,7 @@ export function EnhancedSearchForm({
 
       <div className="space-y-5">
         <div className="relative">
-          <label htmlFor="query" className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="query" className="block text-sm font-semibold text-gray-300 mb-2">
             Job Title or Keywords <span className="text-red-500">*</span>
           </label>
           <input
@@ -241,12 +238,12 @@ export function EnhancedSearchForm({
             onFocus={() => setShowQuerySuggestions(true)}
             onBlur={() => setTimeout(() => setShowQuerySuggestions(false), 200)}
             placeholder="e.g. Software Engineer, Product Manager"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-800 disabled:cursor-not-allowed"
             required
             disabled={isLoading}
           />
           {showQuerySuggestions && filteredQuerySuggestions.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               {filteredQuerySuggestions.map((suggestion, index) => (
                 <button
                   key={index}
@@ -255,7 +252,7 @@ export function EnhancedSearchForm({
                     setQuery(suggestion);
                     setShowQuerySuggestions(false);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm text-gray-700 transition-colors"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-700 text-sm text-gray-300 transition-colors"
                 >
                   {suggestion}
                 </button>
@@ -265,7 +262,7 @@ export function EnhancedSearchForm({
         </div>
 
         <div className="relative">
-          <label htmlFor="location" className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="location" className="block text-sm font-semibold text-gray-300 mb-2">
             Location
           </label>
           <input
@@ -280,11 +277,11 @@ export function EnhancedSearchForm({
             onFocus={() => setShowLocationSuggestions(true)}
             onBlur={() => setTimeout(() => setShowLocationSuggestions(false), 200)}
             placeholder="e.g. San Francisco, Remote"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-800 disabled:cursor-not-allowed"
             disabled={isLoading}
           />
           {showLocationSuggestions && filteredLocationSuggestions.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               {filteredLocationSuggestions.map((loc, index) => (
                 <button
                   key={index}
@@ -293,7 +290,7 @@ export function EnhancedSearchForm({
                     setLocation(loc);
                     setShowLocationSuggestions(false);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-blue-50 text-sm text-gray-700 transition-colors"
+                  className="w-full text-left px-4 py-2 hover:bg-gray-700 text-sm text-gray-300 transition-colors"
                 >
                   {loc}
                 </button>
@@ -303,7 +300,7 @@ export function EnhancedSearchForm({
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
+          <label className="block text-sm font-semibold text-gray-300 mb-3">
             Salary Range (USD/year)
           </label>
           <div className="space-y-3">
@@ -316,7 +313,7 @@ export function EnhancedSearchForm({
                 className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                 disabled={isLoading}
               />
-              <label htmlFor="preset-salary" className="text-sm text-gray-700">
+              <label htmlFor="preset-salary" className="text-sm text-gray-300">
                 Preset ranges
               </label>
             </div>
@@ -331,7 +328,7 @@ export function EnhancedSearchForm({
                     className={`px-3 py-2 text-sm rounded-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       salaryRange === `${range.min}-${range.max}`
                         ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
+                        : 'bg-gray-800 text-gray-300 border-gray-600 hover:border-blue-500'
                     }`}
                   >
                     ${range.label}
@@ -348,7 +345,7 @@ export function EnhancedSearchForm({
                 className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                 disabled={isLoading}
               />
-              <label htmlFor="custom-salary" className="text-sm text-gray-700">
+              <label htmlFor="custom-salary" className="text-sm text-gray-300">
                 Custom range
               </label>
             </div>
@@ -360,7 +357,7 @@ export function EnhancedSearchForm({
                     value={customMinSalary}
                     onChange={(e) => setCustomMinSalary(e.target.value)}
                     placeholder="Min (e.g. 80000)"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                    className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-800"
                     disabled={isLoading}
                   />
                 </div>
@@ -370,7 +367,7 @@ export function EnhancedSearchForm({
                     value={customMaxSalary}
                     onChange={(e) => setCustomMaxSalary(e.target.value)}
                     placeholder="Max (e.g. 150000)"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                    className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-800"
                     disabled={isLoading}
                   />
                 </div>
@@ -380,17 +377,17 @@ export function EnhancedSearchForm({
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
+          <label className="block text-sm font-semibold text-gray-300 mb-3">
             Job Sources <span className="text-red-500">*</span>
           </label>
           <div className="flex gap-4">
-            {(['linkedin', 'indeed'] as JobSource[]).map(source => (
+            {(['google_jobs', 'linkedin', 'indeed'] as JobSource[]).map(source => (
               <label
                 key={source}
                 className={`flex-1 flex items-center justify-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition-all ${
                   selectedSources.includes(source)
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-gray-300 hover:border-blue-400'
+                    ? 'border-blue-600 bg-blue-900/50'
+                    : 'border-gray-600 hover:border-blue-400'
                 } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <input
@@ -400,14 +397,16 @@ export function EnhancedSearchForm({
                   className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   disabled={isLoading}
                 />
-                <span className="text-sm font-medium text-gray-700 capitalize">{source}</span>
+                <span className="text-sm font-medium text-gray-300 capitalize">
+                  {source === 'google_jobs' ? 'Google Jobs' : source}
+                </span>
               </label>
             ))}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
+          <label className="block text-sm font-semibold text-gray-300 mb-3">
             Job Type
           </label>
           <div className="flex flex-wrap gap-2">
@@ -420,7 +419,7 @@ export function EnhancedSearchForm({
                 className={`px-4 py-2 text-sm rounded-full border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                   selectedJobTypes.includes(type)
                     ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
+                    : 'bg-gray-800 text-gray-300 border-gray-600 hover:border-blue-500'
                 }`}
               >
                 {type.replace('-', ' ')}
@@ -430,7 +429,7 @@ export function EnhancedSearchForm({
         </div>
 
         <div>
-          <label htmlFor="keywords" className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="keywords" className="block text-sm font-semibold text-gray-300 mb-2">
             Additional Keywords
           </label>
           <input
@@ -439,10 +438,10 @@ export function EnhancedSearchForm({
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
             placeholder="e.g. React, TypeScript, Remote"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-800 disabled:cursor-not-allowed"
             disabled={isLoading}
           />
-          <p className="mt-1 text-xs text-gray-500">Separate multiple keywords with commas</p>
+          <p className="mt-1 text-xs text-gray-400">Separate multiple keywords with commas</p>
         </div>
       </div>
 
@@ -473,7 +472,7 @@ export function EnhancedSearchForm({
           type="button"
           onClick={handleReset}
           disabled={isLoading}
-          className="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="px-6 py-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           Reset
         </button>

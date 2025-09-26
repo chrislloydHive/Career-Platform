@@ -59,7 +59,7 @@ export function formatScoreBreakdown(job: ScoredJob): string {
 }
 
 export function getMatchReasons(job: ScoredJob): string {
-  const enhanced = job.metadata?.enhancedScoreBreakdown;
+  const enhanced = job.metadata?.enhancedScoreBreakdown as { topReasons?: string[] } | undefined;
   if (!enhanced || !enhanced.topReasons) {
     return 'N/A';
   }

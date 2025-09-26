@@ -47,9 +47,9 @@ export function RecentSearches({ onSelectSearch, maxItems = 5 }: RecentSearchesP
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-gray-900 rounded-lg shadow-md p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Recent Searches</h2>
+        <h2 className="text-lg font-semibold text-gray-100">Recent Searches</h2>
         <button
           onClick={handleClearAll}
           className="text-xs text-red-600 hover:text-red-700 font-medium"
@@ -62,7 +62,7 @@ export function RecentSearches({ onSelectSearch, maxItems = 5 }: RecentSearchesP
         {displayedHistory.map((item) => (
           <div
             key={item.id}
-            className="group flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer"
+            className="group flex items-center justify-between p-3 border border-gray-700 rounded-lg hover:border-blue-400 hover:bg-gray-800 transition-all cursor-pointer"
             onClick={() => onSelectSearch(item.criteria)}
           >
             <div className="flex-1 min-w-0">
@@ -70,11 +70,11 @@ export function RecentSearches({ onSelectSearch, maxItems = 5 }: RecentSearchesP
                 <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-gray-100 truncate">
                   {formatSearchSummary(item)}
                 </p>
               </div>
-              <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+              <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
                 <span>{formatRelativeTime(item.timestamp)}</span>
                 {item.resultsCount !== undefined && (
                   <span className="flex items-center gap-1">

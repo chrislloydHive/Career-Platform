@@ -86,30 +86,30 @@ export function JobList({ jobs, isLoading = false }: JobListProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <p className="text-gray-600">Loading jobs...</p>
+        <p className="text-gray-400">Loading jobs...</p>
       </div>
     );
   }
 
   if (jobs.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-12 text-center">
+      <div className="bg-gray-900 rounded-lg shadow-md p-12 text-center">
         <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">No jobs found</h3>
-        <p className="text-gray-600">Try adjusting your search criteria to find more jobs.</p>
+        <h3 className="text-xl font-semibold text-gray-100 mb-2">No jobs found</h3>
+        <p className="text-gray-400">Try adjusting your search criteria to find more jobs.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-md p-4">
+      <div className="bg-gray-900 rounded-lg shadow-md p-4">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
           <div className="flex flex-wrap items-center gap-4">
             <div>
-              <label htmlFor="search" className="text-sm font-medium text-gray-700 mr-2">
+              <label htmlFor="search" className="text-sm font-medium text-gray-300 mr-2">
                 Quick Search:
               </label>
               <input
@@ -118,19 +118,19 @@ export function JobList({ jobs, isLoading = false }: JobListProps) {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Filter by title, company, location..."
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <label htmlFor="source" className="text-sm font-medium text-gray-700">
+              <label htmlFor="source" className="text-sm font-medium text-gray-300">
                 Source:
               </label>
               <select
                 id="source"
                 value={filterSource}
                 onChange={(e) => setFilterSource(e.target.value as JobSource | 'all')}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All ({jobs.length})</option>
                 <option value="linkedin">LinkedIn ({sourceStats.linkedin || 0})</option>
@@ -139,7 +139,7 @@ export function JobList({ jobs, isLoading = false }: JobListProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <label htmlFor="minScore" className="text-sm font-medium text-gray-700">
+              <label htmlFor="minScore" className="text-sm font-medium text-gray-300">
                 Min Score:
               </label>
               <input
@@ -155,7 +155,7 @@ export function JobList({ jobs, isLoading = false }: JobListProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">Sort by:</span>
+            <span className="text-sm font-medium text-gray-300">Sort by:</span>
             <div className="flex gap-1">
               {[
                 { value: 'score' as SortOption, label: 'Score' },
@@ -169,7 +169,7 @@ export function JobList({ jobs, isLoading = false }: JobListProps) {
                   className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     sortBy === value
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   {label}
@@ -185,7 +185,7 @@ export function JobList({ jobs, isLoading = false }: JobListProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-sm text-gray-600">
+      <div className="flex items-center justify-between text-sm text-gray-400">
         <span>
           Showing {filteredAndSortedJobs.length} of {jobs.length} jobs
         </span>

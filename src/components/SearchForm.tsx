@@ -53,10 +53,10 @@ export function SearchForm({ onSearch, isLoading = false }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
+    <form onSubmit={handleSubmit} className="bg-gray-900 rounded-lg shadow-md p-6 space-y-6">
       <div className="space-y-4">
         <div>
-          <label htmlFor="query" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="query" className="block text-sm font-medium text-gray-300 mb-1">
             Job Title or Keywords
           </label>
           <input
@@ -65,14 +65,14 @@ export function SearchForm({ onSearch, isLoading = false }: SearchFormProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="e.g. Software Engineer, Product Manager"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
             disabled={isLoading}
           />
         </div>
 
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="location" className="block text-sm font-medium text-gray-300 mb-1">
             Location
           </label>
           <input
@@ -81,14 +81,14 @@ export function SearchForm({ onSearch, isLoading = false }: SearchFormProps) {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="e.g. San Francisco, Remote"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isLoading}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="minSalary" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="minSalary" className="block text-sm font-medium text-gray-300 mb-1">
               Min Salary (USD)
             </label>
             <input
@@ -97,12 +97,12 @@ export function SearchForm({ onSearch, isLoading = false }: SearchFormProps) {
               value={minSalary}
               onChange={(e) => setMinSalary(e.target.value)}
               placeholder="e.g. 80000"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={isLoading}
             />
           </div>
           <div>
-            <label htmlFor="maxSalary" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="maxSalary" className="block text-sm font-medium text-gray-300 mb-1">
               Max Salary (USD)
             </label>
             <input
@@ -111,14 +111,14 @@ export function SearchForm({ onSearch, isLoading = false }: SearchFormProps) {
               value={maxSalary}
               onChange={(e) => setMaxSalary(e.target.value)}
               placeholder="e.g. 150000"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={isLoading}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Job Sources
           </label>
           <div className="flex gap-4">
@@ -131,14 +131,14 @@ export function SearchForm({ onSearch, isLoading = false }: SearchFormProps) {
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   disabled={isLoading}
                 />
-                <span className="text-sm text-gray-700 capitalize">{source}</span>
+                <span className="text-sm text-gray-300 capitalize">{source}</span>
               </label>
             ))}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Job Type
           </label>
           <div className="flex flex-wrap gap-3">
@@ -151,14 +151,14 @@ export function SearchForm({ onSearch, isLoading = false }: SearchFormProps) {
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   disabled={isLoading}
                 />
-                <span className="text-sm text-gray-700 capitalize">{type.replace('-', ' ')}</span>
+                <span className="text-sm text-gray-300 capitalize">{type.replace('-', ' ')}</span>
               </label>
             ))}
           </div>
         </div>
 
         <div>
-          <label htmlFor="keywords" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="keywords" className="block text-sm font-medium text-gray-300 mb-1">
             Additional Keywords (comma-separated)
           </label>
           <input
@@ -167,7 +167,7 @@ export function SearchForm({ onSearch, isLoading = false }: SearchFormProps) {
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
             placeholder="e.g. React, TypeScript, Remote"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isLoading}
           />
         </div>

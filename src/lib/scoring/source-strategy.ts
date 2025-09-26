@@ -22,6 +22,12 @@ export class SourceQualityScoringStrategy implements ScoringStrategy {
       jobQuality: 0.88,
       description: 'Large job board with diverse listings',
     },
+    'google_jobs': {
+      baseScore: 88,
+      reliability: 0.93,
+      jobQuality: 0.90,
+      description: 'Aggregated from multiple sources',
+    },
   };
 
   score(job: RawJob, criteria: ScoringCriteria): ScoringStrategyResult {

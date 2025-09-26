@@ -1,5 +1,5 @@
 import { RawJob, JobSource, ScraperConfig, ScraperResult, ScraperError } from '@/types';
-import { IScraper, SerpApiScraper } from './scrapers';
+import { IScraper, SerpApiScraper, BaseScraper } from './scrapers';
 import { SerpApiLinkedInScraper } from './scrapers/serpapi-linkedin-scraper';
 import { SerpApiIndeedScraper } from './scrapers/serpapi-indeed-scraper';
 
@@ -41,9 +41,9 @@ export class JobSearchEngine {
     this.progress = new Map();
     this.timeoutMs = timeoutMs;
 
-    this.scrapers.set('google_jobs', new SerpApiScraper() as any);
-    this.scrapers.set('linkedin', new SerpApiLinkedInScraper() as any);
-    this.scrapers.set('indeed', new SerpApiIndeedScraper() as any);
+    this.scrapers.set('google_jobs', new SerpApiScraper() as unknown as BaseScraper);
+    this.scrapers.set('linkedin', new SerpApiLinkedInScraper() as unknown as BaseScraper);
+    this.scrapers.set('indeed', new SerpApiIndeedScraper() as unknown as BaseScraper);
   }
 
   async search(config: SearchEngineConfig): Promise<SearchEngineResult> {
