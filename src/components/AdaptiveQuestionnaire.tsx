@@ -82,19 +82,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
     onComplete?.(profile);
   };
 
-  const getAreaIcon = (area: ExplorationArea) => {
-    const icons: Record<ExplorationArea, string> = {
-      'work-style': 'WS',
-      'people-interaction': 'PI',
-      'problem-solving': 'PS',
-      'creativity': 'CR',
-      'structure-flexibility': 'SF',
-      'values': 'VL',
-      'environment': 'EN',
-      'learning-growth': 'LG',
-    };
-    return icons[area];
-  };
 
   const getAreaLabel = (area: ExplorationArea) => {
     return area.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -263,12 +250,12 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
           <h3 className="text-lg font-semibold text-gray-100 mb-4">Exploration Areas</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {explorationProgress.map(area => (
-              <div key={area.area} className="flex items-center justify-between">
+              <div key={area.area} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-750">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-semibold text-gray-500 w-6">{getAreaIcon(area.area)}</span>
-                  <span className="text-gray-300">{getAreaLabel(area.area)}</span>
+                  <div className="h-4 w-1 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm text-gray-300">{getAreaLabel(area.area)}</span>
                 </div>
-                <span className="text-sm text-gray-500">
+                <span className="text-xs text-gray-500">
                   {area.depth}/{area.totalQuestions}
                 </span>
               </div>
@@ -278,16 +265,16 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
       )}
 
       {/* Question Card */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-8 mb-6">
-        <div className="flex items-start gap-3 mb-6">
-          <div className="w-10 h-10 bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-xs font-mono font-bold text-blue-400">{getAreaIcon(currentQuestion.area)}</span>
+      <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-8 mb-6">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-6 w-1 bg-blue-500 rounded-full"></div>
+            <span className="text-sm font-semibold text-blue-400">
+              {getAreaLabel(currentQuestion.area)}
+            </span>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-xs">
-                {getAreaLabel(currentQuestion.area)}
-              </span>
               <span className="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs">
                 {currentQuestion.type}
               </span>
@@ -365,19 +352,20 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
           {showInsights && (
             <div className="space-y-3">
               {insights.map((insight, index) => (
-                <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-purple-900/30 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-mono font-bold text-purple-400">{getAreaIcon(insight.area)}</span>
+                <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-1 bg-green-500 rounded-full"></div>
+                      <span className="text-xs font-medium text-green-400">{getAreaLabel(insight.area)}</span>
                     </div>
-                    <div className="flex-1">
+                    <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           insight.type === 'hidden-interest'
-                            ? 'bg-blue-900/50 text-blue-300'
+                            ? 'bg-green-900/50 text-green-300'
                             : insight.type === 'strength'
-                            ? 'bg-blue-800/50 text-blue-400'
-                            : 'bg-blue-900/50 text-blue-400'
+                            ? 'bg-green-800/50 text-green-400'
+                            : 'bg-green-900/50 text-green-400'
                         }`}>
                           {insight.type.replace('-', ' ')}
                         </span>

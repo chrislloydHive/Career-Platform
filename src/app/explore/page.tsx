@@ -76,14 +76,14 @@ export default function ExplorePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Strengths */}
             {profile.analysis.strengths.length > 0 && (
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-100 mb-4">
+              <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-6">
+                <h2 className="text-xl font-bold text-blue-400 mb-4">
                   Your Strengths
                 </h2>
                 <ul className="space-y-3">
                   {profile.analysis.strengths.map((strength, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="text-green-400 mt-1">✓</span>
+                      <span className="text-blue-400 mt-1">✓</span>
                       <span className="text-gray-300">{strength}</span>
                     </li>
                   ))}
@@ -93,8 +93,8 @@ export default function ExplorePage() {
 
             {/* Preferences */}
             {profile.analysis.preferences.length > 0 && (
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-100 mb-4">
+              <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-6">
+                <h2 className="text-xl font-bold text-blue-400 mb-4">
                   Work Preferences
                 </h2>
                 <ul className="space-y-3">
@@ -110,14 +110,14 @@ export default function ExplorePage() {
 
             {/* Hidden Interests */}
             {profile.analysis.hiddenInterests.length > 0 && (
-              <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-700/50 p-6">
-                <h2 className="text-xl font-bold text-gray-100 mb-4">
+              <div className="bg-gradient-to-br from-green-900/20 to-blue-900/20 rounded-lg border border-green-700/30 p-6">
+                <h2 className="text-xl font-bold text-green-400 mb-4">
                   Hidden Interests
                 </h2>
                 <ul className="space-y-3">
                   {profile.analysis.hiddenInterests.map((interest, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="text-purple-400 mt-1">•</span>
+                      <span className="text-green-400 mt-1">•</span>
                       <span className="text-gray-300">{interest}</span>
                     </li>
                   ))}
@@ -127,14 +127,14 @@ export default function ExplorePage() {
 
             {/* Suggestions */}
             {profile.analysis.suggestions.length > 0 && (
-              <div className="bg-gray-800 rounded-lg border border-orange-700/50 p-6">
-                <h2 className="text-xl font-bold text-gray-100 mb-4">
+              <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-6">
+                <h2 className="text-xl font-bold text-blue-400 mb-4">
                   Suggestions
                 </h2>
                 <ul className="space-y-3">
                   {profile.analysis.suggestions.map((suggestion, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="text-orange-400 mt-1">→</span>
+                      <span className="text-blue-400 mt-1">→</span>
                       <span className="text-gray-300">{suggestion}</span>
                     </li>
                   ))}
@@ -148,8 +148,8 @@ export default function ExplorePage() {
             <div className="mt-8 space-y-6">
               {/* Value Hierarchy */}
               {profile.patterns.valueHierarchy && profile.patterns.valueHierarchy.topValues.length > 0 && (
-                <div className="bg-gradient-to-br from-indigo-900/30 to-purple-900/30 rounded-lg border border-indigo-700/50 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4">
+                <div className="bg-gradient-to-br from-blue-900/30 to-green-900/20 rounded-lg border border-blue-700/50 p-6">
+                  <h2 className="text-xl font-bold text-blue-400 mb-4">
                     Your Core Values
                   </h2>
                   <p className="text-gray-300 mb-4 italic">
@@ -165,7 +165,7 @@ export default function ExplorePage() {
                         <div className="flex items-center gap-2">
                           <div className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-indigo-500"
+                              className="h-full bg-blue-500"
                               style={{ width: `${value.priority * 10}%` }}
                             />
                           </div>
@@ -179,8 +179,8 @@ export default function ExplorePage() {
 
               {/* Preference Intensities */}
               {profile.patterns.preferenceIntensities && profile.patterns.preferenceIntensities.length > 0 && (
-                <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4">
+                <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-6">
+                  <h2 className="text-xl font-bold text-blue-400 mb-4">
                     Preference Intensity Analysis
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -209,21 +209,21 @@ export default function ExplorePage() {
 
               {/* Hidden Motivations */}
               {profile.patterns.hiddenMotivations && profile.patterns.hiddenMotivations.length > 0 && (
-                <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-lg border border-purple-700/50 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4">
+                <div className="bg-gradient-to-br from-green-900/20 to-blue-900/20 rounded-lg border border-green-700/50 p-6">
+                  <h2 className="text-xl font-bold text-green-400 mb-4">
                     Hidden Motivations
                   </h2>
                   <div className="space-y-4">
                     {profile.patterns.hiddenMotivations.map((motivation, index) => (
                       <div key={index} className="bg-gray-900/50 rounded-lg p-4">
                         <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold text-purple-300">{motivation.motivation}</h3>
+                          <h3 className="font-semibold text-green-300">{motivation.motivation}</h3>
                           <span className="text-xs text-gray-400">{Math.round(motivation.confidence * 100)}% confidence</span>
                         </div>
                         <p className="text-gray-300 text-sm mb-3">{motivation.insight}</p>
                         <div className="flex flex-wrap gap-2">
                           {motivation.relatedAreas.map((area, i) => (
-                            <span key={i} className="px-2 py-1 bg-purple-900/50 text-purple-400 rounded text-xs">
+                            <span key={i} className="px-2 py-1 bg-green-900/50 text-green-400 rounded text-xs">
                               {area.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                             </span>
                           ))}
@@ -236,8 +236,8 @@ export default function ExplorePage() {
 
               {/* Consistency Patterns */}
               {profile.patterns.consistencyPatterns && profile.patterns.consistencyPatterns.length > 0 && (
-                <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4">
+                <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-6">
+                  <h2 className="text-xl font-bold text-blue-400 mb-4">
                     Response Consistency Patterns
                   </h2>
                   <div className="space-y-3">
