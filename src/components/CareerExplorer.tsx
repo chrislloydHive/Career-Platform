@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import type { JobCategory, CareerCategory, ExperienceLevel } from '@/types/career';
 import { careerResearchService } from '@/lib/career-research/career-service';
+import type { SavedItem } from '@/types/saved-items';
 
 interface CareerExplorerProps {
   onCareerSelect?: (career: JobCategory) => void;
@@ -45,8 +46,8 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
         if (response.ok) {
           const data = await response.json();
           const careerIds = data.items
-            .filter((item: any) => item.type === 'career')
-            .map((item: any) => item.career.id);
+            .filter((item: SavedItem) => item.type === 'career')
+            .map((item: SavedItem) => item.type === 'career' ? item.career.id : '');
           setSavedCareerIds(careerIds);
         }
       } catch (error) {

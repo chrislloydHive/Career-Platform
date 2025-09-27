@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { careerResearchAI } from '@/lib/ai/career-research-ai';
 import { anthropicClient } from '@/lib/ai/anthropic-client';
+import { getUserProfile, buildShortUserContext, addInteraction } from '@/lib/storage/user-profile';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,10 +21,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const userProfile = await getUserProfile();
+    const userContext = buildShortUserContext(userProfile);
+
+    await addInteraction('career_research', jobTitle);
+
     const careerProfile = await careerResearchAI.generateCareerProfile(
       jobTitle,
       searchResults || '',
-      additionalContext
+      additionalContext,
+      userContext
     );
 
     return NextResponse.json({

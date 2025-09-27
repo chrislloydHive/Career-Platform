@@ -16,13 +16,16 @@ When generating career data:
   async generateCareerProfile(
     jobTitle: string,
     searchResults: string,
-    additionalContext?: string
+    additionalContext?: string,
+    userContext?: string
   ): Promise<JobCategory> {
     if (!anthropicClient.isAvailable()) {
       throw new Error('AI service not available. Please configure ANTHROPIC_API_KEY.');
     }
 
     const prompt = `Based on the following information about "${jobTitle}", generate a complete career profile.
+
+${userContext ? `User Context (tailor recommendations to this person):\n${userContext}\n\n` : ''}
 
 Search Results:
 ${searchResults}

@@ -19,6 +19,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
     { href: '/chat', label: 'Career Chat', icon: ChatIcon },
     { href: '/resources', label: 'Resources', icon: BookIcon },
     { href: '/explore', label: 'Self Discovery', icon: CompassIcon },
+    { href: '/profile', label: 'Profile', icon: UserIcon },
   ];
 
   return (
@@ -115,6 +116,14 @@ function BookmarkIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+    </svg>
+  );
+}
+
+function UserIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   );
 }

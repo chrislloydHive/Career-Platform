@@ -34,13 +34,16 @@ Guidelines:
 
   async enhanceQueryUnderstanding(
     query: string,
-    conversationHistory: ChatMessage[]
+    conversationHistory: ChatMessage[],
+    userContext?: string
   ): Promise<EnhancedQueryIntent> {
     const historyContext = this.buildHistoryContext(conversationHistory);
 
     const prompt = `Analyze this career-related query and extract detailed intent:
 
 Query: "${query}"
+
+${userContext ? `\n${userContext}\n` : ''}
 
 ${historyContext}
 
@@ -87,7 +90,8 @@ Return a JSON object with:
     query: string,
     intent: EnhancedQueryIntent,
     matchedCareers: JobCategory[],
-    conversationHistory: ChatMessage[]
+    conversationHistory: ChatMessage[],
+    userContext?: string
   ): Promise<{
     message: string;
     followUpQuestions: string[];
@@ -105,6 +109,8 @@ Return a JSON object with:
     }));
 
     const prompt = `The user asked: "${query}"
+
+${userContext ? `\n${userContext}\n` : ''}
 
 ${historyContext}
 

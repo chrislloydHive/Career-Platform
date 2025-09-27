@@ -55,13 +55,10 @@ export default function SavedItemsPage() {
         subtitle="Your saved jobs and careers"
       />
 
-      {selectedCareer && (
-        <CareerDetailModal
-          career={selectedCareer}
-          isOpen={!!selectedCareer}
-          onClose={() => setSelectedCareer(null)}
-        />
-      )}
+      <CareerDetailModal
+        career={selectedCareer}
+        onClose={() => setSelectedCareer(null)}
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6 flex items-center justify-between">

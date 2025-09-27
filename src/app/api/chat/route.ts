@@ -4,6 +4,7 @@ import { careerMatcher } from '@/lib/chat/career-matcher';
 import { careerChatAI } from '@/lib/ai/career-chat-ai';
 import { anthropicClient } from '@/lib/ai/anthropic-client';
 import { ChatQuery, ChatResponse } from '@/types/chat';
+import { getUserProfile, buildUserContextPrompt, addInteraction } from '@/lib/storage/user-profile';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,6 +21,11 @@ export async function POST(request: NextRequest) {
     const conversationHistory = context?.previousMessages || [];
     const useAI = anthropicClient.isAvailable();
 
+    const userProfile = await getUserProfile();
+    const userContext = buildUserContextPrompt(userProfile);
+
+    await addInteraction('chat_query', text);
+
     let intent;
     let message: string;
     let followUpQuestions: string[];
@@ -30,7 +36,8 @@ export async function POST(request: NextRequest) {
       try {
         const enhancedIntent = await careerChatAI.enhanceQueryUnderstanding(
           text,
-          conversationHistory
+          conversationHistory,
+          userContext
         );
 
         intent = enhancedIntent;
@@ -44,7 +51,8 @@ export async function POST(request: NextRequest) {
             text,
             enhancedIntent,
             suggestions.map(s => s.career),
-            conversationHistory
+            conversationHistory,
+            userContext
           );
 
           message = aiResponse.message;
