@@ -77,8 +77,7 @@ export default function ExplorePage() {
             {/* Strengths */}
             {profile.analysis.strengths.length > 0 && (
               <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                  <span>💪</span>
+                <h2 className="text-xl font-bold text-gray-100 mb-4">
                   Your Strengths
                 </h2>
                 <ul className="space-y-3">
@@ -95,8 +94,7 @@ export default function ExplorePage() {
             {/* Preferences */}
             {profile.analysis.preferences.length > 0 && (
               <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                  <span>⚙️</span>
+                <h2 className="text-xl font-bold text-gray-100 mb-4">
                   Work Preferences
                 </h2>
                 <ul className="space-y-3">
@@ -113,14 +111,13 @@ export default function ExplorePage() {
             {/* Hidden Interests */}
             {profile.analysis.hiddenInterests.length > 0 && (
               <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-700/50 p-6">
-                <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                  <span>🔮</span>
+                <h2 className="text-xl font-bold text-gray-100 mb-4">
                   Hidden Interests
                 </h2>
                 <ul className="space-y-3">
                   {profile.analysis.hiddenInterests.map((interest, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="text-purple-400 mt-1">✨</span>
+                      <span className="text-purple-400 mt-1">•</span>
                       <span className="text-gray-300">{interest}</span>
                     </li>
                   ))}
@@ -131,8 +128,7 @@ export default function ExplorePage() {
             {/* Suggestions */}
             {profile.analysis.suggestions.length > 0 && (
               <div className="bg-gray-800 rounded-lg border border-orange-700/50 p-6">
-                <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                  <span>💡</span>
+                <h2 className="text-xl font-bold text-gray-100 mb-4">
                   Suggestions
                 </h2>
                 <ul className="space-y-3">
@@ -153,8 +149,7 @@ export default function ExplorePage() {
               {/* Value Hierarchy */}
               {profile.patterns.valueHierarchy && profile.patterns.valueHierarchy.topValues.length > 0 && (
                 <div className="bg-gradient-to-br from-indigo-900/30 to-purple-900/30 rounded-lg border border-indigo-700/50 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                    <span>🎯</span>
+                  <h2 className="text-xl font-bold text-gray-100 mb-4">
                     Your Core Values
                   </h2>
                   <p className="text-gray-300 mb-4 italic">
@@ -185,8 +180,7 @@ export default function ExplorePage() {
               {/* Preference Intensities */}
               {profile.patterns.preferenceIntensities && profile.patterns.preferenceIntensities.length > 0 && (
                 <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                    <span>📊</span>
+                  <h2 className="text-xl font-bold text-gray-100 mb-4">
                     Preference Intensity Analysis
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -216,8 +210,7 @@ export default function ExplorePage() {
               {/* Hidden Motivations */}
               {profile.patterns.hiddenMotivations && profile.patterns.hiddenMotivations.length > 0 && (
                 <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-lg border border-purple-700/50 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                    <span>🔮</span>
+                  <h2 className="text-xl font-bold text-gray-100 mb-4">
                     Hidden Motivations
                   </h2>
                   <div className="space-y-4">
@@ -244,8 +237,7 @@ export default function ExplorePage() {
               {/* Consistency Patterns */}
               {profile.patterns.consistencyPatterns && profile.patterns.consistencyPatterns.length > 0 && (
                 <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                    <span>🔄</span>
+                  <h2 className="text-xl font-bold text-gray-100 mb-4">
                     Response Consistency Patterns
                   </h2>
                   <div className="space-y-3">
@@ -273,8 +265,7 @@ export default function ExplorePage() {
               {/* Contradictions */}
               {profile.patterns.contradictions && profile.patterns.contradictions.length > 0 && (
                 <div className="bg-yellow-900/20 rounded-lg border border-yellow-700/50 p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                    <span>⚠️</span>
+                  <h2 className="text-xl font-bold text-gray-100 mb-4">
                     Areas for Clarification
                   </h2>
                   <div className="space-y-4">
@@ -379,7 +370,11 @@ export default function ExplorePage() {
       {recentInsight && (
         <div className="fixed bottom-6 right-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg p-4 shadow-xl max-w-md animate-slide-up">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">💡</span>
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+              </svg>
+            </div>
             <div>
               <div className="font-semibold mb-1">New Insight Discovered!</div>
               <p className="text-sm opacity-90">{recentInsight.insight}</p>

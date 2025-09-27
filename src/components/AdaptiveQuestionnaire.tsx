@@ -84,14 +84,14 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
 
   const getAreaIcon = (area: ExplorationArea) => {
     const icons: Record<ExplorationArea, string> = {
-      'work-style': '💼',
-      'people-interaction': '👥',
-      'problem-solving': '🧩',
-      'creativity': '🎨',
-      'structure-flexibility': '⚖️',
-      'values': '⭐',
-      'environment': '🌍',
-      'learning-growth': '📚',
+      'work-style': 'WS',
+      'people-interaction': 'PI',
+      'problem-solving': 'PS',
+      'creativity': 'CR',
+      'structure-flexibility': 'SF',
+      'values': 'VL',
+      'environment': 'EN',
+      'learning-growth': 'LG',
     };
     return icons[area];
   };
@@ -265,7 +265,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
             {explorationProgress.map(area => (
               <div key={area.area} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">{getAreaIcon(area.area)}</span>
+                  <span className="text-xs font-mono font-semibold text-gray-500 w-6">{getAreaIcon(area.area)}</span>
                   <span className="text-gray-300">{getAreaLabel(area.area)}</span>
                 </div>
                 <span className="text-sm text-gray-500">
@@ -280,7 +280,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
       {/* Question Card */}
       <div className="bg-gray-800 rounded-lg border border-gray-700 p-8 mb-6">
         <div className="flex items-start gap-3 mb-6">
-          <span className="text-3xl">{getAreaIcon(currentQuestion.area)}</span>
+          <div className="w-10 h-10 bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-mono font-bold text-blue-400">{getAreaIcon(currentQuestion.area)}</span>
+          </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-xs">
@@ -365,7 +367,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
               {insights.map((insight, index) => (
                 <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl">{getAreaIcon(insight.area)}</span>
+                    <div className="w-8 h-8 bg-purple-900/30 rounded flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-mono font-bold text-purple-400">{getAreaIcon(insight.area)}</span>
+                    </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
