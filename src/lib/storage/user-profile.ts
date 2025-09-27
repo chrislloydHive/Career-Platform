@@ -22,6 +22,11 @@ export async function getUserProfile(): Promise<UserProfile> {
     }));
     profile.lastUpdated = new Date(profile.lastUpdated);
 
+    if (!profile.careerPreferences) {
+      profile.careerPreferences = LOUISA_PROFILE.careerPreferences;
+      await saveUserProfile(profile);
+    }
+
     return profile;
   } catch {
     await saveUserProfile(LOUISA_PROFILE);
