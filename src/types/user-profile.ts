@@ -57,7 +57,7 @@ export interface UserProfile {
 export const LOUISA_PROFILE: UserProfile = {
   name: "Louisa Lloyd",
   location: "Spokane, WA",
-  bio: "2023 Gonzaga University graduate (magna cum laude) with a BBA in Marketing and English minor. Driven professional with diverse experience spanning healthcare administration, fitness, marketing, and visual merchandising. Passionate about helping people while working within structured environments.",
+  bio: "2023 Gonzaga University graduate (magna cum laude) with a BBA in Marketing and English minor. Driven professional with diverse experience spanning healthcare administration, fitness, marketing, and visual merchandising. Passionate about helping people while working within structured environments. Contact: (206) 660-6406 | louisaklloyd@gmail.com",
   linkedInUrl: "https://www.linkedin.com/in/louisaklloyd/",
 
   education: [
@@ -67,7 +67,11 @@ export const LOUISA_PROFILE: UserProfile = {
       major: "Marketing",
       minor: "English",
       graduationYear: 2023,
-      honors: ["Magna Cum Laude", "President's List (Fall 2019, Fall 2021)", "Dean's List (multiple semesters)"],
+      honors: [
+        "Magna Cum Laude",
+        "President's List: Fall 2019, Fall 2021",
+        "Dean's List: Spring 2020, Fall 2020, Spring 2021, Fall 2022"
+      ],
       gpa: "Magna Cum Laude"
     },
     {
@@ -83,11 +87,12 @@ export const LOUISA_PROFILE: UserProfile = {
       title: "Personal Trainer",
       company: "Chrome Personal Training Centre",
       location: "Spokane, WA",
-      startDate: "2025-01",
+      startDate: "February 2025",
+      endDate: "June 2025",
       description: [
-        "Built strong rapport with diverse clientele",
-        "Applied education in strength training and biomechanics",
-        "Tailored programming based on individual client needs"
+        "Built strong rapport with a diverse clientele",
+        "Utilized education in strength training and biomechanics",
+        "Tailored programming based on individual need"
       ],
       skills: ["Personal Training", "Client Relations", "Program Design", "Strength Training", "Biomechanics"]
     },
@@ -95,41 +100,41 @@ export const LOUISA_PROFILE: UserProfile = {
       title: "Office Administrator & Marketing Manager",
       company: "Built to Move Chiropractic & Sports Rehab",
       location: "Spokane, WA",
-      startDate: "2024-01",
-      endDate: "2025-01",
+      startDate: "June 2024",
+      endDate: "June 2025",
       description: [
-        "Managed daily clinic operations and patient communications",
-        "Led marketing efforts, social media, and community outreach",
-        "Ensured clinic visibility through engaging marketing materials and community involvement"
+        "Managed daily tasks to ensure clinic's operational needs were met",
+        "Assisted all existing and potential patients with all clinic-related questions, concerns, and needs",
+        "Responsible for patient communication, including clinic's marketing efforts, social media, and community involvement",
+        "Ensured the clinic remained visible to and involved in the community by creating engaging marketing material and facilitating outreach on behalf of the clinic"
       ],
-      skills: ["Healthcare Administration", "Marketing", "Social Media", "Operations Management", "Patient Communication"]
+      skills: ["Healthcare Administration", "Marketing", "Social Media", "Operations Management", "Patient Communication", "Community Outreach"]
     },
     {
       title: "Visual Merchandising Specialist & Educator",
       company: "Lululemon",
       location: "Spokane & Seattle, WA",
-      startDate: "2022-01",
-      endDate: "2024-01",
+      startDate: "June 2022",
+      endDate: "June 2024",
       description: [
-        "Led weekly store remerchandising and layout optimization",
-        "Developed creative product displays that drove sales",
-        "Educated team on design guidelines and product information",
-        "Facilitated personalized guest experiences"
+        "Led and collaborated with the team in remerchandising the store layout on a weekly basis",
+        "Coordinated and executed powerful product displays and drove sales by developing creative strategies that leveraged company direction",
+        "Educated the team on design guidelines and product information",
+        "Facilitated a positive and supportive guest experience and assessed individual needs of each guest to create a personalized experience"
       ],
-      skills: ["Visual Merchandising", "Retail Operations", "Team Training", "Sales", "Customer Experience"]
+      skills: ["Visual Merchandising", "Retail Operations", "Team Training", "Sales", "Customer Experience", "Creative Strategy"]
     },
     {
       title: "Intern",
       company: "Hey Advertising",
       location: "Seattle, WA",
-      startDate: "2020-01",
-      endDate: "2021-01",
+      startDate: "Summer 2020",
+      endDate: "Summer 2021",
       description: [
-        "Developed case studies with creative samples and campaign performance data",
-        "Collaborated on analyzing compelling data and solutions for client pitches",
-        "Compiled and showcased agency work for new business development"
+        "Developed written case studies that included creative samples and campaign performance data for use in new business pitches and responses to proposals; compiled and showcased agency work",
+        "Communicated and collaborated with team members to analyze and evaluate the most compelling data and solutions for future use"
       ],
-      skills: ["Marketing", "Data Analysis", "Case Study Development", "Campaign Strategy", "Client Pitches"]
+      skills: ["Marketing", "Data Analysis", "Case Study Development", "Campaign Strategy", "Client Pitches", "New Business Development"]
     }
   ],
 
@@ -155,8 +160,9 @@ export const LOUISA_PROFILE: UserProfile = {
     "Strategic and creative problem-solving",
     "Operations management and process optimization",
     "Personalized service approach",
-    "Athletic discipline and work ethic",
-    "Adaptability across industries"
+    "Athletic discipline and work ethic (Division I athlete, 20+ hours/week training commitment)",
+    "Adaptability across industries",
+    "Team collaboration and leadership"
   ],
 
   interests: [
