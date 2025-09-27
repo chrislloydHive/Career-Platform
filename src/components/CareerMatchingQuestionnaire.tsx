@@ -38,7 +38,7 @@ export function CareerMatchingQuestionnaire({ onComplete, enableRealTimeMatching
 
   const categoryIcons = {
     interests: '🎯',
-    skills: '💡',
+    skills: '🔧',
     experience: '📊',
     personality: '✨',
     preferences: '⚙️',

@@ -4,13 +4,21 @@ import { useState, useEffect } from 'react';
 import { AdaptiveQuestioningEngine, DiscoveredInsight, IdentifiedGap } from '@/lib/adaptive-questions/adaptive-engine';
 import { SynthesizedInsight } from '@/lib/adaptive-questions/insight-synthesis';
 import { AdaptiveQuestion, ExplorationArea } from '@/lib/adaptive-questions/question-banks';
+import { InteractiveInsightExplorer } from './InteractiveInsightExplorer';
+import { InsightRefinement } from '@/lib/insights/insight-explorer';
+import { UserProfile } from '@/types/user-profile';
+import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/matching/realtime-career-matcher';
+import { LiveCareerMatches } from './LiveCareerMatches';
+import { AuthenticityProfile } from '@/lib/authenticity/authentic-self-detector';
+import { AuthenticityInsightsDisplay } from './AuthenticityInsightsDisplay';
 
 interface AdaptiveQuestionnaireProps {
   onComplete?: (profile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => void;
   onInsightDiscovered?: (insight: DiscoveredInsight) => void;
+  userProfile?: UserProfile;
 }
 
-export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: AdaptiveQuestionnaireProps) {
+export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userProfile }: AdaptiveQuestionnaireProps) {
   const [engine] = useState(() => new AdaptiveQuestioningEngine());
   const [currentQuestions, setCurrentQuestions] = useState<AdaptiveQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -24,6 +32,14 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
   const [gaps, setGaps] = useState<IdentifiedGap[]>([]);
   const [showProgress, setShowProgress] = useState(false);
   const [showSynthesized, setShowSynthesized] = useState(true);
+  const [showInteractiveExplorer, setShowInteractiveExplorer] = useState(false);
+  const [careerMatcher, setCareerMatcher] = useState<RealtimeCareerMatcher | null>(null);
+  const [topCareers, setTopCareers] = useState<CareerFitScore[]>([]);
+  const [risingCareers, setRisingCareers] = useState<CareerFitScore[]>([]);
+  const [latestUpdate, setLatestUpdate] = useState<LiveCareerUpdate | undefined>();
+  const [showCareerMatches, setShowCareerMatches] = useState(false);
+  const [authenticityProfile, setAuthenticityProfile] = useState<AuthenticityProfile | null>(null);
+  const [showAuthenticityInsights, setShowAuthenticityInsights] = useState(false);
 
   useEffect(() => {
     loadNextQuestions();
@@ -64,11 +80,43 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
     setSynthesizedInsights(engine.getSynthesizedInsights());
     setGaps(engine.getGaps());
 
+    if (newInsights.length >= 2) {
+      updateCareerMatches(newInsights);
+    }
+
+    const authProfile = engine.getAuthenticityProfile();
+    if (authProfile) {
+      setAuthenticityProfile(authProfile);
+      if (!showAuthenticityInsights && Object.keys(engine.getState().responses).length >= 5) {
+        setShowAuthenticityInsights(true);
+      }
+    }
+
     if (currentQuestionIndex < currentQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       resetResponse();
     } else {
       loadNextQuestions();
+    }
+  };
+
+  const updateCareerMatches = (currentInsights: DiscoveredInsight[]) => {
+    const responses = engine.getState().responses;
+
+    if (!careerMatcher) {
+      const matcher = new RealtimeCareerMatcher(responses, currentInsights, userProfile);
+      setCareerMatcher(matcher);
+      setTopCareers(matcher.getTopCareers(5));
+      setRisingCareers(matcher.getRisingCareers(3));
+      setShowCareerMatches(true);
+    } else {
+      const updates = careerMatcher.updateScores(currentInsights);
+      setTopCareers(careerMatcher.getTopCareers(5));
+      setRisingCareers(careerMatcher.getRisingCareers(3));
+
+      if (updates.length > 0) {
+        setLatestUpdate(updates[0]);
+      }
     }
   };
 
@@ -123,7 +171,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
                   <div className="flex-1">
                     <p className="text-gray-200 font-medium">{option.label}</p>
                     {option.insight && response === option.value && (
-                      <p className="text-sm text-blue-400 mt-2 italic">💡 {option.insight}</p>
+                      <p className="text-sm text-blue-400 mt-2 italic">{option.insight}</p>
                     )}
                   </div>
                 </div>
@@ -183,13 +231,13 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
                 onClick={() => setResponse(option.value)}
                 className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                   response === option.value
-                    ? 'border-purple-500 bg-purple-900/30'
+                    ? 'border-blue-500 bg-blue-900/30'
                     : 'border-gray-700 bg-gray-800 hover:border-gray-600'
                 }`}
               >
                 <p className="text-gray-200 font-medium">{option.label}</p>
                 {option.insight && response === option.value && (
-                  <p className="text-sm text-purple-400 mt-2 italic">💡 {option.insight}</p>
+                  <p className="text-sm text-blue-400 mt-2 italic">{option.insight}</p>
                 )}
               </button>
             ))}
@@ -408,7 +456,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
         </div>
       )}
 
-      {/* Individual Insights Panel */}
+      {/* Interactive Insight Explorer */}
       {insights.length > 0 && (
         <div className="bg-gradient-to-r from-blue-900/30 to-blue-800/30 rounded-lg border border-blue-700/50 p-6">
           <div className="flex items-center justify-between mb-4">
@@ -416,17 +464,32 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
               <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
-              Area-Specific Insights ({insights.length})
+              Discovered Insights ({insights.length})
             </h3>
             <button
-              onClick={() => setShowInsights(!showInsights)}
-              className="text-sm text-blue-400 hover:text-blue-300"
+              onClick={() => setShowInteractiveExplorer(!showInteractiveExplorer)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
             >
-              {showInsights ? 'Hide' : 'Show'}
+              {showInteractiveExplorer ? 'Simple View' : 'Explore Insights'}
             </button>
           </div>
 
-          {showInsights && (
+          {showInteractiveExplorer ? (
+            <InteractiveInsightExplorer
+              insights={insights}
+              userProfile={userProfile}
+              onAskRelatedQuestion={(question) => {
+                console.log('Related question:', question);
+              }}
+              onRefineInsight={(insight, refinement) => {
+                console.log('Refined insight:', insight, refinement);
+                setInsights(prev => prev.map(i => i.insight === insight.insight ? insight : i));
+              }}
+              onExploreCareer={(careerTitle) => {
+                console.log('Explore career:', careerTitle);
+              }}
+            />
+          ) : (
             <div className="space-y-3">
               {insights.map((insight, index) => (
                 <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
@@ -457,6 +520,36 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Live Career Matches */}
+      {showCareerMatches && topCareers.length > 0 && (
+        <div className="mt-6">
+          <LiveCareerMatches
+            topCareers={topCareers}
+            risingCareers={risingCareers}
+            recentUpdate={latestUpdate}
+            onExploreCareer={(careerTitle) => {
+              console.log('Explore career:', careerTitle);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Authenticity Insights */}
+      {showAuthenticityInsights && authenticityProfile && (
+        <div className="mt-6">
+          <AuthenticityInsightsDisplay
+            profile={authenticityProfile}
+            onAnswerProbingQuestion={(questionId, response) => {
+              engine.recordResponse(questionId, response);
+              const updatedProfile = engine.getAuthenticityProfile();
+              if (updatedProfile) {
+                setAuthenticityProfile(updatedProfile);
+              }
+            }}
+          />
         </div>
       )}
 

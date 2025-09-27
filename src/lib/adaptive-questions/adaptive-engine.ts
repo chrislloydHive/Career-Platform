@@ -25,6 +25,12 @@ import {
 import { StrengthValidationEngine, StrengthProfile } from '../strengths/strength-validation';
 import { UserProfile } from '@/types/user-profile';
 import { HiddenInterestPredictor, ExplorationSuggestion } from '../predictions/hidden-interest-predictor';
+import { FutureSelfProjector, FutureSelfProjection } from '../future-modeling/future-self-projector';
+import { LifeStageAdapter, LifeStageContext, TransitionReadiness, CareerStageInsight } from '../life-stage/life-stage-adapter';
+import { GeographicIntelligence, GeographicProfile, LocationImpact, GeographicInsight } from '../geography/geographic-intelligence';
+import { ConfidenceEvolutionEngine, InsightEvolution, ConfidencePattern, EvolutionSummary } from '../insights/confidence-evolution';
+import { NarrativeInsightGenerator, NarrativeInsight } from '../insights/narrative-insight-generator';
+import { AuthenticSelfDetector, AuthenticityProfile, AuthenticPreference, SelfPerceptionGap } from '../authenticity/authentic-self-detector';
 
 export interface QuestionResponse {
   questionId: string;
@@ -65,12 +71,25 @@ export interface AdaptiveSessionState {
   archaeologyDepth: number;
   strengthProfile: StrengthProfile | null;
   hiddenInterestPredictions: ExplorationSuggestion[];
+  futureSelfProjection: FutureSelfProjection | null;
+  lifeStageContext: LifeStageContext | null;
+  transitionReadiness: TransitionReadiness | null;
+  careerStageInsights: CareerStageInsight[];
+  geographicProfile: GeographicProfile | null;
+  locationImpacts: LocationImpact[];
+  geographicInsights: GeographicInsight[];
+  confidenceEvolutions: InsightEvolution[];
+  confidencePatterns: ConfidencePattern[];
+  evolutionSummary: EvolutionSummary | null;
+  narrativeInsights: NarrativeInsight[];
+  authenticityProfile: AuthenticityProfile | null;
 }
 
 export class AdaptiveQuestioningEngine {
   private state: AdaptiveSessionState;
   private dynamicGenerator: DynamicQuestionGenerator;
   private userProfile?: UserProfile;
+  private generatedQuestionsCache: AdaptiveQuestion[] = [];
 
   constructor(initialState?: Partial<AdaptiveSessionState>, userProfile?: UserProfile) {
     this.dynamicGenerator = new DynamicQuestionGenerator();
@@ -101,6 +120,18 @@ export class AdaptiveQuestioningEngine {
       archaeologyDepth: initialState?.archaeologyDepth || 0,
       strengthProfile: initialState?.strengthProfile || null,
       hiddenInterestPredictions: initialState?.hiddenInterestPredictions || [],
+      futureSelfProjection: initialState?.futureSelfProjection || null,
+      lifeStageContext: initialState?.lifeStageContext || null,
+      transitionReadiness: initialState?.transitionReadiness || null,
+      careerStageInsights: initialState?.careerStageInsights || [],
+      geographicProfile: initialState?.geographicProfile || null,
+      locationImpacts: initialState?.locationImpacts || [],
+      geographicInsights: initialState?.geographicInsights || [],
+      confidenceEvolutions: initialState?.confidenceEvolutions || [],
+      confidencePatterns: initialState?.confidencePatterns || [],
+      evolutionSummary: initialState?.evolutionSummary || null,
+      narrativeInsights: initialState?.narrativeInsights || [],
+      authenticityProfile: initialState?.authenticityProfile || null,
     };
   }
 
@@ -109,9 +140,20 @@ export class AdaptiveQuestioningEngine {
   }
 
   recordResponse(questionId: string, response: unknown, confidenceLevel?: 'certain' | 'somewhat-sure' | 'uncertain') {
-    const question = getQuestionById(questionId);
+    let question = getQuestionById(questionId);
+
     if (!question) {
-      throw new Error(`Question ${questionId} not found`);
+      question = this.generatedQuestionsCache.find(q => q.id === questionId);
+    }
+
+    if (!question) {
+      console.warn(`Question ${questionId} not found in any question bank`);
+      question = {
+        id: questionId,
+        area: 'values' as ExplorationArea,
+        type: 'open-ended',
+        text: 'Question',
+      };
     }
 
     this.state.responses[questionId] = {
@@ -134,9 +176,17 @@ export class AdaptiveQuestioningEngine {
     this.runMotivationArchaeology();
     this.runStrengthValidation();
     this.runHiddenInterestPrediction();
+    this.runFutureSelfProjection();
+    this.runLifeStageAdaptation();
+    this.runGeographicIntelligence();
+    this.runConfidenceEvolution();
+    this.runNarrativeGeneration();
+    this.runAuthenticityDetection();
   }
 
   getNextQuestions(limit: number = 3): AdaptiveQuestion[] {
+    this.generatedQuestionsCache = [];
+
     const candidates: Array<{ question: AdaptiveQuestion; priority: number; reason: string }> = [];
 
     const lastResponse = this.getLastResponse();
@@ -159,7 +209,20 @@ export class AdaptiveQuestioningEngine {
     dynamicQuestions.forEach(q => candidates.push({ question: q, priority: 90, reason: 'Personalized from career interests' }));
 
     const archaeologyQuestions = this.getArchaeologyQuestions();
+    this.generatedQuestionsCache.push(...archaeologyQuestions);
     archaeologyQuestions.forEach(q => candidates.push({ question: q, priority: 85, reason: 'Deep motivation exploration' }));
+
+    const lifeStageQuestions = this.getLifeStageQuestions();
+    this.generatedQuestionsCache.push(...lifeStageQuestions);
+    lifeStageQuestions.forEach(q => candidates.push({ question: q, priority: 87, reason: 'Career stage-specific exploration' }));
+
+    const geographicQuestions = this.getGeographicQuestions();
+    this.generatedQuestionsCache.push(...geographicQuestions);
+    geographicQuestions.forEach(q => candidates.push({ question: q, priority: 86, reason: 'Location and career trade-offs' }));
+
+    const authenticityQuestions = this.getAuthenticityProbingQuestions();
+    this.generatedQuestionsCache.push(...authenticityQuestions);
+    authenticityQuestions.forEach(q => candidates.push({ question: q, priority: 88, reason: 'Discover authentic preferences' }));
 
     const gapQuestions = this.getGapFillingQuestions();
     gapQuestions.forEach(q => candidates.push({ question: q, priority: 80, reason: 'Fill knowledge gap' }));
@@ -598,6 +661,17 @@ export class AdaptiveQuestioningEngine {
       motivationInsights: this.state.motivationInsights,
       strengthProfile: this.state.strengthProfile,
       hiddenInterestPredictions: this.state.hiddenInterestPredictions,
+      futureSelfProjection: this.state.futureSelfProjection,
+      lifeStageContext: this.state.lifeStageContext,
+      transitionReadiness: this.state.transitionReadiness,
+      careerStageInsights: this.state.careerStageInsights,
+      geographicProfile: this.state.geographicProfile,
+      locationImpacts: this.state.locationImpacts,
+      geographicInsights: this.state.geographicInsights,
+      confidenceEvolutions: this.state.confidenceEvolutions,
+      confidencePatterns: this.state.confidencePatterns,
+      evolutionSummary: this.state.evolutionSummary,
+      narrativeInsights: this.state.narrativeInsights,
       gaps: this.state.identifiedGaps,
       progress: this.getExplorationProgress(),
       completion: this.getCompletionPercentage(),
@@ -669,5 +743,270 @@ export class AdaptiveQuestioningEngine {
 
   getHiddenInterestPredictions(): ExplorationSuggestion[] {
     return this.state.hiddenInterestPredictions;
+  }
+
+  private runFutureSelfProjection() {
+    if (!this.userProfile || Object.keys(this.state.responses).length < 10) {
+      return;
+    }
+
+    const interactions = InteractionTracker.getRecentInteractions(100);
+
+    const projector = new FutureSelfProjector(
+      this.state.responses,
+      this.userProfile,
+      this.state.strengthProfile,
+      this.state.motivationInsights,
+      interactions
+    );
+
+    this.state.futureSelfProjection = projector.projectFutureSelf();
+
+    const projection = this.state.futureSelfProjection;
+
+    for (const challenge of projection.challenges) {
+      if (challenge.severity === 'high' && challenge.likelihood >= 0.6) {
+        const existing = this.state.discoveredInsights.find(
+          i => i.insight.includes(challenge.description)
+        );
+
+        if (!existing) {
+          this.state.discoveredInsights.push({
+            type: 'growth-area',
+            area: 'values',
+            insight: `Future challenge: ${challenge.description}. Mitigation: ${challenge.mitigation[0]}`,
+            confidence: challenge.likelihood,
+            basedOn: ['Future self projection'],
+          });
+        }
+      }
+    }
+
+    for (const growthArea of projection.growthAreas.slice(0, 3)) {
+      if (growthArea.importance === 'critical' || growthArea.importance === 'high') {
+        const existing = this.state.discoveredInsights.find(
+          i => i.insight.includes(growthArea.skill)
+        );
+
+        if (!existing) {
+          this.state.discoveredInsights.push({
+            type: 'growth-area',
+            area: 'learning-growth',
+            insight: `High-potential growth area: ${growthArea.skill}. Can reach ${growthArea.potentialLevel} level within ${growthArea.timeToAchieve}.`,
+            confidence: growthArea.naturalAptitude,
+            basedOn: ['Future self projection', 'Strength validation'],
+          });
+        }
+      }
+    }
+  }
+
+  getFutureSelfProjection(): FutureSelfProjection | null {
+    return this.state.futureSelfProjection;
+  }
+
+  private runLifeStageAdaptation() {
+    if (!this.userProfile) {
+      return;
+    }
+
+    const adapter = new LifeStageAdapter(this.userProfile, this.state.responses);
+
+    this.state.lifeStageContext = adapter.detectLifeStage();
+
+    if (Object.keys(this.state.responses).length >= 3) {
+      this.state.transitionReadiness = adapter.assessTransitionReadiness(this.state.lifeStageContext);
+      this.state.careerStageInsights = adapter.generateCareerStageInsights(this.state.lifeStageContext);
+
+      for (const insight of this.state.careerStageInsights) {
+        if (insight.confidence >= 0.7) {
+          const existing = this.state.discoveredInsights.find(
+            i => i.insight === insight.insight
+          );
+
+          if (!existing) {
+            const insightType = insight.type === 'challenge' ? 'growth-area' : 'preference';
+            this.state.discoveredInsights.push({
+              type: insightType,
+              area: 'values',
+              insight: insight.insight,
+              confidence: insight.confidence,
+              basedOn: ['Life stage analysis'],
+            });
+          }
+        }
+      }
+    }
+  }
+
+  private getLifeStageQuestions(): AdaptiveQuestion[] {
+    if (!this.userProfile || !this.state.lifeStageContext) {
+      return [];
+    }
+
+    const adapter = new LifeStageAdapter(this.userProfile, this.state.responses);
+    const questions = adapter.generateLifeStageQuestions(this.state.lifeStageContext);
+
+    return questions.filter(q => !this.state.askedQuestions.includes(q.id)).slice(0, 2);
+  }
+
+  getLifeStageContext(): LifeStageContext | null {
+    return this.state.lifeStageContext;
+  }
+
+  getTransitionReadiness(): TransitionReadiness | null {
+    return this.state.transitionReadiness;
+  }
+
+  getCareerStageInsights(): CareerStageInsight[] {
+    return this.state.careerStageInsights;
+  }
+
+  private runGeographicIntelligence() {
+    if (!this.userProfile) {
+      return;
+    }
+
+    const geoIntel = new GeographicIntelligence(this.userProfile, this.state.responses);
+
+    this.state.geographicProfile = geoIntel.buildGeographicProfile();
+
+    if (Object.keys(this.state.responses).length >= 3) {
+      this.state.locationImpacts = geoIntel.analyzeLocationImpacts(this.state.geographicProfile);
+      this.state.geographicInsights = geoIntel.generateGeographicInsights(
+        this.state.geographicProfile,
+        this.state.locationImpacts
+      );
+
+      for (const insight of this.state.geographicInsights) {
+        if (insight.confidence >= 0.75) {
+          const existing = this.state.discoveredInsights.find(
+            i => i.insight === insight.insight
+          );
+
+          if (!existing) {
+            const insightType = insight.type === 'constraint' ? 'growth-area' : 'preference';
+            this.state.discoveredInsights.push({
+              type: insightType,
+              area: 'environment',
+              insight: insight.insight,
+              confidence: insight.confidence,
+              basedOn: ['Geographic analysis'],
+            });
+          }
+        }
+      }
+    }
+  }
+
+  private getGeographicQuestions(): AdaptiveQuestion[] {
+    if (!this.userProfile || !this.state.geographicProfile) {
+      return [];
+    }
+
+    const geoIntel = new GeographicIntelligence(this.userProfile, this.state.responses);
+    const questions = geoIntel.generateGeographicQuestions(this.state.geographicProfile);
+
+    return questions.filter(q => !this.state.askedQuestions.includes(q.id)).slice(0, 2);
+  }
+
+  getGeographicProfile(): GeographicProfile | null {
+    return this.state.geographicProfile;
+  }
+
+  getLocationImpacts(): LocationImpact[] {
+    return this.state.locationImpacts;
+  }
+
+  getGeographicInsights(): GeographicInsight[] {
+    return this.state.geographicInsights;
+  }
+
+  private runConfidenceEvolution() {
+    if (Object.keys(this.state.responses).length < 3) {
+      return;
+    }
+
+    const evolutionEngine = new ConfidenceEvolutionEngine(
+      this.state.responses,
+      this.state.discoveredInsights
+    );
+
+    this.state.confidenceEvolutions = evolutionEngine.getEvolutions();
+    this.state.confidencePatterns = evolutionEngine.getPatterns();
+    this.state.evolutionSummary = evolutionEngine.getEvolutionSummary();
+
+    for (const pattern of this.state.confidencePatterns) {
+      if (pattern.confidence >= 0.85) {
+        const existing = this.state.discoveredInsights.find(
+          i => i.insight === pattern.implication
+        );
+
+        if (!existing) {
+          this.state.discoveredInsights.push({
+            type: 'preference',
+            area: 'values',
+            insight: pattern.implication,
+            confidence: pattern.confidence,
+            basedOn: ['Confidence evolution analysis'],
+          });
+        }
+      }
+    }
+  }
+
+  getConfidenceEvolutions(): InsightEvolution[] {
+    return this.state.confidenceEvolutions;
+  }
+
+  getConfidencePatterns(): ConfidencePattern[] {
+    return this.state.confidencePatterns;
+  }
+
+  getEvolutionSummary(): EvolutionSummary | null {
+    return this.state.evolutionSummary;
+  }
+
+  private runNarrativeGeneration() {
+    if (!this.userProfile || Object.keys(this.state.responses).length < 3) {
+      return;
+    }
+
+    const narrativeGenerator = new NarrativeInsightGenerator(
+      this.userProfile,
+      this.state.responses,
+      this.state.discoveredInsights
+    );
+
+    this.state.narrativeInsights = narrativeGenerator.generateNarrativeInsights();
+  }
+
+  getNarrativeInsights(): NarrativeInsight[] {
+    return this.state.narrativeInsights;
+  }
+
+  private runAuthenticityDetection() {
+    if (Object.keys(this.state.responses).length < 5) {
+      return;
+    }
+
+    const authenticityDetector = new AuthenticSelfDetector(
+      this.state.responses,
+      this.state.discoveredInsights,
+      this.userProfile
+    );
+
+    this.state.authenticityProfile = authenticityDetector.buildAuthenticityProfile();
+  }
+
+  getAuthenticityProfile(): AuthenticityProfile | null {
+    return this.state.authenticityProfile;
+  }
+
+  getAuthenticityProbingQuestions(): AdaptiveQuestion[] {
+    if (!this.state.authenticityProfile) {
+      return [];
+    }
+    return this.state.authenticityProfile.probingQuestions;
   }
 }

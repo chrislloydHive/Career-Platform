@@ -294,7 +294,7 @@ export default function ProfilePage() {
                       <div className="text-xs sm:text-sm text-gray-400 mt-1">{interaction.context}</div>
                       {interaction.aiLearning && (
                         <div className="text-xs sm:text-sm text-blue-400 mt-2 bg-blue-900/20 rounded p-2">
-                          💡 AI Learning: {interaction.aiLearning}
+                          AI Learning: {interaction.aiLearning}
                         </div>
                       )}
                     </div>
