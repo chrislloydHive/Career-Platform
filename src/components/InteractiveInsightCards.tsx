@@ -40,8 +40,8 @@ export function InteractiveInsightCards({
 
     setExpandedInsight(insightKey);
 
-    if (!exploredInsights.has(insightKey) && userProfile) {
-      const explorer = new InsightExplorer(insight, userProfile, {});
+    if (!exploredInsights.has(insightKey)) {
+      const explorer = new InsightExplorer(insight, insights, userProfile);
       const explored = explorer.explore();
       setExploredInsights(new Map(exploredInsights.set(insightKey, explored)));
     }
