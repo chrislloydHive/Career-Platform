@@ -250,7 +250,7 @@ export default function Home() {
                 <h3 className="text-2xl font-bold text-gray-100 mb-2">Start Your Job Search</h3>
                 <p className="text-gray-400 mb-6 max-w-md mx-auto">
                   Search LinkedIn, Indeed, and Google Jobs with the form on the left, or scrape jobs directly from company career pages
-                  by selecting "Company Sites" as a job source.
+                  by selecting &quot;Company Sites&quot; as a job source.
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center text-sm">
                   <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Company Scraping</span>
