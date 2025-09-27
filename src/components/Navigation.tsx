@@ -28,7 +28,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition-colors">
-                <span className="text-white font-bold text-sm">LC</span>
+                <span className="text-white font-bold text-sm">LL</span>
               </div>
               <span className="text-gray-100 font-semibold hidden sm:block">Career Platform</span>
             </Link>
