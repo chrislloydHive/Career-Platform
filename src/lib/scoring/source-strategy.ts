@@ -28,6 +28,12 @@ export class SourceQualityScoringStrategy implements ScoringStrategy {
       jobQuality: 0.90,
       description: 'Aggregated from multiple sources',
     },
+    'company_scraper': {
+      baseScore: 95,
+      reliability: 0.98,
+      jobQuality: 0.95,
+      description: 'Direct from company career pages',
+    },
   };
 
   score(job: RawJob, criteria: ScoringCriteria): ScoringStrategyResult {
