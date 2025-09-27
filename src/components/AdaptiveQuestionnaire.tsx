@@ -14,6 +14,8 @@ import { NarrativeInsightGenerator, NarrativeInsight } from '@/lib/insights/narr
 import { NarrativeInsightCard } from './NarrativeInsightCard';
 import { ConfidenceEvolutionEngine, InsightEvolution, ConfidencePattern, EvolutionSummary } from '@/lib/insights/confidence-evolution';
 import { ConfidenceEvolutionPanel } from './ConfidenceEvolutionPanel';
+import { FutureSelfProjection } from '@/lib/future-modeling/future-self-projector';
+import { FutureCareerPathVisualizer } from './FutureCareerPathVisualizer';
 
 interface AdaptiveQuestionnaireProps {
   onComplete?: (profile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => void;
@@ -49,6 +51,8 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [confidencePatterns, setConfidencePatterns] = useState<ConfidencePattern[]>([]);
   const [evolutionSummary, setEvolutionSummary] = useState<EvolutionSummary | null>(null);
   const [showConfidenceEvolution, setShowConfidenceEvolution] = useState(false);
+  const [futureProjection, setFutureProjection] = useState<FutureSelfProjection | null>(null);
+  const [showFutureProjection, setShowFutureProjection] = useState(false);
 
   useEffect(() => {
     loadNextQuestions();
@@ -114,6 +118,16 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       if (!showConfidenceEvolution && Object.keys(engine.getState().responses).length >= 5) {
         setShowConfidenceEvolution(true);
+      }
+    }
+
+    if (newInsights.length >= 4 && userProfile) {
+      const projection = engine.getFutureSelfProjection();
+      if (projection) {
+        setFutureProjection(projection);
+        if (!showFutureProjection && Object.keys(engine.getState().responses).length >= 8) {
+          setShowFutureProjection(true);
+        }
       }
     }
 
@@ -661,6 +675,13 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             patterns={confidencePatterns}
             summary={evolutionSummary}
           />
+        </div>
+      )}
+
+      {/* Future Career Path Visualizer */}
+      {showFutureProjection && futureProjection && (
+        <div className="mb-6">
+          <FutureCareerPathVisualizer projection={futureProjection} />
         </div>
       )}
 
