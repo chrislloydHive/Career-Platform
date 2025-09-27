@@ -61,6 +61,7 @@ export function JobCard({ job, rank }: JobCardProps) {
     linkedin: 'bg-blue-900/50 text-blue-400',
     indeed: 'bg-purple-900/50 text-purple-400',
     google_jobs: 'bg-green-900/50 text-green-400',
+    company_scraper: 'bg-orange-900/50 text-orange-400',
   };
 
   return (
