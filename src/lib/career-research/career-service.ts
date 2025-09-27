@@ -1,5 +1,19 @@
 import { JobCategory, CareerResearchQuery, CareerMatch, CareerCategory as CareerCategoryType } from '@/types/career';
-import { allJobCategories } from './index';
+import { healthcareRoles } from './healthcare-roles';
+import { techRoles } from './tech-roles';
+import { marketingRoles } from './marketing-roles';
+import { financeRoles } from './finance-roles';
+import { wellnessRoles } from './wellness-roles';
+import { designRoles } from './design-roles';
+
+const allJobCategories = [
+  ...healthcareRoles,
+  ...techRoles,
+  ...marketingRoles,
+  ...financeRoles,
+  ...wellnessRoles,
+  ...designRoles,
+];
 
 export class CareerResearchService {
   private categories: JobCategory[];
@@ -178,6 +192,18 @@ export class CareerResearchService {
 
   getAllCategories(): CareerCategoryType[] {
     return ['healthcare', 'tech', 'marketing', 'finance', 'wellness', 'design', 'education', 'business'];
+  }
+
+  getAllCareers(): JobCategory[] {
+    return this.categories;
+  }
+
+  getCareerById(id: string): JobCategory | null {
+    return this.findById(id) || null;
+  }
+
+  searchCareers(query: CareerResearchQuery): JobCategory[] {
+    return this.findMatchingCareers(query).map(match => match.jobCategory);
   }
 
   getCategoryStats(category: CareerCategoryType) {

@@ -15,3 +15,5 @@ export const allJobCategories = [
 ];
 
 export { healthcareRoles, techRoles, marketingRoles, financeRoles, wellnessRoles, designRoles };
+
+export { CareerResearchService, careerResearchService } from './career-service';
