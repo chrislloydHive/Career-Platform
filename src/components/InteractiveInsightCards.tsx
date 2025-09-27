@@ -90,30 +90,38 @@ export function InteractiveInsightCards({
     }
   };
 
-  const getStrengthColor = (strength: string) => {
-    switch (strength) {
-      case 'strong':
-        return 'bg-green-500';
-      case 'moderate':
-        return 'bg-blue-500';
-      case 'weak':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-600';
-    }
+  const getStrengthColor = (strength: number) => {
+    if (strength >= 0.7) return 'bg-green-500';
+    if (strength >= 0.4) return 'bg-blue-500';
+    return 'bg-gray-500';
   };
 
-  const getStrengthWidth = (strength: string) => {
-    switch (strength) {
-      case 'strong':
-        return '100%';
-      case 'moderate':
-        return '66%';
-      case 'weak':
-        return '33%';
-      default:
-        return '50%';
-    }
+  const getStrengthWidth = (strength: number) => {
+    return `${Math.round(strength * 100)}%`;
+  };
+
+  const getStrengthLabel = (strength: number) => {
+    if (strength >= 0.7) return 'strong';
+    if (strength >= 0.4) return 'moderate';
+    return 'weak';
+  };
+
+  const getStrengthBgClass = (strength: number) => {
+    if (strength >= 0.7) return 'bg-green-500/20';
+    if (strength >= 0.4) return 'bg-blue-500/20';
+    return 'bg-gray-500/20';
+  };
+
+  const getStrengthTextClass = (strength: number) => {
+    if (strength >= 0.7) return 'text-green-400';
+    if (strength >= 0.4) return 'text-blue-400';
+    return 'text-gray-400';
+  };
+
+  const getStrengthBadgeClass = (strength: number) => {
+    if (strength >= 0.7) return 'bg-green-500/20 text-green-400';
+    if (strength >= 0.4) return 'bg-blue-500/20 text-blue-400';
+    return 'bg-gray-500/20 text-gray-400';
   };
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
@@ -247,16 +255,8 @@ export function InteractiveInsightCards({
                       {explored.evidence.map((evidence, idx) => (
                         <div key={idx} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
                           <div className="flex items-start gap-3 mb-3">
-                            <div className={`p-1.5 rounded ${
-                              evidence.strength === 'strong' ? 'bg-green-500/20' :
-                              evidence.strength === 'moderate' ? 'bg-blue-500/20' :
-                              'bg-gray-500/20'
-                            }`}>
-                              <svg className={`w-4 h-4 ${
-                                evidence.strength === 'strong' ? 'text-green-400' :
-                                evidence.strength === 'moderate' ? 'text-blue-400' :
-                                'text-gray-400'
-                              }`} fill="currentColor" viewBox="0 0 20 20">
+                            <div className={`p-1.5 rounded ${getStrengthBgClass(evidence.strength)}`}>
+                              <svg className={`w-4 h-4 ${getStrengthTextClass(evidence.strength)}`} fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             </div>
@@ -265,12 +265,8 @@ export function InteractiveInsightCards({
                                 <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                                   {evidence.type.replace('-', ' ')}
                                 </span>
-                                <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-                                  evidence.strength === 'strong' ? 'bg-green-500/20 text-green-400' :
-                                  evidence.strength === 'moderate' ? 'bg-blue-500/20 text-blue-400' :
-                                  'bg-gray-500/20 text-gray-400'
-                                }`}>
-                                  {evidence.strength}
+                                <span className={`text-xs font-medium px-2 py-0.5 rounded ${getStrengthBadgeClass(evidence.strength)}`}>
+                                  {getStrengthLabel(evidence.strength)}
                                 </span>
                               </div>
                               <p className="text-sm text-gray-300 mb-3">{evidence.description}</p>
