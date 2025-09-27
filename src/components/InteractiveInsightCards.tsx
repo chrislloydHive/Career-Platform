@@ -331,21 +331,14 @@ export function InteractiveInsightCards({
                             </div>
                           </div>
                           <p className="text-sm text-gray-300 mb-3">{career.explanation}</p>
-                          {career.roleProgression && career.roleProgression.length > 0 && (
+                          {career.potentialRoles && career.potentialRoles.length > 0 && (
                             <div className="mb-3">
-                              <div className="text-xs font-semibold text-gray-400 mb-2">Career Path:</div>
-                              <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                                {career.roleProgression.map((role, ridx) => (
-                                  <div key={ridx} className="flex items-center gap-2 flex-shrink-0">
-                                    <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded whitespace-nowrap">
-                                      {role}
-                                    </span>
-                                    {ridx < career.roleProgression.length - 1 && (
-                                      <svg className="w-3 h-3 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                                      </svg>
-                                    )}
-                                  </div>
+                              <div className="text-xs font-semibold text-gray-400 mb-2">Potential Roles:</div>
+                              <div className="flex flex-wrap gap-2">
+                                {career.potentialRoles.map((role, ridx) => (
+                                  <span key={ridx} className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded whitespace-nowrap">
+                                    {role}
+                                  </span>
                                 ))}
                               </div>
                             </div>
