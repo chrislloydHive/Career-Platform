@@ -290,7 +290,7 @@ export function InteractiveInsightCards({
                       </h4>
                       {explored.relatedQuestions.map((question, idx) => (
                         <div key={idx} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-colors">
-                          <div className="flex items-start justify-between gap-3 mb-2">
+                          <div className="flex items-start justify-between gap-3 mb-3">
                             <p className="text-sm text-gray-200 flex-1">{question.question}</p>
                             <span className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
                               question.purpose === 'clarify' ? 'bg-blue-500/20 text-blue-400' :
@@ -301,7 +301,6 @@ export function InteractiveInsightCards({
                               {question.purpose}
                             </span>
                           </div>
-                          <p className="text-xs text-gray-400 mb-3">{question.why}</p>
                           <button
                             onClick={() => onAskRelatedQuestion?.(question.question)}
                             className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
