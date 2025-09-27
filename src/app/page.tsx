@@ -176,6 +176,13 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-3">
               <a
+                href="/explore"
+                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-colors flex items-center gap-2"
+              >
+                <span>✨</span>
+                Discover Yourself
+              </a>
+              <a
                 href="/careers"
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
               >
