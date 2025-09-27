@@ -7,7 +7,7 @@ import { AdaptiveQuestion, ExplorationArea } from '@/lib/adaptive-questions/ques
 import { InteractiveInsightExplorer } from './InteractiveInsightExplorer';
 import { UserProfile } from '@/types/user-profile';
 import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/matching/realtime-career-matcher';
-import { LiveCareerMatches } from './LiveCareerMatches';
+import { LiveCareerMatchesPanel } from './LiveCareerMatchesPanel';
 import { AuthenticityProfile } from '@/lib/authenticity/authentic-self-detector';
 import { AuthenticityInsightsDisplay } from './AuthenticityInsightsDisplay';
 
@@ -274,7 +274,10 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const explorationProgress = engine.getExplorationProgress();
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-8">
+    <div className="max-w-7xl mx-auto p-4 sm:p-8">
+      <div className="flex gap-8">
+        {/* Main Content */}
+        <div className="flex-1 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -522,19 +525,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )}
 
-      {/* Live Career Matches */}
-      {showCareerMatches && topCareers.length > 0 && (
-        <div className="mt-6">
-          <LiveCareerMatches
-            topCareers={topCareers}
-            risingCareers={risingCareers}
-            recentUpdate={latestUpdate}
-            onExploreCareer={(careerTitle) => {
-              console.log('Explore career:', careerTitle);
-            }}
-          />
-        </div>
-      )}
 
       {/* Authenticity Insights */}
       {showAuthenticityInsights && authenticityProfile && (
@@ -571,6 +561,19 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           </div>
         </div>
       )}
+        </div>
+
+        {/* Sticky Sidebar - Live Career Matches */}
+        {showCareerMatches && (
+          <div className="hidden lg:block w-96 flex-shrink-0">
+            <LiveCareerMatchesPanel
+              topCareers={topCareers}
+              risingCareers={risingCareers}
+              latestUpdate={latestUpdate}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
