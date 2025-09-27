@@ -9,7 +9,7 @@ import { UserProfile } from '@/types/user-profile';
 import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/matching/realtime-career-matcher';
 import { LiveCareerMatchesPanel } from './LiveCareerMatchesPanel';
 import { AuthenticityProfile } from '@/lib/authenticity/authentic-self-detector';
-import { AuthenticityInsightsDisplay } from './AuthenticityInsightsDisplay';
+import { AuthenticityDetectionPanel } from './AuthenticityDetectionPanel';
 
 interface AdaptiveQuestionnaireProps {
   onComplete?: (profile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => void;
@@ -487,11 +487,11 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       )}
 
 
-      {/* Authenticity Insights */}
+      {/* Authenticity Detection Panel */}
       {showAuthenticityInsights && authenticityProfile && (
         <div className="mt-6">
-          <AuthenticityInsightsDisplay
-            profile={authenticityProfile}
+          <AuthenticityDetectionPanel
+            authenticityProfile={authenticityProfile}
             onAnswerProbingQuestion={(questionId, response) => {
               engine.recordResponse(questionId, response);
               const updatedProfile = engine.getAuthenticityProfile();

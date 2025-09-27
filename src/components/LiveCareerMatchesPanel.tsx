@@ -47,6 +47,7 @@ export function LiveCareerMatchesPanel({
 
     setAnimatingScores(newAnimating);
     setPreviousScores(newPreviousScores);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topCareers]);
 
   const getScoreColor = (score: number) => {
