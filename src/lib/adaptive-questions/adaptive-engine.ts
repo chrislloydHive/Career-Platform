@@ -12,6 +12,7 @@ import {
   Contradiction,
   HiddenMotivation,
 } from './pattern-recognition';
+import { InsightSynthesisEngine, SynthesizedInsight } from './insight-synthesis';
 
 export interface QuestionResponse {
   questionId: string;
@@ -47,6 +48,7 @@ export interface AdaptiveSessionState {
   valueHierarchy: ValueHierarchy | null;
   contradictions: Contradiction[];
   hiddenMotivations: HiddenMotivation[];
+  synthesizedInsights: SynthesizedInsight[];
 }
 
 export class AdaptiveQuestioningEngine {
@@ -74,6 +76,7 @@ export class AdaptiveQuestioningEngine {
       valueHierarchy: initialState?.valueHierarchy || null,
       contradictions: initialState?.contradictions || [],
       hiddenMotivations: initialState?.hiddenMotivations || [],
+      synthesizedInsights: initialState?.synthesizedInsights || [],
     };
   }
 
@@ -103,6 +106,7 @@ export class AdaptiveQuestioningEngine {
     this.checkForInsights();
     this.detectGaps();
     this.runPatternRecognition();
+    this.runInsightSynthesis();
   }
 
   getNextQuestions(limit: number = 3): AdaptiveQuestion[] {
@@ -303,6 +307,15 @@ export class AdaptiveQuestioningEngine {
     this.handleContradictions();
   }
 
+  private runInsightSynthesis() {
+    if (Object.keys(this.state.responses).length < 5) {
+      return;
+    }
+
+    const synthesisEngine = new InsightSynthesisEngine(this.state.responses);
+    this.state.synthesizedInsights = synthesisEngine.synthesizeInsights();
+  }
+
   private updateInsightsWithPatterns(patternEngine: PatternRecognitionEngine) {
     for (const insight of this.state.discoveredInsights) {
       const newConfidence = patternEngine.calculateDynamicConfidence(
@@ -373,6 +386,10 @@ export class AdaptiveQuestioningEngine {
     return [...this.state.discoveredInsights];
   }
 
+  getSynthesizedInsights(): SynthesizedInsight[] {
+    return [...this.state.synthesizedInsights];
+  }
+
   getGaps(): IdentifiedGap[] {
     return [...this.state.identifiedGaps];
   }
@@ -431,6 +448,7 @@ export class AdaptiveQuestioningEngine {
     return {
       responses: this.state.responses,
       insights: this.state.discoveredInsights,
+      synthesizedInsights: this.state.synthesizedInsights,
       gaps: this.state.identifiedGaps,
       progress: this.getExplorationProgress(),
       completion: this.getCompletionPercentage(),

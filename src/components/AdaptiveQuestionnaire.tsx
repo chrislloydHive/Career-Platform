@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AdaptiveQuestioningEngine, DiscoveredInsight, IdentifiedGap } from '@/lib/adaptive-questions/adaptive-engine';
+import { SynthesizedInsight } from '@/lib/adaptive-questions/insight-synthesis';
 import { AdaptiveQuestion, ExplorationArea } from '@/lib/adaptive-questions/question-banks';
 
 interface AdaptiveQuestionnaireProps {
@@ -19,8 +20,10 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
   const [confidenceLevel, setConfidenceLevel] = useState<'certain' | 'somewhat-sure' | 'uncertain'>('certain');
   const [showInsights, setShowInsights] = useState(false);
   const [insights, setInsights] = useState<DiscoveredInsight[]>([]);
+  const [synthesizedInsights, setSynthesizedInsights] = useState<SynthesizedInsight[]>([]);
   const [gaps, setGaps] = useState<IdentifiedGap[]>([]);
   const [showProgress, setShowProgress] = useState(false);
+  const [showSynthesized, setShowSynthesized] = useState(true);
 
   useEffect(() => {
     loadNextQuestions();
@@ -58,6 +61,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
     }
 
     setInsights(newInsights);
+    setSynthesizedInsights(engine.getSynthesizedInsights());
     setGaps(engine.getGaps());
 
     if (currentQuestionIndex < currentQuestions.length - 1) {
@@ -331,7 +335,80 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
         </div>
       </div>
 
-      {/* Insights Panel */}
+      {/* Synthesized Insights - Priority Display */}
+      {synthesizedInsights.length > 0 && (
+        <div className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-lg border-2 border-blue-600/60 p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Cross-Domain Insights ({synthesizedInsights.length})
+            </h3>
+            <button
+              onClick={() => setShowSynthesized(!showSynthesized)}
+              className="text-sm text-blue-400 hover:text-blue-300 font-medium"
+            >
+              {showSynthesized ? 'Hide' : 'Show'}
+            </button>
+          </div>
+
+          {showSynthesized && (
+            <div className="space-y-4">
+              {synthesizedInsights.map((insight, index) => (
+                <div key={index} className="bg-gray-800/70 rounded-lg p-5 border-l-4 border-blue-500">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                            insight.type === 'cross-domain'
+                              ? 'bg-blue-600 text-white'
+                              : insight.type === 'paradox'
+                              ? 'bg-purple-600 text-white'
+                              : insight.type === 'nuanced-preference'
+                              ? 'bg-green-600 text-white'
+                              : 'bg-orange-600 text-white'
+                          }`}>
+                            {insight.type.replace('-', ' ')}
+                          </span>
+                          <span className="text-xs font-medium text-gray-400">
+                            {Math.round(insight.confidence * 100)}% confidence
+                          </span>
+                        </div>
+                        <h4 className="text-lg font-bold text-gray-100 mb-2">{insight.title}</h4>
+                        <p className="text-gray-300 leading-relaxed">{insight.description}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {insight.sourceAreas.map((area, i) => (
+                        <span key={i} className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded text-xs font-medium">
+                          {getAreaLabel(area)}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="bg-gray-900/50 rounded-lg p-4 border border-green-700/30">
+                      <h5 className="text-sm font-semibold text-green-400 mb-2">Implications for Your Career:</h5>
+                      <ul className="space-y-1.5">
+                        {insight.implications.map((implication, i) => (
+                          <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
+                            <span className="text-green-400 mt-0.5">→</span>
+                            <span>{implication}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Individual Insights Panel */}
       {insights.length > 0 && (
         <div className="bg-gradient-to-r from-blue-900/30 to-blue-800/30 rounded-lg border border-blue-700/50 p-6">
           <div className="flex items-center justify-between mb-4">
@@ -339,7 +416,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
               <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
-              Discovered Insights ({insights.length})
+              Area-Specific Insights ({insights.length})
             </h3>
             <button
               onClick={() => setShowInsights(!showInsights)}

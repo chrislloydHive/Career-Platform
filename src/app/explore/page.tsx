@@ -49,9 +49,9 @@ export default function ExplorePage() {
             </div>
             <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
               <div className="text-3xl font-bold text-purple-400 mb-1">
-                {profile.insights.length}
+                {profile.synthesizedInsights.length}
               </div>
-              <div className="text-sm text-gray-400">Insights Discovered</div>
+              <div className="text-sm text-gray-400">Cross-Domain Insights</div>
             </div>
             <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
               <div className="text-3xl font-bold text-green-400 mb-1">
@@ -72,6 +72,66 @@ export default function ExplorePage() {
               <div className="text-sm text-gray-400">Avg Confidence</div>
             </div>
           </div>
+
+          {/* Cross-Domain Insights - Featured Section */}
+          {profile.synthesizedInsights.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-100 mb-4 flex items-center gap-2">
+                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Your Cross-Domain Insights
+              </h2>
+              <div className="grid grid-cols-1 gap-4">
+                {profile.synthesizedInsights.map((insight, index) => (
+                  <div key={index} className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-lg border-2 border-blue-600/60 p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                            insight.type === 'cross-domain'
+                              ? 'bg-blue-600 text-white'
+                              : insight.type === 'paradox'
+                              ? 'bg-purple-600 text-white'
+                              : insight.type === 'nuanced-preference'
+                              ? 'bg-green-600 text-white'
+                              : 'bg-orange-600 text-white'
+                          }`}>
+                            {insight.type.replace('-', ' ')}
+                          </span>
+                          <span className="text-xs font-medium text-gray-400">
+                            {Math.round(insight.confidence * 100)}% confidence
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-100 mb-2">{insight.title}</h3>
+                        <p className="text-gray-300 leading-relaxed">{insight.description}</p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {insight.sourceAreas.map((area, i) => (
+                          <span key={i} className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded text-xs font-medium">
+                            {area.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="bg-gray-900/50 rounded-lg p-4 border border-green-700/30">
+                        <h4 className="text-sm font-semibold text-green-400 mb-2">Career Implications:</h4>
+                        <ul className="space-y-1.5">
+                          {insight.implications.map((implication, i) => (
+                            <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
+                              <span className="text-green-400 mt-0.5">→</span>
+                              <span>{implication}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Strengths */}
