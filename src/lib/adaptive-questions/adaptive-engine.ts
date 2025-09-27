@@ -4,6 +4,14 @@ import {
   allQuestionBanks,
   getQuestionById,
 } from './question-banks';
+import {
+  PatternRecognitionEngine,
+  ConsistencyPattern,
+  PreferenceIntensity,
+  ValueHierarchy,
+  Contradiction,
+  HiddenMotivation,
+} from './pattern-recognition';
 
 export interface QuestionResponse {
   questionId: string;
@@ -34,6 +42,11 @@ export interface AdaptiveSessionState {
   identifiedGaps: IdentifiedGap[];
   currentArea?: ExplorationArea;
   explorationDepth: Record<ExplorationArea, number>;
+  consistencyPatterns: ConsistencyPattern[];
+  preferenceIntensities: PreferenceIntensity[];
+  valueHierarchy: ValueHierarchy | null;
+  contradictions: Contradiction[];
+  hiddenMotivations: HiddenMotivation[];
 }
 
 export class AdaptiveQuestioningEngine {
@@ -56,6 +69,11 @@ export class AdaptiveQuestioningEngine {
         'environment': 0,
         'learning-growth': 0,
       },
+      consistencyPatterns: initialState?.consistencyPatterns || [],
+      preferenceIntensities: initialState?.preferenceIntensities || [],
+      valueHierarchy: initialState?.valueHierarchy || null,
+      contradictions: initialState?.contradictions || [],
+      hiddenMotivations: initialState?.hiddenMotivations || [],
     };
   }
 
@@ -84,6 +102,7 @@ export class AdaptiveQuestioningEngine {
 
     this.checkForInsights();
     this.detectGaps();
+    this.runPatternRecognition();
   }
 
   getNextQuestions(limit: number = 3): AdaptiveQuestion[] {
@@ -264,6 +283,75 @@ export class AdaptiveQuestioningEngine {
     }
   }
 
+  private runPatternRecognition() {
+    if (Object.keys(this.state.responses).length < 3) {
+      return;
+    }
+
+    const patternEngine = new PatternRecognitionEngine(this.state.responses);
+
+    this.state.consistencyPatterns = patternEngine.detectConsistencyPatterns();
+    this.state.preferenceIntensities = patternEngine.analyzePreferenceIntensity();
+    this.state.valueHierarchy = patternEngine.detectValueHierarchy();
+    this.state.contradictions = patternEngine.detectContradictions();
+    this.state.hiddenMotivations = patternEngine.discoverHiddenMotivations();
+
+    this.updateInsightsWithPatterns(patternEngine);
+
+    this.addMotivationInsights();
+
+    this.handleContradictions();
+  }
+
+  private updateInsightsWithPatterns(patternEngine: PatternRecognitionEngine) {
+    for (const insight of this.state.discoveredInsights) {
+      const newConfidence = patternEngine.calculateDynamicConfidence(
+        insight,
+        this.state.consistencyPatterns,
+        this.state.preferenceIntensities,
+        this.state.valueHierarchy || { topValues: [], valueConflicts: [], coreMotivation: '', confidence: 0.5 }
+      );
+      insight.confidence = newConfidence;
+    }
+  }
+
+  private addMotivationInsights() {
+    for (const motivation of this.state.hiddenMotivations) {
+      const existing = this.state.discoveredInsights.find(
+        i => i.insight === motivation.insight
+      );
+
+      if (!existing) {
+        this.state.discoveredInsights.push({
+          type: 'hidden-interest',
+          area: motivation.relatedAreas[0],
+          insight: motivation.insight,
+          confidence: motivation.confidence,
+          basedOn: motivation.evidence,
+        });
+      }
+    }
+  }
+
+  private handleContradictions() {
+    for (const contradiction of this.state.contradictions) {
+      if (contradiction.needsClarification && contradiction.severity === 'high') {
+        const existing = this.state.identifiedGaps.find(
+          g => g.gap.includes(contradiction.question1) || g.gap.includes(contradiction.question2)
+        );
+
+        if (!existing) {
+          this.state.identifiedGaps.push({
+            area: 'values',
+            gap: `Clarify apparent contradiction: ${contradiction.possibleReasons[0]}`,
+            importance: 'high',
+            suggestedQuestions: [],
+          });
+        }
+      }
+    }
+  }
+
   private getResponseValues(): Record<string, unknown> {
     const values: Record<string, unknown> = {};
     for (const [questionId, response] of Object.entries(this.state.responses)) {
@@ -329,6 +417,16 @@ export class AdaptiveQuestioningEngine {
     };
   }
 
+  getPatternAnalysis() {
+    return {
+      consistencyPatterns: this.state.consistencyPatterns,
+      preferenceIntensities: this.state.preferenceIntensities,
+      valueHierarchy: this.state.valueHierarchy,
+      contradictions: this.state.contradictions,
+      hiddenMotivations: this.state.hiddenMotivations,
+    };
+  }
+
   exportProfile() {
     return {
       responses: this.state.responses,
@@ -337,6 +435,7 @@ export class AdaptiveQuestioningEngine {
       progress: this.getExplorationProgress(),
       completion: this.getCompletionPercentage(),
       analysis: this.analyzeUserProfile(),
+      patterns: this.getPatternAnalysis(),
     };
   }
 }
