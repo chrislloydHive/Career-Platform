@@ -124,6 +124,19 @@ export function InteractiveInsightCards({
     return 'bg-gray-500/20 text-gray-400';
   };
 
+  const getRefinementLabel = (type: InsightRefinement['type']) => {
+    switch (type) {
+      case 'agree':
+        return 'I Agree';
+      case 'partially-agree':
+        return 'Partially Agree';
+      case 'disagree':
+        return 'I Disagree';
+      case 'needs-context':
+        return 'Needs More Context';
+    }
+  };
+
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
     {
       id: 'evidence',
@@ -390,10 +403,10 @@ export function InteractiveInsightCards({
                               )}
                             </div>
                             <div className="flex-1">
-                              <div className="text-sm font-semibold text-gray-100 mb-1">
-                                {option.label}
+                              <div className="text-sm font-semibold text-gray-100 mb-2">
+                                {getRefinementLabel(option.type)}
                               </div>
-                              <p className="text-xs text-gray-400">{option.followUpQuestion}</p>
+                              <p className="text-xs text-gray-400">{option.followUpQuestions[0]}</p>
                             </div>
                             <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
