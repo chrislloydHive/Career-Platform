@@ -36,6 +36,9 @@ export class InsightSynthesisEngine {
     insights.push(...this.detectProblemSolvingCreativitySynergy());
     insights.push(...this.detectAutonomyCollaborationBalance());
     insights.push(...this.detectLearningApplicationPatterns());
+    insights.push(...this.detectFundamentalMotivationDrivers());
+    insights.push(...this.detectIdentityCareerAlignment());
+    insights.push(...this.detectEnergyAuthenticity());
 
     return insights.filter(i => i.confidence >= 0.6).sort((a, b) => b.confidence - a.confidence);
   }
@@ -451,5 +454,183 @@ export class InsightSynthesisEngine {
     const matchWeight = matches.reduce((sum, r) => sum + r.weight, 0);
 
     return matchWeight / totalWeight >= 0.5;
+  }
+
+  private detectFundamentalMotivationDrivers(): SynthesizedInsight[] {
+    const insights: SynthesizedInsight[] = [];
+    const valueResponses = this.getResponsesByArea('values');
+
+    const structureNeed = this.responses['cd-1'];
+    const clarityDeep = this.responses['cd-2'];
+
+    if (structureNeed?.response === 'uncertainty' && clarityDeep) {
+      insights.push({
+        type: 'cross-domain',
+        title: 'Clarity as Psychological Safety',
+        description: 'Your need for structure isn\'t about rigidity - it\'s about needing clear expectations to feel psychologically safe and perform at your best. Without knowing what success looks like, you experience genuine stress that impacts your work quality.',
+        confidence: 0.9,
+        sourceAreas: ['values', 'work-style'],
+        basedOn: ['cd-1', 'cd-2'],
+        implications: [
+          'Prioritize roles with clear KPIs and defined success metrics',
+          'During interviews, assess how clearly the role and expectations are defined',
+          'Avoid ambiguous startup environments where expectations shift rapidly',
+          'You\'ll thrive in roles with regular feedback and performance clarity'
+        ]
+      });
+    }
+
+    const autonomyResponse = this.responses['cd-autonomy'];
+    const trustSubResponse = autonomyResponse?.response === 'trust';
+
+    if (trustSubResponse) {
+      insights.push({
+        type: 'nuanced-preference',
+        title: 'Trust and Respect as Core Needs',
+        description: 'Your desire for autonomy isn\'t about avoiding oversight - it\'s fundamentally about needing to be trusted and having your judgment respected. Being micromanaged feels like a violation of trust, not just an inconvenience.',
+        confidence: 0.88,
+        sourceAreas: ['values', 'people-interaction'],
+        basedOn: ['cd-autonomy'],
+        implications: [
+          'Seek managers with coaching rather than controlling styles',
+          'Look for cultures that emphasize trust and empowerment',
+          'Red flag: micromanagement or approval-heavy processes',
+          'You need to demonstrate competence to earn autonomy'
+        ]
+      });
+    }
+
+    return insights;
+  }
+
+  private detectIdentityCareerAlignment(): SynthesizedInsight[] {
+    const insights: SynthesizedInsight[] = [];
+
+    const roleModelResponse = this.responses['ci-role-models'];
+    const peakExperience = this.responses['pe-2'];
+
+    if (roleModelResponse?.response === 'problem-solvers' && peakExperience) {
+      insights.push({
+        type: 'cross-domain',
+        title: 'Problem-Solver Identity Core',
+        description: 'Solving problems isn\'t just what you do - it\'s who you are. Your early identification with problem-solvers reveals that intellectual challenge and analytical work are central to your identity, not just career preferences. Work that doesn\'t challenge your mind will feel empty regardless of other benefits.',
+        confidence: 0.92,
+        sourceAreas: ['values', 'problem-solving', 'learning-growth'],
+        basedOn: ['ci-role-models', 'pe-2'],
+        implications: [
+          'You need intellectually challenging work to feel fulfilled',
+          'Routine execution without problem-solving will drain you',
+          'Prioritize roles with novel challenges over repetitive tasks',
+          'Consider positions that evolve with increasing complexity',
+          'High compensation won\'t compensate for lack of intellectual engagement'
+        ]
+      });
+    }
+
+    if (roleModelResponse?.response === 'helpers') {
+      insights.push({
+        type: 'cross-domain',
+        title: 'Service as Identity',
+        description: 'Helping others is fundamental to your identity, formed in childhood. This isn\'t a preference you can compromise on - you need to see visible, direct impact on individuals to feel your work matters. Abstract or indirect impact won\'t satisfy this deep need.',
+        confidence: 0.9,
+        sourceAreas: ['values', 'people-interaction'],
+        basedOn: ['ci-role-models'],
+        implications: [
+          'Prioritize roles with direct human impact',
+          'Avoid pure strategy or backend roles without visible beneficiaries',
+          'You need to see and hear from the people you help',
+          'Consider customer-facing, teaching, or healthcare-adjacent roles',
+          'Metrics alone won\'t fulfill you - you need stories and faces'
+        ]
+      });
+    }
+
+    if (roleModelResponse?.response === 'creators') {
+      insights.push({
+        type: 'cross-domain',
+        title: 'Maker Identity',
+        description: 'You identified early with creators because making and building is core to who you are. You need tangible output - something you can point to and say "I made that." Pure analysis or advising without creation will feel incomplete.',
+        confidence: 0.88,
+        sourceAreas: ['creativity', 'work-style'],
+        basedOn: ['ci-role-models'],
+        implications: [
+          'You need to create tangible outputs: code, designs, content, products',
+          'Avoid pure consulting roles without implementation',
+          'Look for maker cultures that value building',
+          'Your portfolio/body of work matters deeply to your fulfillment',
+          'Consider roles where you own creation from concept to completion'
+        ]
+      });
+    }
+
+    return insights;
+  }
+
+  private detectEnergyAuthenticity(): SynthesizedInsight[] {
+    const insights: SynthesizedInsight[] = [];
+
+    const energyDrain = this.responses['ep-2'];
+    const energySource = this.responses['ep-1'];
+    const aliveResponse = this.responses['ep-3'];
+
+    if (energyDrain?.response === 'social' && energySource) {
+      insights.push({
+        type: 'conditional-behavior',
+        title: 'Introversion is Neurological, Not Preference',
+        description: 'Your need for solitude to recharge isn\'t a preference - it\'s how your nervous system works. Constant social interaction genuinely depletes your cognitive resources. High-meeting, always-on cultures will burn you out regardless of how interesting the work is.',
+        confidence: 0.93,
+        sourceAreas: ['work-style', 'environment', 'people-interaction'],
+        basedOn: ['ep-2', 'ep-1'],
+        implications: [
+          'You NEED roles with substantial independent work time',
+          'Excessive meetings will impact your work quality and health',
+          'Remote work with async communication may suit you better',
+          'Build in recharge time between social obligations',
+          'This is non-negotiable - don\'t accept roles that violate this',
+          'Look for cultures that respect focus time and limit meetings'
+        ]
+      });
+    }
+
+    if (energyDrain?.response === 'constraints') {
+      insights.push({
+        type: 'nuanced-preference',
+        title: 'Creative Freedom as Energy Source',
+        description: 'Rigid constraints don\'t just frustrate you - they actively drain your energy because autonomy and creative freedom are fundamental to how you stay motivated. You need the ability to exercise judgment and solve problems your way to maintain engagement.',
+        confidence: 0.87,
+        sourceAreas: ['work-style', 'creativity', 'values'],
+        basedOn: ['ep-2'],
+        implications: [
+          'Highly regulated industries may slowly deplete you',
+          'Seek roles with decision-making authority and judgment calls',
+          'Avoid process-heavy environments with approval bottlenecks',
+          'Look for "how" flexibility even if "what" is defined',
+          'Startups or innovative teams may provide needed freedom'
+        ]
+      });
+    }
+
+    if (aliveResponse) {
+      const aliveText = String(aliveResponse.response).toLowerCase();
+      if (aliveText.includes('creat') || aliveText.includes('build') || aliveText.includes('mak')) {
+        insights.push({
+          type: 'cross-domain',
+          title: 'Creation as Vitality Source',
+          description: 'You feel most alive when creating. This reveals that creative expression and tangible output aren\'t nice-to-haves - they\'re essential to your vitality and engagement. Work that doesn\'t let you create will leave you feeling depleted and disconnected.',
+          confidence: 0.85,
+          sourceAreas: ['creativity', 'work-style', 'values'],
+          basedOn: ['ep-3'],
+          implications: [
+            'Prioritize roles where you create vs. manage or optimize',
+            'Greenfield projects will energize you more than maintenance',
+            'Consider maker roles: engineering, design, content creation',
+            'Avoid pure operations or optimization roles',
+            'You need creative outlets even in analytical roles'
+          ]
+        });
+      }
+    }
+
+    return insights;
   }
 }

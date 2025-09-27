@@ -15,6 +15,13 @@ import {
 import { InsightSynthesisEngine, SynthesizedInsight } from './insight-synthesis';
 import { DynamicQuestionGenerator, DynamicQuestionContext } from './dynamic-question-generator';
 import { InteractionTracker } from './interaction-tracker';
+import {
+  allArchaeologyQuestions,
+  getArchaeologyFollowUps,
+  synthesizeMotivationInsights,
+  MotivationInsight,
+  ArchaeologyQuestion,
+} from './motivation-archaeology';
 
 export interface QuestionResponse {
   questionId: string;
@@ -51,6 +58,8 @@ export interface AdaptiveSessionState {
   contradictions: Contradiction[];
   hiddenMotivations: HiddenMotivation[];
   synthesizedInsights: SynthesizedInsight[];
+  motivationInsights: MotivationInsight[];
+  archaeologyDepth: number;
 }
 
 export class AdaptiveQuestioningEngine {
@@ -81,6 +90,8 @@ export class AdaptiveQuestioningEngine {
       contradictions: initialState?.contradictions || [],
       hiddenMotivations: initialState?.hiddenMotivations || [],
       synthesizedInsights: initialState?.synthesizedInsights || [],
+      motivationInsights: initialState?.motivationInsights || [],
+      archaeologyDepth: initialState?.archaeologyDepth || 0,
     };
   }
 
@@ -111,6 +122,7 @@ export class AdaptiveQuestioningEngine {
     this.detectGaps();
     this.runPatternRecognition();
     this.runInsightSynthesis();
+    this.runMotivationArchaeology();
   }
 
   getNextQuestions(limit: number = 3): AdaptiveQuestion[] {
@@ -134,6 +146,9 @@ export class AdaptiveQuestioningEngine {
 
     const dynamicQuestions = this.getDynamicQuestions();
     dynamicQuestions.forEach(q => candidates.push({ question: q, priority: 90, reason: 'Personalized from career interests' }));
+
+    const archaeologyQuestions = this.getArchaeologyQuestions();
+    archaeologyQuestions.forEach(q => candidates.push({ question: q, priority: 85, reason: 'Deep motivation exploration' }));
 
     const gapQuestions = this.getGapFillingQuestions();
     gapQuestions.forEach(q => candidates.push({ question: q, priority: 80, reason: 'Fill knowledge gap' }));
@@ -340,6 +355,54 @@ export class AdaptiveQuestioningEngine {
     this.state.synthesizedInsights = synthesisEngine.synthesizeInsights();
   }
 
+  private runMotivationArchaeology() {
+    const responseValues = this.getResponseValues();
+    const motivationInsights = synthesizeMotivationInsights(responseValues);
+
+    for (const insight of motivationInsights) {
+      const existing = this.state.motivationInsights.find(
+        i => i.insight === insight.insight
+      );
+
+      if (!existing) {
+        this.state.motivationInsights.push(insight);
+        this.state.archaeologyDepth++;
+      }
+    }
+  }
+
+  private getArchaeologyQuestions(): AdaptiveQuestion[] {
+    const questions: AdaptiveQuestion[] = [];
+    const responseValues = this.getResponseValues();
+
+    const followUps = getArchaeologyFollowUps(responseValues);
+    for (const followUp of followUps) {
+      if (!this.state.askedQuestions.includes(followUp.id)) {
+        questions.push(followUp as AdaptiveQuestion);
+      }
+    }
+
+    if (this.state.archaeologyDepth < 3 && Object.keys(this.state.responses).length >= 3) {
+      for (const question of allArchaeologyQuestions) {
+        if (question.depth === 'intermediate' && !this.state.askedQuestions.includes(question.id)) {
+          questions.push(question as AdaptiveQuestion);
+          break;
+        }
+      }
+    }
+
+    if (this.state.archaeologyDepth >= 5) {
+      for (const question of allArchaeologyQuestions) {
+        if (question.depth === 'deep' && !this.state.askedQuestions.includes(question.id)) {
+          questions.push(question as AdaptiveQuestion);
+          break;
+        }
+      }
+    }
+
+    return questions.slice(0, 2);
+  }
+
   private updateInsightsWithPatterns(patternEngine: PatternRecognitionEngine) {
     for (const insight of this.state.discoveredInsights) {
       const newConfidence = patternEngine.calculateDynamicConfidence(
@@ -473,11 +536,16 @@ export class AdaptiveQuestioningEngine {
       responses: this.state.responses,
       insights: this.state.discoveredInsights,
       synthesizedInsights: this.state.synthesizedInsights,
+      motivationInsights: this.state.motivationInsights,
       gaps: this.state.identifiedGaps,
       progress: this.getExplorationProgress(),
       completion: this.getCompletionPercentage(),
       analysis: this.analyzeUserProfile(),
       patterns: this.getPatternAnalysis(),
     };
+  }
+
+  getMotivationInsights(): MotivationInsight[] {
+    return this.state.motivationInsights;
   }
 }
