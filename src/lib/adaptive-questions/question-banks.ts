@@ -232,6 +232,30 @@ export const peopleInteractionQuestions: AdaptiveQuestion[] = [
     ],
   },
   {
+    id: 'pi-conflict-clarify',
+    area: 'people-interaction',
+    type: 'multiple-choice',
+    text: 'When you choose to accept and move on from a disagreement, is it usually because:',
+    options: [
+      { value: 'avoid-conflict', label: 'I want to avoid conflict and maintain harmony' },
+      { value: 'pragmatic', label: 'I pick my battles and focus on what matters most' },
+      { value: 'trust-team', label: 'I trust the team\'s collective decision-making' },
+      { value: 'not-worth-it', label: 'The issue isn\'t important enough to push back on' },
+    ],
+    insightTriggers: [
+      {
+        pattern: (responses) => responses['pi-conflict-clarify'] === 'avoid-conflict',
+        insight: 'Conflict-averse - values harmony and avoiding confrontation',
+        hiddenInterest: 'Supportive roles, collaborative environments'
+      },
+      {
+        pattern: (responses) => responses['pi-conflict-clarify'] === 'pragmatic',
+        insight: 'Strategically assertive - knows when to push and when to yield',
+        hiddenInterest: 'Leadership, strategy, project management'
+      },
+    ],
+  },
+  {
     id: 'pi-energy-source',
     area: 'people-interaction',
     type: 'scale',

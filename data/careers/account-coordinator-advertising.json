@@ -1,0 +1,204 @@
+{
+  "id": "account-coordinator-advertising",
+  "category": "marketing",
+  "title": "Account Coordinator",
+  "description": "An Account Coordinator serves as the primary liaison between clients and internal agency teams, managing day-to-day project coordination and client communication. They support senior account managers in campaign execution, timeline management, and ensuring deliverables meet client expectations while maintaining strong client relationships.",
+  "alternativeTitles": [
+    "Junior Account Manager",
+    "Client Services Coordinator",
+    "Project Coordinator",
+    "Client Relations Coordinator"
+  ],
+  "dailyTasks": [
+    {
+      "task": "Client communication and email management",
+      "frequency": "daily",
+      "timePercentage": 30
+    },
+    {
+      "task": "Internal team coordination and project updates",
+      "frequency": "daily",
+      "timePercentage": 25
+    },
+    {
+      "task": "Project timeline and budget tracking",
+      "frequency": "daily",
+      "timePercentage": 20
+    },
+    {
+      "task": "Meeting preparation and documentation",
+      "frequency": "daily",
+      "timePercentage": 15
+    },
+    {
+      "task": "Administrative tasks and reporting",
+      "frequency": "daily",
+      "timePercentage": 10
+    }
+  ],
+  "requiredSkills": [
+    {
+      "skill": "Client Communication",
+      "category": "soft",
+      "importance": "required",
+      "description": "Strong written and verbal communication skills"
+    },
+    {
+      "skill": "Project Management",
+      "category": "technical",
+      "importance": "required",
+      "description": "Experience with project management tools and methodologies"
+    },
+    {
+      "skill": "Microsoft Office Suite",
+      "category": "technical",
+      "importance": "required",
+      "description": "Proficiency in Excel, PowerPoint, and Word"
+    },
+    {
+      "skill": "Organization",
+      "category": "soft",
+      "importance": "required",
+      "description": "Strong attention to detail and multi-tasking abilities"
+    },
+    {
+      "skill": "Marketing Knowledge",
+      "category": "technical",
+      "importance": "preferred",
+      "description": "Understanding of marketing principles and strategies"
+    }
+  ],
+  "salaryRanges": [
+    {
+      "min": 45000,
+      "max": 60000,
+      "median": 52000,
+      "currency": "USD",
+      "period": "yearly",
+      "experienceLevel": "entry"
+    },
+    {
+      "min": 55000,
+      "max": 75000,
+      "median": 65000,
+      "currency": "USD",
+      "period": "yearly",
+      "experienceLevel": "mid"
+    }
+  ],
+  "careerProgression": [
+    {
+      "level": "entry",
+      "title": "Account Coordinator",
+      "yearsExperience": "0-2 years",
+      "typicalSalaryRange": {
+        "min": 45000,
+        "max": 60000,
+        "currency": "USD"
+      },
+      "keyResponsibilities": [
+        "Client communication",
+        "Project coordination",
+        "Administrative support"
+      ],
+      "requiredSkills": [
+        "Communication",
+        "Organization",
+        "Microsoft Office"
+      ]
+    },
+    {
+      "level": "mid",
+      "title": "Account Manager",
+      "yearsExperience": "2-5 years",
+      "typicalSalaryRange": {
+        "min": 60000,
+        "max": 85000,
+        "currency": "USD"
+      },
+      "keyResponsibilities": [
+        "Client strategy",
+        "Team leadership",
+        "Budget management"
+      ],
+      "requiredSkills": [
+        "Strategic thinking",
+        "Leadership",
+        "Budget management"
+      ]
+    },
+    {
+      "level": "senior",
+      "title": "Senior Account Manager",
+      "yearsExperience": "5-8 years",
+      "typicalSalaryRange": {
+        "min": 80000,
+        "max": 120000,
+        "currency": "USD"
+      },
+      "keyResponsibilities": [
+        "Strategic planning",
+        "Team management",
+        "Business development"
+      ],
+      "requiredSkills": [
+        "Strategic planning",
+        "Team management",
+        "Business development"
+      ]
+    }
+  ],
+  "industryInsights": [
+    {
+      "topic": "Digital Transformation",
+      "description": "Increasing focus on digital marketing and virtual client relationships",
+      "trend": "growing"
+    },
+    {
+      "topic": "Project Management Tools",
+      "description": "Growing adoption of advanced project management and collaboration platforms",
+      "trend": "growing"
+    }
+  ],
+  "workEnvironment": {
+    "remote": true,
+    "hybrid": true,
+    "onsite": true,
+    "travelRequired": false,
+    "typicalHours": "40-45 hours per week, standard business hours with occasional evening meetings"
+  },
+  "jobOutlook": {
+    "growthRate": "7% (2021-2031, average growth)",
+    "projectedJobs": "5,000 per year",
+    "competitionLevel": "medium"
+  },
+  "education": {
+    "minimumDegree": "Bachelor's degree",
+    "preferredDegree": "Bachelor's in Marketing, Communications, or Business",
+    "certifications": [
+      "Project Management Professional (PMP)",
+      "Digital Marketing Certifications"
+    ],
+    "alternativePathways": [
+      "Marketing internships",
+      "Client service experience",
+      "Sales experience"
+    ]
+  },
+  "relatedRoles": [
+    "Project Coordinator",
+    "Marketing Coordinator",
+    "Client Services Manager",
+    "Digital Account Manager"
+  ],
+  "keywords": [
+    "account management",
+    "client services",
+    "project coordination",
+    "marketing",
+    "advertising",
+    "agency",
+    "client relations",
+    "account coordination"
+  ]
+}
