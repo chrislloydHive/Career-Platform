@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
-import { UserProfile } from '@/types/user-profile';
+import { UserProfile, CareerPreferences } from '@/types/user-profile';
+import { CareerPreferencesEditor } from '@/components/CareerPreferencesEditor';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'insights'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'preferences' | 'history' | 'insights'>('overview');
 
   useEffect(() => {
     loadProfile();
@@ -24,6 +25,24 @@ export default function ProfilePage() {
       console.error('Failed to load profile:', error);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleSavePreferences(preferences: CareerPreferences) {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ careerPreferences: preferences }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data.profile);
+      }
+    } catch (error) {
+      console.error('Failed to save preferences:', error);
+      throw error;
     }
   }
 
@@ -69,6 +88,16 @@ export default function ProfilePage() {
             }`}
           >
             Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('preferences')}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'preferences'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            Preferences
           </button>
           <button
             onClick={() => setActiveTab('history')}
@@ -244,6 +273,13 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'preferences' && (
+          <CareerPreferencesEditor
+            preferences={profile.careerPreferences}
+            onSave={handleSavePreferences}
+          />
         )}
 
         {activeTab === 'history' && (

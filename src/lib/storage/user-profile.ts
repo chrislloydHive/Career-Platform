@@ -85,6 +85,41 @@ ${profile.bio}
 ## Current Location
 ${profile.location}
 
+## 🎯 CAREER PREFERENCES (CRITICAL FOR RECOMMENDATIONS)
+
+### Ideal Role
+${profile.careerPreferences.idealRole}
+
+### What Matters Most
+${profile.careerPreferences.whatMatters.map(item => `- ${item}`).join('\n')}
+
+### Ideal Work Environment
+${profile.careerPreferences.workEnvironment.map(item => `- ${item}`).join('\n')}
+
+### Deal Breakers (MUST AVOID)
+${profile.careerPreferences.dealBreakers.map(item => `- ${item}`).join('\n')}
+
+### Key Motivations
+${profile.careerPreferences.motivations.map(item => `- ${item}`).join('\n')}
+
+### Skills to Leverage
+${profile.careerPreferences.skillsToLeverage.map(item => `- ${item}`).join('\n')}
+
+### Skills to Grow
+${profile.careerPreferences.skillsToGrow.map(item => `- ${item}`).join('\n')}
+
+### Culture Fit Requirements
+${profile.careerPreferences.cultureFit.map(item => `- ${item}`).join('\n')}
+
+### Work-Life Balance Priority
+${profile.careerPreferences.workLifeBalance}
+
+### Compensation Philosophy
+${profile.careerPreferences.compensationPriority}
+
+### Additional Context
+${profile.careerPreferences.customNotes}
+
 ## Education
 ${profile.education.map(edu => `
 - ${edu.degree} in ${edu.major}${edu.minor ? ` (Minor: ${edu.minor})` : ''} from ${edu.institution} (${edu.graduationYear})

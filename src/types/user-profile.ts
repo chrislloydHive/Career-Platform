@@ -18,6 +18,20 @@ export interface Experience {
   skills?: string[];
 }
 
+export interface CareerPreferences {
+  whatMatters: string[];
+  idealRole: string;
+  workEnvironment: string[];
+  dealBreakers: string[];
+  motivations: string[];
+  skillsToLeverage: string[];
+  skillsToGrow: string[];
+  cultureFit: string[];
+  workLifeBalance: string;
+  compensationPriority: string;
+  customNotes: string;
+}
+
 export interface UserProfile {
   name: string;
   location: string;
@@ -36,6 +50,8 @@ export interface UserProfile {
   careerGoals: string[];
   preferredIndustries: string[];
   preferredLocations: string[];
+
+  careerPreferences: CareerPreferences;
 
   interactionHistory: {
     timestamp: Date;
@@ -209,6 +225,62 @@ export const LOUISA_PROFILE: UserProfile = {
     "Pacific Northwest",
     "Remote (with Pacific Northwest base)"
   ],
+
+  careerPreferences: {
+    whatMatters: [
+      "Helping people and making direct impact",
+      "Structure and clear processes",
+      "Creativity combined with strategy",
+      "Professional growth opportunities",
+      "Work-life balance"
+    ],
+    idealRole: "A role that combines marketing expertise with passion for health and wellness, allowing me to help people while working in structured environments with opportunities for growth",
+    workEnvironment: [
+      "Collaborative team environment",
+      "Clear communication channels",
+      "Supportive leadership",
+      "Hybrid or remote flexibility",
+      "Health-conscious culture"
+    ],
+    dealBreakers: [
+      "Lack of growth opportunities",
+      "Poor work-life balance",
+      "Chaotic or unstructured environment",
+      "No mission or purpose alignment",
+      "Limited autonomy"
+    ],
+    motivations: [
+      "Making a positive impact on people's health and wellbeing",
+      "Building meaningful relationships with clients/customers",
+      "Applying creative problem-solving to real challenges",
+      "Continuous learning and skill development",
+      "Contributing to a mission I believe in"
+    ],
+    skillsToLeverage: [
+      "Marketing and brand strategy",
+      "Social media and content creation",
+      "Client relationship building",
+      "Healthcare operations and patient communication",
+      "Visual merchandising and creative execution"
+    ],
+    skillsToGrow: [
+      "Digital marketing and analytics",
+      "Health technology platforms",
+      "Strategic planning and business development",
+      "Data-driven decision making",
+      "Leadership and team management"
+    ],
+    cultureFit: [
+      "Values authenticity and transparency",
+      "Encourages innovation and new ideas",
+      "Prioritizes employee wellbeing",
+      "Celebrates diversity and inclusion",
+      "Has a clear mission focused on positive impact"
+    ],
+    workLifeBalance: "High priority - need time for personal fitness, family, and recharging. Prefer 40-45 hour weeks with flexibility for wellness activities.",
+    compensationPriority: "Competitive salary important, but not the primary driver. More interested in total package including growth potential, benefits, and mission alignment. Minimum $55-60k.",
+    customNotes: "After working in healthcare, fitness, and retail, I've learned I thrive in roles where I can combine my marketing creativity with my passion for helping people live healthier lives. I'm most energized when I can see the direct impact of my work on individuals' wellbeing. The structure and operations side of my chiropractic clinic role taught me I appreciate clear processes, but I also need creative outlets. Ideally looking for a company at the intersection of wellness, technology, and marketing where I can grow into strategy and leadership roles."
+  },
 
   interactionHistory: [],
   aiInsights: [],
