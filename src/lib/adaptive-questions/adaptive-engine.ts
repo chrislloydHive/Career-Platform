@@ -24,6 +24,7 @@ import {
 } from './motivation-archaeology';
 import { StrengthValidationEngine, StrengthProfile } from '../strengths/strength-validation';
 import { UserProfile } from '@/types/user-profile';
+import { HiddenInterestPredictor, ExplorationSuggestion } from '../predictions/hidden-interest-predictor';
 
 export interface QuestionResponse {
   questionId: string;
@@ -63,6 +64,7 @@ export interface AdaptiveSessionState {
   motivationInsights: MotivationInsight[];
   archaeologyDepth: number;
   strengthProfile: StrengthProfile | null;
+  hiddenInterestPredictions: ExplorationSuggestion[];
 }
 
 export class AdaptiveQuestioningEngine {
@@ -98,6 +100,7 @@ export class AdaptiveQuestioningEngine {
       motivationInsights: initialState?.motivationInsights || [],
       archaeologyDepth: initialState?.archaeologyDepth || 0,
       strengthProfile: initialState?.strengthProfile || null,
+      hiddenInterestPredictions: initialState?.hiddenInterestPredictions || [],
     };
   }
 
@@ -130,6 +133,7 @@ export class AdaptiveQuestioningEngine {
     this.runInsightSynthesis();
     this.runMotivationArchaeology();
     this.runStrengthValidation();
+    this.runHiddenInterestPrediction();
   }
 
   getNextQuestions(limit: number = 3): AdaptiveQuestion[] {
@@ -593,6 +597,7 @@ export class AdaptiveQuestioningEngine {
       synthesizedInsights: this.state.synthesizedInsights,
       motivationInsights: this.state.motivationInsights,
       strengthProfile: this.state.strengthProfile,
+      hiddenInterestPredictions: this.state.hiddenInterestPredictions,
       gaps: this.state.identifiedGaps,
       progress: this.getExplorationProgress(),
       completion: this.getCompletionPercentage(),
@@ -607,5 +612,62 @@ export class AdaptiveQuestioningEngine {
 
   getStrengthProfile(): StrengthProfile | null {
     return this.state.strengthProfile;
+  }
+
+  private runHiddenInterestPrediction() {
+    if (!this.userProfile || Object.keys(this.state.responses).length < 5) {
+      return;
+    }
+
+    const interactions = InteractionTracker.getRecentInteractions(100);
+
+    const predictor = new HiddenInterestPredictor(
+      this.state.responses,
+      interactions,
+      this.userProfile
+    );
+
+    this.state.hiddenInterestPredictions = predictor.predictHiddenInterests();
+
+    for (const prediction of this.state.hiddenInterestPredictions) {
+      const existing = this.state.discoveredInsights.find(
+        i => i.insight.includes(prediction.careerArea) && i.type === 'hidden-interest'
+      );
+
+      if (!existing) {
+        this.state.discoveredInsights.push({
+          type: 'hidden-interest',
+          area: this.mapCareerAreaToExplorationArea(prediction.careerArea),
+          insight: prediction.reasoning,
+          confidence: prediction.confidence,
+          basedOn: prediction.signals.map(s => s.evidence.join('; ')),
+        });
+      }
+    }
+  }
+
+  private mapCareerAreaToExplorationArea(careerArea: string): ExplorationArea {
+    const mapping: Record<string, ExplorationArea> = {
+      'Data Visualization': 'creativity',
+      'Product Management': 'problem-solving',
+      'UX Research': 'people-interaction',
+      'Operations': 'structure-flexibility',
+      'Training': 'learning-growth',
+      'Analytics': 'problem-solving',
+      'Customer Success': 'people-interaction',
+      'Content Strategy': 'creativity',
+    };
+
+    for (const [key, value] of Object.entries(mapping)) {
+      if (careerArea.includes(key)) {
+        return value;
+      }
+    }
+
+    return 'work-style';
+  }
+
+  getHiddenInterestPredictions(): ExplorationSuggestion[] {
+    return this.state.hiddenInterestPredictions;
   }
 }
