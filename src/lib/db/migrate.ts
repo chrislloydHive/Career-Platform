@@ -32,7 +32,7 @@ export async function migrateFromJSON() {
           preferred_industries = ${JSON.stringify(profile.preferredIndustries)},
           preferred_locations = ${JSON.stringify(profile.preferredLocations)},
           career_preferences = ${JSON.stringify(profile.careerPreferences)},
-          last_updated = ${new Date(profile.lastUpdated)}
+          last_updated = ${new Date(profile.lastUpdated).toISOString()}
         WHERE user_id = 'louisa'
       `;
       console.log('Updated existing profile');
@@ -60,7 +60,7 @@ export async function migrateFromJSON() {
           ${JSON.stringify(profile.preferredIndustries)},
           ${JSON.stringify(profile.preferredLocations)},
           ${JSON.stringify(profile.careerPreferences)},
-          ${new Date(profile.lastUpdated)},
+          ${new Date(profile.lastUpdated).toISOString()},
           CURRENT_TIMESTAMP
         )
       `;
@@ -78,7 +78,7 @@ export async function migrateFromJSON() {
             ${interaction.action},
             ${interaction.context},
             ${interaction.aiLearning || null},
-            ${new Date(interaction.timestamp)}
+            ${new Date(interaction.timestamp).toISOString()}
           )
         `;
       }
@@ -96,7 +96,7 @@ export async function migrateFromJSON() {
             ${insight.insight},
             ${insight.confidence},
             ${insight.source},
-            ${new Date(insight.timestamp)}
+            ${new Date(insight.timestamp).toISOString()}
           )
         `;
       }
@@ -120,8 +120,8 @@ export async function migrateFromJSON() {
             ${JSON.stringify(item.type === 'job' ? item.job : item.career)},
             ${item.notes || null},
             ${JSON.stringify(item.tags || [])},
-            ${new Date(item.savedAt)},
-            ${new Date(savedItemsCollection.lastModified)}
+            ${new Date(item.savedAt).toISOString()},
+            ${new Date(savedItemsCollection.lastModified).toISOString()}
           )
         `;
       }

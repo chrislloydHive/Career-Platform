@@ -1,6 +1,7 @@
 'use client';
 
 import { ScoredJob, JobSource } from '@/types';
+import { InteractionTracker } from '@/lib/adaptive-questions/interaction-tracker';
 
 interface JobCardProps {
   job: ScoredJob;
@@ -8,6 +9,12 @@ interface JobCardProps {
 }
 
 export function JobCard({ job, rank }: JobCardProps) {
+  const handleViewJob = () => {
+    InteractionTracker.trackRoleInterest(job.title, {
+      company: job.company,
+    });
+  };
+
   const formatSalary = (salary: typeof job.salary) => {
     if (!salary) return 'Salary not specified';
 
@@ -140,6 +147,7 @@ export function JobCard({ job, rank }: JobCardProps) {
           href={job.url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={handleViewJob}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
         >
           View Job

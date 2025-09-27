@@ -21,9 +21,25 @@ export async function POST(request: NextRequest) {
 
     if (type === 'job') {
       const savedItem = await saveJob(item, notes, tags);
+
+      if (typeof window !== 'undefined') {
+        const { InteractionTracker } = await import('@/lib/adaptive-questions/interaction-tracker');
+        InteractionTracker.trackJobSaved(item.title, {
+          company: item.company,
+        });
+      }
+
       return NextResponse.json({ success: true, item: savedItem });
     } else if (type === 'career') {
       const savedItem = await saveCareer(item, notes, tags);
+
+      if (typeof window !== 'undefined') {
+        const { InteractionTracker } = await import('@/lib/adaptive-questions/interaction-tracker');
+        InteractionTracker.trackCareerViewed(item.title, {
+          industry: item.category,
+        });
+      }
+
       return NextResponse.json({ success: true, item: savedItem });
     } else {
       return NextResponse.json(

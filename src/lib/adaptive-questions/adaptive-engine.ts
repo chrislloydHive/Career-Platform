@@ -13,6 +13,8 @@ import {
   HiddenMotivation,
 } from './pattern-recognition';
 import { InsightSynthesisEngine, SynthesizedInsight } from './insight-synthesis';
+import { DynamicQuestionGenerator, DynamicQuestionContext } from './dynamic-question-generator';
+import { InteractionTracker } from './interaction-tracker';
 
 export interface QuestionResponse {
   questionId: string;
@@ -53,8 +55,10 @@ export interface AdaptiveSessionState {
 
 export class AdaptiveQuestioningEngine {
   private state: AdaptiveSessionState;
+  private dynamicGenerator: DynamicQuestionGenerator;
 
   constructor(initialState?: Partial<AdaptiveSessionState>) {
+    this.dynamicGenerator = new DynamicQuestionGenerator();
     this.state = {
       responses: initialState?.responses || {},
       askedQuestions: initialState?.askedQuestions || [],
@@ -128,6 +132,9 @@ export class AdaptiveQuestioningEngine {
       }
     }
 
+    const dynamicQuestions = this.getDynamicQuestions();
+    dynamicQuestions.forEach(q => candidates.push({ question: q, priority: 90, reason: 'Personalized from career interests' }));
+
     const gapQuestions = this.getGapFillingQuestions();
     gapQuestions.forEach(q => candidates.push({ question: q, priority: 80, reason: 'Fill knowledge gap' }));
 
@@ -200,6 +207,23 @@ export class AdaptiveQuestioningEngine {
     }
 
     return null;
+  }
+
+  private getDynamicQuestions(): AdaptiveQuestion[] {
+    const interactions = InteractionTracker.getRecentInteractions(50);
+
+    if (interactions.length < 2) {
+      return [];
+    }
+
+    const context: DynamicQuestionContext = {
+      interactions,
+      existingResponses: this.state.responses,
+    };
+
+    const dynamicQuestions = this.dynamicGenerator.generateQuestionsFromContext(context);
+
+    return dynamicQuestions.filter(q => !this.state.askedQuestions.includes(q.id));
   }
 
   private getGapFillingQuestions(): AdaptiveQuestion[] {

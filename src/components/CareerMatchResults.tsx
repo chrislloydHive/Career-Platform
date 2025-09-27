@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { CareerMatch } from '@/types/career-matching';
 import { CareerDetailModal } from './CareerDetailModal';
+import { InteractionTracker } from '@/lib/adaptive-questions/interaction-tracker';
 
 interface CareerMatchResultsProps {
   matches: CareerMatch[];
@@ -219,7 +220,13 @@ export function CareerMatchResults({ matches, userProfile }: CareerMatchResultsP
                   {expandedMatch === match.career.id ? 'Hide Details' : 'Show Details'}
                 </button>
                 <button
-                  onClick={() => setSelectedCareer(match)}
+                  onClick={() => {
+                    InteractionTracker.trackCareerViewed(match.career.title, {
+                      industry: match.career.category,
+                      skills: match.career.requiredSkills?.map(s => s.skill) || [],
+                    });
+                    setSelectedCareer(match);
+                  }}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   View Full Profile

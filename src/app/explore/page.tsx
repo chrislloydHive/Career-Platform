@@ -213,7 +213,7 @@ export default function ExplorePage() {
                     Your Core Values
                   </h2>
                   <p className="text-gray-300 mb-4 italic">
-                    "{profile.patterns.valueHierarchy.coreMotivation}"
+                    &ldquo;{profile.patterns.valueHierarchy.coreMotivation}&rdquo;
                   </p>
                   <div className="space-y-3">
                     {profile.patterns.valueHierarchy.topValues.map((value, index) => (

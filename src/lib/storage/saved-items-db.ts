@@ -67,7 +67,7 @@ export async function saveJob(job: ScoredJob, notes?: string, tags?: string[]): 
           ${JSON.stringify(job)},
           ${notes || null},
           ${JSON.stringify(tags || [])},
-          ${savedAt}
+          ${savedAt.toISOString()}
         )
       `;
     }
@@ -114,7 +114,7 @@ export async function saveCareer(career: JobCategory, notes?: string, tags?: str
           ${JSON.stringify(career)},
           ${notes || null},
           ${JSON.stringify(tags || [])},
-          ${savedAt}
+          ${savedAt.toISOString()}
         )
       `;
     }

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChatMessage, CareerSuggestion } from '@/types/chat';
 import Link from 'next/link';
+import { InteractionTracker } from '@/lib/adaptive-questions/interaction-tracker';
 
 export function CareerChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -36,6 +37,8 @@ export function CareerChat() {
       content: input,
       timestamp: new Date(),
     };
+
+    InteractionTracker.trackChatTopic(input);
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
@@ -179,12 +182,20 @@ export function CareerChat() {
 function CareerSuggestionCard({ suggestion }: { suggestion: CareerSuggestion }) {
   const { career, relevanceScore, reasoning, matchedKeywords } = suggestion;
 
+  const handleCareerClick = () => {
+    InteractionTracker.trackCareerViewed(career.title, {
+      industry: career.category,
+      skills: career.requiredSkills?.map(s => s.skill) || [],
+    });
+  };
+
   return (
     <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 hover:border-blue-500 transition-all">
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <Link
             href={`/careers?id=${career.id}`}
+            onClick={handleCareerClick}
             className="text-lg font-semibold text-gray-100 hover:text-blue-400 transition-colors"
           >
             {career.title}
