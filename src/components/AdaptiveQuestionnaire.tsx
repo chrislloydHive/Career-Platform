@@ -5,7 +5,6 @@ import { AdaptiveQuestioningEngine, DiscoveredInsight, IdentifiedGap } from '@/l
 import { SynthesizedInsight } from '@/lib/adaptive-questions/insight-synthesis';
 import { AdaptiveQuestion, ExplorationArea } from '@/lib/adaptive-questions/question-banks';
 import { InteractiveInsightExplorer } from './InteractiveInsightExplorer';
-import { InsightRefinement } from '@/lib/insights/insight-explorer';
 import { UserProfile } from '@/types/user-profile';
 import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/matching/realtime-career-matcher';
 import { LiveCareerMatches } from './LiveCareerMatches';
@@ -26,7 +25,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [scaleValue, setScaleValue] = useState(3);
   const [textInput, setTextInput] = useState('');
   const [confidenceLevel, setConfidenceLevel] = useState<'certain' | 'somewhat-sure' | 'uncertain'>('certain');
-  const [showInsights, setShowInsights] = useState(false);
   const [insights, setInsights] = useState<DiscoveredInsight[]>([]);
   const [synthesizedInsights, setSynthesizedInsights] = useState<SynthesizedInsight[]>([]);
   const [gaps, setGaps] = useState<IdentifiedGap[]>([]);
@@ -43,6 +41,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
   useEffect(() => {
     loadNextQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadNextQuestions = () => {

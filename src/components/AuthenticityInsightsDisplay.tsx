@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import {
   AuthenticityProfile,
-  AuthenticPreference,
-  SelfPerceptionGap,
 } from '@/lib/authenticity/authentic-self-detector';
 import { AdaptiveQuestion } from '@/lib/adaptive-questions/question-banks';
 
@@ -123,7 +121,7 @@ export function AuthenticityInsightsDisplay({
                   {pref.shouldWantSignals.length > 0 && (
                     <div className="bg-orange-900/20 border border-orange-700/50 rounded-lg p-3">
                       <div className="text-xs font-semibold text-orange-400 mb-2">
-                        "Should-Want" Signals
+                        &quot;Should-Want&quot; Signals
                       </div>
                       <ul className="space-y-1">
                         {pref.shouldWantSignals.map((signal, i) => (
@@ -139,7 +137,7 @@ export function AuthenticityInsightsDisplay({
                   {pref.actuallyWantSignals.length > 0 && (
                     <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-3">
                       <div className="text-xs font-semibold text-green-400 mb-2">
-                        "Actually-Want" Signals
+                        &quot;Actually-Want&quot; Signals
                       </div>
                       <ul className="space-y-1">
                         {pref.actuallyWantSignals.map((signal, i) => (
