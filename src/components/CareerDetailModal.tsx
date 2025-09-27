@@ -2,6 +2,7 @@
 
 import type { JobCategory } from '@/types/career';
 import { useState } from 'react';
+import { LiveCareerInsights } from './LiveCareerInsights';
 
 interface CareerDetailModalProps {
   career: JobCategory | null;
@@ -9,7 +10,7 @@ interface CareerDetailModalProps {
 }
 
 export function CareerDetailModal({ career, onClose }: CareerDetailModalProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'progression' | 'skills' | 'insights'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'progression' | 'skills' | 'insights' | 'livedata'>('overview');
 
   if (!career) return null;
 
@@ -61,17 +62,18 @@ export function CareerDetailModal({ career, onClose }: CareerDetailModalProps) {
 
         {/* Tabs */}
         <div className="border-b border-gray-700 bg-gray-850">
-          <div className="flex px-6">
+          <div className="flex px-6 overflow-x-auto">
             {[
               { id: 'overview', label: 'Overview' },
               { id: 'progression', label: 'Career Path' },
               { id: 'skills', label: 'Skills' },
               { id: 'insights', label: 'Industry Insights' },
+              { id: 'livedata', label: '🌐 Live Market Data' },
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+                className={`px-4 py-3 font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-400'
                     : 'border-transparent text-gray-400 hover:text-gray-300'
@@ -403,6 +405,13 @@ export function CareerDetailModal({ career, onClose }: CareerDetailModalProps) {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Live Market Data Tab */}
+          {activeTab === 'livedata' && (
+            <div>
+              <LiveCareerInsights roleName={career.title} />
             </div>
           )}
         </div>

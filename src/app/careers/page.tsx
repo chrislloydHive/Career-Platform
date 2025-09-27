@@ -19,16 +19,25 @@ export default function CareersPage() {
               <h1 className="text-2xl font-bold text-gray-100">Career Research</h1>
               <p className="text-sm text-gray-400">Explore career paths and opportunities</p>
             </div>
-            <button
-              onClick={() => setShowComparison(!showComparison)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                showComparison
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-              }`}
-            >
-              {showComparison ? 'Back to Explorer' : 'Compare Careers'}
-            </button>
+            <div className="flex items-center gap-3">
+              <a
+                href="/careers/emerging"
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+              >
+                <span>🚀</span>
+                Emerging Roles
+              </a>
+              <button
+                onClick={() => setShowComparison(!showComparison)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  showComparison
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                }`}
+              >
+                {showComparison ? 'Back to Explorer' : 'Compare Careers'}
+              </button>
+            </div>
           </div>
         </div>
       </header>
