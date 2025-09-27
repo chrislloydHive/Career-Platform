@@ -17,6 +17,7 @@ export function LiveCareerInsights({ roleName, location, onInsightsLoaded }: Liv
 
   useEffect(() => {
     loadInsights();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roleName, location]);
 
   const loadInsights = async () => {
@@ -48,9 +49,6 @@ export function LiveCareerInsights({ roleName, location, onInsightsLoaded }: Liv
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    return null;
-  };
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {

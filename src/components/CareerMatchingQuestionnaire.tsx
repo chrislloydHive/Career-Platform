@@ -52,6 +52,7 @@ export function CareerMatchingQuestionnaire({ onComplete, enableRealTimeMatching
     if (enableRealTimeMatching && Object.keys(responses).length >= 5) {
       updateRealtimeMatches();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [responses, enableRealTimeMatching]);
 
   const updateRealtimeMatches = () => {
@@ -397,7 +398,7 @@ export function CareerMatchingQuestionnaire({ onComplete, enableRealTimeMatching
 
           {showRealtimePreview && (
             <div className="mt-4 space-y-3">
-              {realtimeMatches.map((match, index) => (
+              {realtimeMatches.map((match) => (
                 <div key={match.career.id} className="bg-gray-800/50 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-semibold text-gray-100">{match.career.title}</h4>

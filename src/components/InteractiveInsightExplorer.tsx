@@ -7,7 +7,6 @@ import {
   ExploredInsight,
   InsightEvidence,
   RelatedQuestion,
-  CareerConnection,
   InsightRefinement,
 } from '@/lib/insights/insight-explorer';
 import { UserProfile } from '@/types/user-profile';

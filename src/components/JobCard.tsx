@@ -57,12 +57,6 @@ export function JobCard({ job, rank }: JobCardProps) {
     return 'text-gray-400 bg-gray-800 border-gray-700';
   };
 
-  const getScoreBarColor = (score: number) => {
-    if (score >= 80) return 'bg-green-500';
-    if (score >= 60) return 'bg-blue-500';
-    if (score >= 40) return 'bg-yellow-500';
-    return 'bg-gray-400';
-  };
 
   const sourceColors: Record<JobSource, string> = {
     linkedin: 'bg-blue-900/50 text-blue-400',

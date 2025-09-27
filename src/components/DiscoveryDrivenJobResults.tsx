@@ -5,7 +5,6 @@ import {
   DiscoveryDrivenSearch,
   JobMatch,
   SearchTerm,
-  SearchFilter,
   DiscoveryMatch,
 } from '@/lib/jobs/discovery-driven-search';
 
@@ -190,9 +189,9 @@ export function DiscoveryDrivenJobResults({
                           <p className="text-sm text-gray-300 mb-1">{match.explanation}</p>
                           <div className="bg-gray-800 rounded p-2 border border-gray-700">
                             <p className="text-xs text-gray-400 mb-1 font-medium">Your insight:</p>
-                            <p className="text-xs text-blue-400 italic mb-2">"{match.insight}"</p>
+                            <p className="text-xs text-blue-400 italic mb-2">&quot;{match.insight}&quot;</p>
                             <p className="text-xs text-gray-400 mb-1 font-medium">Job evidence:</p>
-                            <p className="text-xs text-gray-300">"{match.jobEvidence}"</p>
+                            <p className="text-xs text-gray-300">&quot;{match.jobEvidence}&quot;</p>
                           </div>
                         </div>
                       </div>

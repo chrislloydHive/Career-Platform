@@ -13,7 +13,7 @@ interface CareerMatchResultsProps {
   };
 }
 
-export function CareerMatchResults({ matches, userProfile }: CareerMatchResultsProps) {
+export function CareerMatchResults({ matches }: CareerMatchResultsProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [expandedMatch, setExpandedMatch] = useState<string | null>(null);
   const [selectedCareer, setSelectedCareer] = useState<CareerMatch | null>(null);
@@ -87,7 +87,7 @@ export function CareerMatchResults({ matches, userProfile }: CareerMatchResultsP
       </div>
 
       <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-6'}>
-        {matches.map((match, index) => (
+        {matches.map((match) => (
           <div
             key={match.career.id}
             className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow"
