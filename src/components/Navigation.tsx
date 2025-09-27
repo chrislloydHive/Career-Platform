@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface NavigationProps {
   title?: string;
@@ -11,6 +11,13 @@ interface NavigationProps {
 
 export function Navigation({ title, subtitle, actions }: NavigationProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  };
 
   const navItems = [
     { href: '/', label: 'Job Search', icon: SearchIcon },
@@ -56,11 +63,16 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
             </nav>
           </div>
 
-          {actions && (
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-2">
-              {actions}
-            </div>
-          )}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-2">
+            {actions}
+            <button
+              onClick={handleLogout}
+              className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <LogoutIcon className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {(title || subtitle) && (
@@ -126,6 +138,14 @@ function UserIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  );
+}
+
+function LogoutIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
     </svg>
   );
 }
