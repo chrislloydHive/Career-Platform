@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
 import { DiscoveredInsight } from '@/lib/adaptive-questions/adaptive-engine';
@@ -24,22 +25,18 @@ export default function ExplorePage() {
   if (showResults && profile) {
     return (
       <div className="min-h-screen bg-gray-950">
-        <header className="bg-gray-900 border-b border-gray-700 sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-100">Your Career Profile</h1>
-                <p className="text-sm text-gray-400">Based on adaptive exploration</p>
-              </div>
-              <Link
-                href="/career-match"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Find Matching Careers
-              </Link>
-            </div>
-          </div>
-        </header>
+        <Navigation
+          title="Your Career Profile"
+          subtitle="Based on adaptive exploration"
+          actions={
+            <Link
+              href="/career-match"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            >
+              Find Matches
+            </Link>
+          }
+        />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Summary Stats */}
@@ -153,12 +150,12 @@ export default function ExplorePage() {
                   <div className="flex items-start justify-between mb-2">
                     <span className={`px-3 py-1 rounded text-xs font-medium ${
                       insight.type === 'hidden-interest'
-                        ? 'bg-purple-900/50 text-purple-400'
+                        ? 'bg-blue-900/50 text-blue-400'
                         : insight.type === 'strength'
-                        ? 'bg-green-900/50 text-green-400'
+                        ? 'bg-blue-800/50 text-blue-300'
                         : insight.type === 'preference'
                         ? 'bg-blue-900/50 text-blue-400'
-                        : 'bg-orange-900/50 text-orange-400'
+                        : 'bg-blue-700/50 text-blue-500'
                     }`}>
                       {insight.type.replace('-', ' ')}
                     </span>
@@ -200,24 +197,10 @@ export default function ExplorePage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      <header className="bg-gray-900 border-b border-gray-700 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-100">Career Exploration</h1>
-              <p className="text-sm text-gray-400">Discover your hidden interests and strengths</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Link
-                href="/careers"
-                className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                Browse Careers
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation
+        title="Self Discovery"
+        subtitle="Discover your hidden interests and strengths"
+      />
 
       <main>
         <AdaptiveQuestionnaire

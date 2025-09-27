@@ -682,7 +682,7 @@ export const techRoles: JobCategory[] = [
     keywords: ['product manager', 'product management', 'roadmap', 'agile', 'scrum', 'strategy', 'user research', 'PM'],
   },
   {
-    id: 'ux-ui-designer',
+    id: 'ux-ui-designer-tech',
     category: 'tech',
     title: 'UX/UI Designer',
     description: 'UX/UI Designers create intuitive and visually appealing digital experiences by researching user needs, designing interfaces, and ensuring products are both functional and delightful to use.',

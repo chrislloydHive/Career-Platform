@@ -49,34 +49,26 @@ export function LiveCareerInsights({ roleName, location, onInsightsLoaded }: Liv
   };
 
   const getCategoryIcon = (category: string) => {
-    const icons: Record<string, string> = {
-      salary: '💰',
-      demand: '📈',
-      skills: '🎯',
-      trends: '📊',
-      lifestyle: '🌟',
-      emerging: '🚀',
-    };
-    return icons[category] || '📌';
+    return null;
   };
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      salary: 'bg-green-900/30 text-green-400 border-green-700/50',
-      demand: 'bg-blue-900/30 text-blue-400 border-blue-700/50',
-      skills: 'bg-purple-900/30 text-purple-400 border-purple-700/50',
-      trends: 'bg-orange-900/30 text-orange-400 border-orange-700/50',
-      lifestyle: 'bg-pink-900/30 text-pink-400 border-pink-700/50',
-      emerging: 'bg-yellow-900/30 text-yellow-400 border-yellow-700/50',
+      salary: 'bg-blue-900/30 text-blue-400 border-blue-700/50',
+      demand: 'bg-blue-800/30 text-blue-300 border-blue-600/50',
+      skills: 'bg-blue-900/30 text-blue-400 border-blue-700/50',
+      trends: 'bg-blue-800/30 text-blue-300 border-blue-600/50',
+      lifestyle: 'bg-blue-900/30 text-blue-500 border-blue-700/50',
+      emerging: 'bg-blue-700/30 text-blue-300 border-blue-600/50',
     };
     return colors[category] || 'bg-gray-800 text-gray-300 border-gray-700';
   };
 
   const getConfidenceBadge = (confidence: string) => {
     const badges: Record<string, { color: string; label: string }> = {
-      high: { color: 'bg-green-900/50 text-green-400', label: 'High Confidence' },
-      medium: { color: 'bg-yellow-900/50 text-yellow-400', label: 'Medium Confidence' },
-      low: { color: 'bg-orange-900/50 text-orange-400', label: 'Low Confidence' },
+      high: { color: 'bg-blue-900/50 text-blue-300', label: 'High Confidence' },
+      medium: { color: 'bg-blue-800/50 text-blue-400', label: 'Medium Confidence' },
+      low: { color: 'bg-blue-700/50 text-blue-500', label: 'Low Confidence' },
     };
     return badges[confidence] || badges.low;
   };
@@ -143,7 +135,7 @@ export function LiveCareerInsights({ roleName, location, onInsightsLoaded }: Liv
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
               <span>Live Data</span>
             </div>
           </div>
@@ -160,7 +152,7 @@ export function LiveCareerInsights({ roleName, location, onInsightsLoaded }: Liv
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
-              {category === 'all' ? 'All Insights' : `${getCategoryIcon(category)} ${category}`}
+              {category === 'all' ? 'All Insights' : category}
             </button>
           ))}
         </div>
@@ -173,7 +165,6 @@ export function LiveCareerInsights({ roleName, location, onInsightsLoaded }: Liv
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">{getCategoryIcon(insight.category)}</span>
                   <h3 className="font-semibold text-gray-100">{insight.title}</h3>
                 </div>
                 <span className={`px-2 py-1 rounded text-xs font-medium ${getConfidenceBadge(insight.confidence).color}`}>

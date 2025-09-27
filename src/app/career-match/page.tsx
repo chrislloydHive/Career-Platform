@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Navigation } from '@/components/Navigation';
 import { CareerMatchingQuestionnaire } from '@/components/CareerMatchingQuestionnaire';
 import { CareerMatchResults } from '@/components/CareerMatchResults';
 import { UserProfile, CareerMatch } from '@/types/career-matching';
@@ -22,18 +23,25 @@ export default function CareerMatchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950">
+      <Navigation
+        title="Career Match"
+        subtitle={showQuestionnaire
+          ? 'Answer questions to find your perfect career match'
+          : 'Your personalized career matches'}
+        actions={
+          !showQuestionnaire ? (
+            <button
+              onClick={handleRetakeQuestionnaire}
+              className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors text-sm"
+            >
+              Retake
+            </button>
+          ) : null
+        }
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Career Matching System
-          </h1>
-          <p className="text-lg text-gray-600">
-            {showQuestionnaire
-              ? 'Answer questions about your interests, skills, and preferences to find your perfect career match'
-              : 'Your personalized career matches based on your profile'}
-          </p>
-        </div>
 
         {showQuestionnaire ? (
           <CareerMatchingQuestionnaire
@@ -41,17 +49,7 @@ export default function CareerMatchPage() {
             enableRealTimeMatching={true}
           />
         ) : (
-          <>
-            <div className="mb-6 flex justify-end">
-              <button
-                onClick={handleRetakeQuestionnaire}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                Retake Questionnaire
-              </button>
-            </div>
-            <CareerMatchResults matches={matches} userProfile={userProfile || undefined} />
-          </>
+          <CareerMatchResults matches={matches} userProfile={userProfile || undefined} />
         )}
       </div>
     </div>

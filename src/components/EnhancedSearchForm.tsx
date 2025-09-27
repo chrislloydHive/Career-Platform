@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { SearchCriteria, JobSource, JobType } from '@/types';
+import { CompanyJobScraper } from './CompanyJobScraper';
 
 interface EnhancedSearchFormProps {
   onSearch: (criteria: SearchCriteria) => void;
@@ -380,11 +381,11 @@ export function EnhancedSearchForm({
           <label className="block text-sm font-semibold text-gray-300 mb-3">
             Job Sources <span className="text-red-500">*</span>
           </label>
-          <div className="flex gap-4">
-            {(['google_jobs', 'linkedin', 'indeed'] as JobSource[]).map(source => (
+          <div className="grid grid-cols-2 gap-3">
+            {(['google_jobs', 'linkedin', 'indeed', 'company_scraper'] as JobSource[]).map(source => (
               <label
                 key={source}
-                className={`flex-1 flex items-center justify-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                className={`flex items-center justify-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition-all ${
                   selectedSources.includes(source)
                     ? 'border-blue-600 bg-blue-900/50'
                     : 'border-gray-600 hover:border-blue-400'
@@ -398,12 +399,18 @@ export function EnhancedSearchForm({
                   disabled={isLoading}
                 />
                 <span className="text-sm font-medium text-gray-300 capitalize">
-                  {source === 'google_jobs' ? 'Google Jobs' : source}
+                  {source === 'google_jobs' ? 'Google Jobs' : source === 'company_scraper' ? 'Company Sites' : source}
                 </span>
               </label>
             ))}
           </div>
         </div>
+
+        {selectedSources.includes('company_scraper') && (
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <CompanyJobScraper />
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-semibold text-gray-300 mb-3">

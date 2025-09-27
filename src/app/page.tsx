@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { SearchCriteria, ScoredJob } from '@/types';
+import { Navigation } from '@/components/Navigation';
 import { EnhancedSearchForm } from '@/components/EnhancedSearchForm';
 import { EnhancedJobList } from '@/components/EnhancedJobList';
 import { RecentSearches } from '@/components/RecentSearches';
@@ -167,45 +168,23 @@ export default function Home() {
         />
       )}
 
-      <header className="bg-gray-900 border-b border-gray-700 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-100">Job Search Platform</h1>
-              <p className="text-sm text-gray-400">Louisa&apos;s career starts here!</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <a
-                href="/explore"
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-colors flex items-center gap-2"
-              >
-                <span>✨</span>
-                Discover Yourself
-              </a>
-              <a
-                href="/careers"
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Explore Careers
-              </a>
-              {jobs.length > 0 && (
-              <button
-                onClick={() => setShowExportDialog(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Export Results
-              </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation
+        title="Job Search"
+        subtitle="Finding Louisa's Next Career"
+        actions={
+          jobs.length > 0 ? (
+            <button
+              onClick={() => setShowExportDialog(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span className="hidden sm:inline">Export</span>
+            </button>
+          ) : null
+        }
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -270,14 +249,14 @@ export default function Home() {
                 </svg>
                 <h3 className="text-2xl font-bold text-gray-100 mb-2">Start Your Job Search</h3>
                 <p className="text-gray-400 mb-6 max-w-md mx-auto">
-                  Enter your job preferences to find opportunities from LinkedIn and Indeed,
-                  ranked by AI-powered matching scores.
+                  Search LinkedIn, Indeed, and Google Jobs with the form on the left, or scrape jobs directly from company career pages
+                  by selecting "Company Sites" as a job source.
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center text-sm">
-                  <span className="px-3 py-1 bg-blue-900/50 text-blue-400 rounded-full">Smart Scoring</span>
-                  <span className="px-3 py-1 bg-green-900/50 text-green-400 rounded-full">Multiple Sources</span>
-                  <span className="px-3 py-1 bg-purple-900/50 text-purple-400 rounded-full">Export to Excel</span>
-                  <span className="px-3 py-1 bg-yellow-900/50 text-yellow-400 rounded-full">Save & Track</span>
+                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Company Scraping</span>
+                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Multiple Sources</span>
+                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Export to Excel</span>
+                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Save & Track</span>
                 </div>
               </div>
             )}

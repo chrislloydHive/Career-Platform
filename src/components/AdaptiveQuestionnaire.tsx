@@ -344,10 +344,12 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
 
       {/* Insights Panel */}
       {insights.length > 0 && (
-        <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-700/50 p-6">
+        <div className="bg-gradient-to-r from-blue-900/30 to-blue-800/30 rounded-lg border border-blue-700/50 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-100 flex items-center gap-2">
-              <span>💡</span>
+              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
               Discovered Insights ({insights.length})
             </h3>
             <button
@@ -368,9 +370,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           insight.type === 'hidden-interest'
-                            ? 'bg-purple-900/50 text-purple-400'
+                            ? 'bg-blue-900/50 text-blue-300'
                             : insight.type === 'strength'
-                            ? 'bg-green-900/50 text-green-400'
+                            ? 'bg-blue-800/50 text-blue-400'
                             : 'bg-blue-900/50 text-blue-400'
                         }`}>
                           {insight.type.replace('-', ' ')}
@@ -391,15 +393,17 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered }: Adapt
 
       {/* Gaps Identified */}
       {gaps.length > 0 && (
-        <div className="mt-6 bg-orange-900/20 rounded-lg border border-orange-700/50 p-6">
+        <div className="mt-6 bg-blue-900/20 rounded-lg border border-blue-700/50 p-6">
           <h3 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
-            <span>🔍</span>
+            <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
             Areas to Explore
           </h3>
           <div className="space-y-2">
             {gaps.map((gap, index) => (
               <div key={index} className="text-sm text-gray-300 flex items-start gap-2">
-                <span className="text-orange-400 mt-0.5">→</span>
+                <span className="text-blue-400 mt-0.5">•</span>
                 <span>{gap.gap}</span>
               </div>
             ))}

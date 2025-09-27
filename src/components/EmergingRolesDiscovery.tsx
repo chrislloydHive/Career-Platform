@@ -54,10 +54,10 @@ export function EmergingRolesDiscovery({ category = 'technology' }: EmergingRole
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-700/50 p-6">
+      <div className="bg-gradient-to-r from-blue-900/30 to-blue-800/30 rounded-lg border border-blue-700/50 p-6">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
-            <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
@@ -84,12 +84,12 @@ export function EmergingRolesDiscovery({ category = 'technology' }: EmergingRole
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && discoverRoles()}
               placeholder="e.g., AI, sustainability, remote work..."
-              className="flex-1 px-4 py-3 bg-gray-900 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="flex-1 px-4 py-3 bg-gray-900 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
               onClick={discoverRoles}
               disabled={loading || !searchQuery}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (
                 <>
@@ -144,8 +144,8 @@ export function EmergingRolesDiscovery({ category = 'technology' }: EmergingRole
             <h3 className="text-xl font-bold text-gray-100">
               Found {emergingRoles.length} Emerging {emergingRoles.length === 1 ? 'Role' : 'Roles'}
             </h3>
-            <span className="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm flex items-center gap-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm flex items-center gap-1">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
               Live Results
             </span>
           </div>
@@ -154,19 +154,17 @@ export function EmergingRolesDiscovery({ category = 'technology' }: EmergingRole
             {emergingRoles.map((role, index) => (
               <div
                 key={index}
-                className="bg-gray-800 rounded-lg border border-gray-700 p-5 hover:border-purple-500/50 transition-all"
+                className="bg-gray-800 rounded-lg border border-gray-700 p-5 hover:border-blue-500/50 transition-all"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">🚀</span>
                       <h4 className="text-lg font-semibold text-gray-100">{role.title}</h4>
                     </div>
                     <p className="text-gray-300 leading-relaxed mb-3">{role.snippet}</p>
                   </div>
                   <div className="ml-4 flex-shrink-0">
-                    <div className="flex items-center gap-1 px-3 py-1 bg-purple-900/30 text-purple-400 rounded-lg text-sm">
-                      <span>📊</span>
+                    <div className="flex items-center gap-1 px-3 py-1 bg-blue-900/30 text-blue-400 rounded-lg text-sm">
                       <span>{Math.round(role.relevanceScore * 100)}% Match</span>
                     </div>
                   </div>
@@ -181,7 +179,7 @@ export function EmergingRolesDiscovery({ category = 'technology' }: EmergingRole
                     href={role.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-2"
                   >
                     Learn More
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,0 +1,218 @@
+{
+  "id": "advertising-account-executive",
+  "category": "marketing",
+  "title": "Advertising Account Executive",
+  "description": "An Advertising Account Executive serves as the primary liaison between an advertising agency and its clients, managing client relationships and overseeing advertising campaigns from conception to execution. They collaborate with creative teams to develop strategic advertising solutions while ensuring client satisfaction and campaign success.",
+  "alternativeTitles": [
+    "Client Services Executive",
+    "Agency Account Manager",
+    "Brand Partnership Manager",
+    "Client Relationship Manager"
+  ],
+  "dailyTasks": [
+    {
+      "task": "Client meetings and communication",
+      "frequency": "daily",
+      "timePercentage": 30
+    },
+    {
+      "task": "Campaign strategy and planning",
+      "frequency": "daily",
+      "timePercentage": 25
+    },
+    {
+      "task": "Internal team coordination",
+      "frequency": "daily",
+      "timePercentage": 20
+    },
+    {
+      "task": "Proposal and presentation development",
+      "frequency": "daily",
+      "timePercentage": 15
+    },
+    {
+      "task": "Budget management and reporting",
+      "frequency": "daily",
+      "timePercentage": 10
+    }
+  ],
+  "requiredSkills": [
+    {
+      "skill": "Client Relationship Management",
+      "category": "soft",
+      "importance": "required",
+      "description": "Building and maintaining strong client relationships"
+    },
+    {
+      "skill": "Project Management",
+      "category": "technical",
+      "importance": "required",
+      "description": "Managing multiple campaigns and deadlines"
+    },
+    {
+      "skill": "Strategic Planning",
+      "category": "technical",
+      "importance": "required",
+      "description": "Developing effective advertising strategies"
+    },
+    {
+      "skill": "Communication",
+      "category": "soft",
+      "importance": "required",
+      "description": "Excellence in written and verbal communication"
+    },
+    {
+      "skill": "Digital Marketing Tools",
+      "category": "technical",
+      "importance": "preferred",
+      "description": "Familiarity with marketing analytics and campaign management tools"
+    }
+  ],
+  "salaryRanges": [
+    {
+      "min": 45000,
+      "max": 65000,
+      "median": 55000,
+      "currency": "USD",
+      "period": "yearly",
+      "experienceLevel": "entry"
+    },
+    {
+      "min": 65000,
+      "max": 95000,
+      "median": 80000,
+      "currency": "USD",
+      "period": "yearly",
+      "experienceLevel": "mid"
+    },
+    {
+      "min": 95000,
+      "max": 150000,
+      "median": 120000,
+      "currency": "USD",
+      "period": "yearly",
+      "experienceLevel": "senior"
+    }
+  ],
+  "careerProgression": [
+    {
+      "level": "entry",
+      "title": "Junior Account Executive",
+      "yearsExperience": "0-2 years",
+      "typicalSalaryRange": {
+        "min": 45000,
+        "max": 65000
+      },
+      "keyResponsibilities": [
+        "Supporting senior team members",
+        "Managing client communications",
+        "Coordinating with internal teams"
+      ],
+      "requiredSkills": [
+        "Basic project management",
+        "Communication",
+        "Organization"
+      ]
+    },
+    {
+      "level": "mid",
+      "title": "Account Executive",
+      "yearsExperience": "3-5 years",
+      "typicalSalaryRange": {
+        "min": 65000,
+        "max": 95000
+      },
+      "keyResponsibilities": [
+        "Managing client relationships",
+        "Developing campaign strategies",
+        "Leading client presentations"
+      ],
+      "requiredSkills": [
+        "Strategic planning",
+        "Client management",
+        "Team leadership"
+      ]
+    },
+    {
+      "level": "senior",
+      "title": "Senior Account Executive",
+      "yearsExperience": "6+ years",
+      "typicalSalaryRange": {
+        "min": 95000,
+        "max": 150000
+      },
+      "keyResponsibilities": [
+        "Managing major accounts",
+        "Developing new business",
+        "Mentoring junior staff"
+      ],
+      "requiredSkills": [
+        "Business development",
+        "Strategic leadership",
+        "Advanced client management"
+      ]
+    }
+  ],
+  "industryInsights": [
+    {
+      "topic": "Digital Transformation",
+      "description": "Increasing focus on digital advertising and integrated campaigns",
+      "trend": "growing"
+    },
+    {
+      "topic": "Data-Driven Decision Making",
+      "description": "Greater emphasis on analytics and measurable results",
+      "trend": "growing"
+    },
+    {
+      "topic": "Remote Client Management",
+      "description": "Rise in virtual client relationships and remote collaboration",
+      "trend": "growing"
+    }
+  ],
+  "workEnvironment": {
+    "remote": true,
+    "hybrid": true,
+    "onsite": true,
+    "travelRequired": true,
+    "typicalHours": "40-50 hours per week, occasional evening events or client meetings"
+  },
+  "jobOutlook": {
+    "growthRate": "6% (2021-2031, average growth)",
+    "projectedJobs": "8,000 openings per year",
+    "competitionLevel": "high"
+  },
+  "education": {
+    "minimumDegree": "Bachelor's degree in Marketing, Advertising, or related field",
+    "preferredDegree": "Bachelor's degree with MBA or Master's in Marketing/Communications",
+    "certifications": [
+      "Digital Marketing Certification",
+      "Project Management Professional (PMP)",
+      "IAB Digital Media Sales Certification"
+    ],
+    "alternativePathways": [
+      "Sales experience with transition to advertising",
+      "Marketing coordinator experience",
+      "Client service roles in related industries"
+    ]
+  },
+  "relatedRoles": [
+    "Media Planner",
+    "Brand Manager",
+    "Marketing Manager",
+    "Business Development Manager",
+    "Client Services Manager"
+  ],
+  "keywords": [
+    "advertising",
+    "account management",
+    "client relations",
+    "marketing",
+    "agency",
+    "campaign management",
+    "client services",
+    "brand strategy",
+    "digital marketing",
+    "business development"
+  ]
+}

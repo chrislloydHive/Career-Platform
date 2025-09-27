@@ -1,4 +1,4 @@
-export type JobSource = 'linkedin' | 'indeed' | 'google_jobs';
+export type JobSource = 'linkedin' | 'indeed' | 'google_jobs' | 'company_scraper';
 
 export type SalaryPeriod = 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly';
 

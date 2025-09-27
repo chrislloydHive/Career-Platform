@@ -1,35 +1,69 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { JobCategory, CareerCategory, ExperienceLevel } from '@/types/career';
 import { careerResearchService } from '@/lib/career-research/career-service';
 
 interface CareerExplorerProps {
   onCareerSelect?: (career: JobCategory) => void;
+  onTriggerAIResearch?: (searchQuery: string) => void;
 }
 
-export function CareerExplorer({ onCareerSelect }: CareerExplorerProps) {
+export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerExplorerProps) {
   const [selectedCategory, setSelectedCategory] = useState<CareerCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [salaryRange, setSalaryRange] = useState<{ min: number; max: number }>({
     min: 0,
     max: 500000,
   });
-  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | 'all'>('all');
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | 'all'>('entry');
+  const [userCareers, setUserCareers] = useState<JobCategory[]>([]);
+  const [isLoadingUserCareers, setIsLoadingUserCareers] = useState(true);
+
+  useEffect(() => {
+    async function loadUserCareers() {
+      try {
+        const response = await fetch('/api/careers');
+        if (response.ok) {
+          const data = await response.json();
+          setUserCareers(data.careers || []);
+        }
+      } catch (error) {
+        console.error('Failed to load user careers:', error);
+      } finally {
+        setIsLoadingUserCareers(false);
+      }
+    }
+    loadUserCareers();
+  }, []);
 
   const categories = careerResearchService.getAllCategories();
 
-  const filteredCareers = useMemo(() => {
+  const { filteredCareers, hasExactMatch } = useMemo(() => {
     let careers: JobCategory[] = [];
 
     if (selectedCategory === 'all') {
-      careers = categories.flatMap(cat => careerResearchService.findByCategory(cat));
+      careers = [
+        ...categories.flatMap(cat => careerResearchService.findByCategory(cat)),
+        ...userCareers
+      ];
     } else {
-      careers = careerResearchService.findByCategory(selectedCategory);
+      careers = [
+        ...careerResearchService.findByCategory(selectedCategory),
+        ...userCareers.filter(c => c.category === selectedCategory)
+      ];
     }
 
+    let exactMatch = false;
+
     if (searchQuery.trim()) {
-      const searchLower = searchQuery.toLowerCase();
+      const searchLower = searchQuery.toLowerCase().trim();
+
+      exactMatch = careers.some(career =>
+        career.title.toLowerCase() === searchLower ||
+        career.alternativeTitles.some(t => t.toLowerCase() === searchLower)
+      );
+
       careers = careers.filter(career =>
         career.title.toLowerCase().includes(searchLower) ||
         career.description.toLowerCase().includes(searchLower) ||
@@ -51,8 +85,8 @@ export function CareerExplorer({ onCareerSelect }: CareerExplorerProps) {
       return salariesInRange.length > 0;
     });
 
-    return careers;
-  }, [selectedCategory, searchQuery, salaryRange, experienceLevel, categories]);
+    return { filteredCareers: careers, hasExactMatch: exactMatch };
+  }, [selectedCategory, searchQuery, salaryRange, experienceLevel, categories, userCareers]);
 
   const getCategoryIcon = () => {
     return null;
@@ -222,6 +256,37 @@ export function CareerExplorer({ onCareerSelect }: CareerExplorerProps) {
             {filteredCareers.length !== 1 ? 's' : ''}
           </p>
         </div>
+
+        {/* No Exact Match - AI Research Suggestion */}
+        {searchQuery.trim() && !hasExactMatch && (
+          <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-6 mb-6">
+            <div className="flex items-start gap-4">
+              <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-100 mb-2">
+                  No exact match for &quot;{searchQuery}&quot;
+                </h3>
+                <p className="text-gray-300 mb-4">
+                  {filteredCareers.length > 0
+                    ? `We found ${filteredCareers.length} similar career${filteredCareers.length !== 1 ? 's' : ''}, but not an exact match for "${searchQuery}".`
+                    : `We couldn't find any careers matching "${searchQuery}".`
+                  } Would you like to use AI to research this specific career title?
+                </p>
+                <button
+                  onClick={() => onTriggerAIResearch?.(searchQuery)}
+                  className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium inline-flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  Research &quot;{searchQuery}&quot; with AI
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Career Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
