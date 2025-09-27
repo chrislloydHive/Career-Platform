@@ -10,6 +10,8 @@ import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/m
 import { LiveCareerMatchesPanel } from './LiveCareerMatchesPanel';
 import { AuthenticityProfile } from '@/lib/authenticity/authentic-self-detector';
 import { AuthenticityDetectionPanel } from './AuthenticityDetectionPanel';
+import { NarrativeInsightGenerator, NarrativeInsight } from '@/lib/insights/narrative-insight-generator';
+import { NarrativeInsightCard } from './NarrativeInsightCard';
 
 interface AdaptiveQuestionnaireProps {
   onComplete?: (profile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => void;
@@ -40,6 +42,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [showCareerMatches, setShowCareerMatches] = useState(false);
   const [authenticityProfile, setAuthenticityProfile] = useState<AuthenticityProfile | null>(null);
   const [showAuthenticityInsights, setShowAuthenticityInsights] = useState(false);
+  const [narrativeInsights, setNarrativeInsights] = useState<NarrativeInsight[]>([]);
 
   useEffect(() => {
     loadNextQuestions();
@@ -84,6 +87,15 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     setInsights(newInsights);
     setSynthesizedInsights(engine.getSynthesizedInsights());
     setGaps(engine.getGaps());
+
+    if (newInsights.length >= 2 && userProfile) {
+      const narrativeGen = new NarrativeInsightGenerator(
+        userProfile,
+        engine.getState().responses,
+        newInsights
+      );
+      setNarrativeInsights(narrativeGen.generateNarrativeInsights());
+    }
 
     if (newInsights.length >= 2) {
       updateCareerMatches(newInsights);
@@ -614,32 +626,10 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )}
 
-      {/* Interactive Insight Cards */}
-      {insights.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-              Discovered Insights ({insights.length})
-            </h3>
-            <span className="text-xs text-gray-400">Click any card to explore</span>
-          </div>
-          <InteractiveInsightCards
-            insights={insights}
-            userProfile={userProfile}
-            onAskRelatedQuestion={(question) => {
-              console.log('Related question:', question);
-            }}
-            onRefineInsight={(insight, refinement) => {
-              console.log('Refined insight:', insight, refinement);
-              setInsights(prev => prev.map(i => i.insight === insight.insight ? insight : i));
-            }}
-            onExploreCareer={(careerTitle) => {
-              console.log('Explore career:', careerTitle);
-            }}
-          />
+      {/* Narrative Insight Cards - Story Format */}
+      {narrativeInsights.length > 0 && (
+        <div className="mb-6">
+          <NarrativeInsightCard narrativeInsights={narrativeInsights} />
         </div>
       )}
 
