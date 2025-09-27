@@ -206,9 +206,9 @@ export default function Home() {
         }
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div className="lg:col-span-1 space-y-4 sm:space-y-6">
             <EnhancedSearchForm
               onSearch={handleSearch}
               isLoading={isSearching}
@@ -217,16 +217,18 @@ export default function Home() {
             />
 
             {jobs.length === 0 && (
-              <RecentSearches
-                onSelectSearch={handleSelectRecentSearch}
-                maxItems={5}
-              />
+              <div className="hidden sm:block">
+                <RecentSearches
+                  onSelectSearch={handleSelectRecentSearch}
+                  maxItems={5}
+                />
+              </div>
             )}
 
             {jobs.length > 0 && (
-              <div className="bg-gray-800 rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-100 mb-3">Search Summary</h3>
-                <div className="space-y-2 text-sm">
+              <div className="bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2 sm:mb-3">Search Summary</h3>
+                <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Total Jobs:</span>
                     <span className="font-medium text-gray-100">{jobs.length}</span>
@@ -263,20 +265,20 @@ export default function Home() {
                 savedJobIds={savedJobIds}
               />
             ) : (
-              <div className="bg-gray-800 rounded-lg shadow-md p-12 text-center">
-                <svg className="w-20 h-20 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-gray-800 rounded-lg shadow-md p-6 sm:p-8 lg:p-12 text-center">
+                <svg className="w-16 h-16 sm:w-20 sm:h-20 text-gray-300 mx-auto mb-4 sm:mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <h3 className="text-2xl font-bold text-gray-100 mb-2">Start Your Job Search</h3>
-                <p className="text-gray-400 mb-6 max-w-md mx-auto">
-                  Search LinkedIn, Indeed, and Google Jobs with the form on the left, or scrape jobs directly from company career pages
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2">Start Your Job Search</h3>
+                <p className="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6 max-w-md mx-auto">
+                  Search LinkedIn, Indeed, and Google Jobs with the form above, or scrape jobs directly from company career pages
                   by selecting &quot;Company Sites&quot; as a job source.
                 </p>
-                <div className="flex flex-wrap gap-2 justify-center text-sm">
-                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Company Scraping</span>
-                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Multiple Sources</span>
-                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Export to Excel</span>
-                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full">Save & Track</span>
+                <div className="flex flex-wrap gap-2 justify-center text-xs sm:text-sm">
+                  <span className="px-2 sm:px-3 py-1 bg-gray-700 text-gray-300 rounded-full whitespace-nowrap">Company Scraping</span>
+                  <span className="px-2 sm:px-3 py-1 bg-gray-700 text-gray-300 rounded-full whitespace-nowrap">Multiple Sources</span>
+                  <span className="px-2 sm:px-3 py-1 bg-gray-700 text-gray-300 rounded-full whitespace-nowrap">Export to Excel</span>
+                  <span className="px-2 sm:px-3 py-1 bg-gray-700 text-gray-300 rounded-full whitespace-nowrap">Save & Track</span>
                 </div>
               </div>
             )}

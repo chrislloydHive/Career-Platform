@@ -24,17 +24,17 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
 
   return (
     <header className="bg-gray-900 border-b border-gray-700 sticky top-0 z-40 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition-colors">
-                <span className="text-white font-bold text-sm">LL</span>
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          <div className="flex items-center gap-2 sm:gap-8 flex-1 min-w-0">
+            <Link href="/" className="flex items-center gap-1 sm:gap-2 group flex-shrink-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition-colors">
+                <span className="text-white font-bold text-xs sm:text-sm">LL</span>
               </div>
-              <span className="text-gray-100 font-semibold hidden sm:block">Career Platform</span>
+              <span className="text-gray-100 font-semibold text-sm sm:text-base hidden sm:block">Career Platform</span>
             </Link>
 
-            <nav className="flex items-center gap-1">
+            <nav className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto scrollbar-hide flex-1">
               {navItems.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
@@ -42,29 +42,31 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                    className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 sm:gap-2 flex-shrink-0 ${
                       isActive
                         ? 'bg-blue-600 text-white'
                         : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span className="hidden md:inline">{item.label}</span>
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="hidden lg:inline whitespace-nowrap">{item.label}</span>
                   </Link>
                 );
               })}
             </nav>
           </div>
 
-          <div className="flex items-center gap-3">
-            {actions}
-          </div>
+          {actions && (
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-2">
+              {actions}
+            </div>
+          )}
         </div>
 
         {(title || subtitle) && (
-          <div className="pb-4">
-            {title && <h1 className="text-xl font-bold text-gray-100">{title}</h1>}
-            {subtitle && <p className="text-sm text-gray-400 mt-0.5">{subtitle}</p>}
+          <div className="pb-3 sm:pb-4 pt-1">
+            {title && <h1 className="text-lg sm:text-xl font-bold text-gray-100">{title}</h1>}
+            {subtitle && <p className="text-xs sm:text-sm text-gray-400 mt-0.5">{subtitle}</p>}
           </div>
         )}
       </div>

@@ -58,11 +58,11 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-950">
       <Navigation title="Your Profile" subtitle="AI learns about you with every interaction" />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 flex items-center gap-2">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="mb-4 sm:mb-6 flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide pb-2">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === 'overview'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
@@ -72,29 +72,29 @@ export default function ProfilePage() {
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === 'history'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
             }`}
           >
-            Interaction History
+            <span className="hidden sm:inline">Interaction </span>History
           </button>
           <button
             onClick={() => setActiveTab('insights')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === 'insights'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
             }`}
           >
-            AI Insights ({profile.aiInsights.length})
+            <span className="hidden sm:inline">AI </span>Insights ({profile.aiInsights.length})
           </button>
         </div>
 
         {activeTab === 'overview' && (
-          <div className="space-y-6">
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-100">{profile.name}</h2>
