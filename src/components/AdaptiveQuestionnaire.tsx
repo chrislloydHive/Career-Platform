@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { AdaptiveQuestioningEngine, DiscoveredInsight, IdentifiedGap } from '@/lib/adaptive-questions/adaptive-engine';
 import { SynthesizedInsight } from '@/lib/adaptive-questions/insight-synthesis';
 import { AdaptiveQuestion, ExplorationArea } from '@/lib/adaptive-questions/question-banks';
-import { InteractiveInsightExplorer } from './InteractiveInsightExplorer';
+import { InteractiveInsightCards } from './InteractiveInsightCards';
 import { UserProfile } from '@/types/user-profile';
 import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/matching/realtime-career-matcher';
 import { LiveCareerMatchesPanel } from './LiveCareerMatchesPanel';
@@ -30,7 +30,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [gaps, setGaps] = useState<IdentifiedGap[]>([]);
   const [showProgress, setShowProgress] = useState(false);
   const [showSynthesized, setShowSynthesized] = useState(true);
-  const [showInteractiveExplorer, setShowInteractiveExplorer] = useState(false);
   const [careerMatcher, setCareerMatcher] = useState<RealtimeCareerMatcher | null>(null);
   const [topCareers, setTopCareers] = useState<CareerFitScore[]>([]);
   const [risingCareers, setRisingCareers] = useState<CareerFitScore[]>([]);
@@ -458,70 +457,32 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )}
 
-      {/* Interactive Insight Explorer */}
+      {/* Interactive Insight Cards */}
       {insights.length > 0 && (
-        <div className="bg-gradient-to-r from-blue-900/30 to-blue-800/30 rounded-lg border border-blue-700/50 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-100 flex items-center gap-2">
-              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
               Discovered Insights ({insights.length})
             </h3>
-            <button
-              onClick={() => setShowInteractiveExplorer(!showInteractiveExplorer)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-            >
-              {showInteractiveExplorer ? 'Simple View' : 'Explore Insights'}
-            </button>
+            <span className="text-xs text-gray-400">Click any card to explore</span>
           </div>
-
-          {showInteractiveExplorer ? (
-            <InteractiveInsightExplorer
-              insights={insights}
-              userProfile={userProfile}
-              onAskRelatedQuestion={(question) => {
-                console.log('Related question:', question);
-              }}
-              onRefineInsight={(insight, refinement) => {
-                console.log('Refined insight:', insight, refinement);
-                setInsights(prev => prev.map(i => i.insight === insight.insight ? insight : i));
-              }}
-              onExploreCareer={(careerTitle) => {
-                console.log('Explore career:', careerTitle);
-              }}
-            />
-          ) : (
-            <div className="space-y-3">
-              {insights.map((insight, index) => (
-                <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="h-4 w-1 bg-green-500 rounded-full"></div>
-                      <span className="text-xs font-medium text-green-400">{getAreaLabel(insight.area)}</span>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          insight.type === 'hidden-interest'
-                            ? 'bg-green-900/50 text-green-300'
-                            : insight.type === 'strength'
-                            ? 'bg-green-800/50 text-green-400'
-                            : 'bg-green-900/50 text-green-400'
-                        }`}>
-                          {insight.type.replace('-', ' ')}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {Math.round(insight.confidence * 100)}% confidence
-                        </span>
-                      </div>
-                      <p className="text-gray-300">{insight.insight}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <InteractiveInsightCards
+            insights={insights}
+            userProfile={userProfile}
+            onAskRelatedQuestion={(question) => {
+              console.log('Related question:', question);
+            }}
+            onRefineInsight={(insight, refinement) => {
+              console.log('Refined insight:', insight, refinement);
+              setInsights(prev => prev.map(i => i.insight === insight.insight ? insight : i));
+            }}
+            onExploreCareer={(careerTitle) => {
+              console.log('Explore career:', careerTitle);
+            }}
+          />
         </div>
       )}
 
