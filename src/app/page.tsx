@@ -127,20 +127,40 @@ export default function Home() {
     }
   };
 
-  const handleSaveJob = (job: ScoredJob) => {
-    setSavedJobIds(prev => {
-      if (prev.includes(job.id)) {
+  const handleSaveJob = async (job: ScoredJob) => {
+    const isSaved = savedJobIds.includes(job.id);
+
+    if (isSaved) {
+      try {
+        await fetch(`/api/saved-items?id=job-${job.id}`, {
+          method: 'DELETE',
+        });
+        setSavedJobIds(prev => prev.filter(id => id !== job.id));
         addToast(
           createToast('info', 'Job Removed', `${job.title} removed from saved jobs`)
         );
-        return prev.filter(id => id !== job.id);
-      } else {
+      } catch (error) {
+        addToast(
+          createToast('error', 'Error', 'Failed to remove job')
+        );
+      }
+    } else {
+      try {
+        await fetch('/api/saved-items', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'job', item: job }),
+        });
+        setSavedJobIds(prev => [...prev, job.id]);
         addToast(
           createToast('success', 'Job Saved', `${job.title} added to saved jobs`)
         );
-        return [...prev, job.id];
+      } catch (error) {
+        addToast(
+          createToast('error', 'Error', 'Failed to save job')
+        );
       }
-    });
+    }
   };
 
   const handleSelectRecentSearch = (criteria: SearchCriteria) => {

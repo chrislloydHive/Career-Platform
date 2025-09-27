@@ -19,6 +19,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | 'all'>('entry');
   const [userCareers, setUserCareers] = useState<JobCategory[]>([]);
   const [isLoadingUserCareers, setIsLoadingUserCareers] = useState(true);
+  const [savedCareerIds, setSavedCareerIds] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadUserCareers() {
@@ -36,6 +37,50 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
     }
     loadUserCareers();
   }, []);
+
+  useEffect(() => {
+    async function loadSavedCareers() {
+      try {
+        const response = await fetch('/api/saved-items');
+        if (response.ok) {
+          const data = await response.json();
+          const careerIds = data.items
+            .filter((item: any) => item.type === 'career')
+            .map((item: any) => item.career.id);
+          setSavedCareerIds(careerIds);
+        }
+      } catch (error) {
+        console.error('Failed to load saved careers:', error);
+      }
+    }
+    loadSavedCareers();
+  }, []);
+
+  const handleSaveCareer = async (career: JobCategory) => {
+    const isSaved = savedCareerIds.includes(career.id);
+
+    if (isSaved) {
+      try {
+        await fetch(`/api/saved-items?id=career-${career.id}`, {
+          method: 'DELETE',
+        });
+        setSavedCareerIds(prev => prev.filter(id => id !== career.id));
+      } catch (error) {
+        console.error('Failed to remove career:', error);
+      }
+    } else {
+      try {
+        await fetch('/api/saved-items', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'career', item: career }),
+        });
+        setSavedCareerIds(prev => [...prev, career.id]);
+      } catch (error) {
+        console.error('Failed to save career:', error);
+      }
+    }
+  };
 
   const categories = careerResearchService.getAllCategories();
 
@@ -297,20 +342,37 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
             return (
               <div
                 key={career.id}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-blue-500 transition-all cursor-pointer group"
-                onClick={() => onCareerSelect?.(career)}
+                className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-blue-500 transition-all group relative"
               >
-                {/* Category Badge */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-xs font-medium">
-                    {getCategoryLabel(career.category)}
-                  </span>
-                  {career.workEnvironment.remote && (
-                    <span className="px-2 py-1 bg-green-900/50 text-green-400 rounded text-xs">
-                      Remote
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSaveCareer(career);
+                  }}
+                  className={`absolute top-4 right-4 p-2 rounded-lg transition-all ${
+                    savedCareerIds.includes(career.id)
+                      ? 'bg-yellow-600 text-white'
+                      : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                  }`}
+                  title={savedCareerIds.includes(career.id) ? 'Remove from saved' : 'Save career'}
+                >
+                  <svg className="w-5 h-5" fill={savedCareerIds.includes(career.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                </button>
+
+                <div className="cursor-pointer" onClick={() => onCareerSelect?.(career)}>
+                  {/* Category Badge */}
+                  <div className="flex items-center justify-between mb-3 pr-12">
+                    <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-xs font-medium">
+                      {getCategoryLabel(career.category)}
                     </span>
-                  )}
-                </div>
+                    {career.workEnvironment.remote && (
+                      <span className="px-2 py-1 bg-green-900/50 text-green-400 rounded text-xs">
+                        Remote
+                      </span>
+                    )}
+                  </div>
 
                 {/* Title */}
                 <h3 className="text-xl font-semibold text-gray-100 mb-2 group-hover:text-blue-400 transition-colors">
@@ -358,6 +420,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
                       {career.jobOutlook.competitionLevel}
                     </span>
                   </div>
+                </div>
                 </div>
               </div>
             );
