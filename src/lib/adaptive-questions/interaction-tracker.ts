@@ -1,4 +1,15 @@
-import { CareerInteraction } from './dynamic-question-generator';
+export interface CareerInteraction {
+  type: 'role_interest' | 'job_saved' | 'career_viewed' | 'chat_topic' | 'search_query';
+  content: string;
+  timestamp: Date;
+  metadata?: {
+    roleTitle?: string;
+    company?: string;
+    skills?: string[];
+    industry?: string;
+    jobFunction?: string;
+  };
+}
 
 export class InteractionTracker {
   private static readonly STORAGE_KEY = 'career_interactions';

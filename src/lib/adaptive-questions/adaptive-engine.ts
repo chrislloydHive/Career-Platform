@@ -22,6 +22,8 @@ import {
   MotivationInsight,
   ArchaeologyQuestion,
 } from './motivation-archaeology';
+import { StrengthValidationEngine, StrengthProfile } from '../strengths/strength-validation';
+import { UserProfile } from '@/types/user-profile';
 
 export interface QuestionResponse {
   questionId: string;
@@ -60,14 +62,17 @@ export interface AdaptiveSessionState {
   synthesizedInsights: SynthesizedInsight[];
   motivationInsights: MotivationInsight[];
   archaeologyDepth: number;
+  strengthProfile: StrengthProfile | null;
 }
 
 export class AdaptiveQuestioningEngine {
   private state: AdaptiveSessionState;
   private dynamicGenerator: DynamicQuestionGenerator;
+  private userProfile?: UserProfile;
 
-  constructor(initialState?: Partial<AdaptiveSessionState>) {
+  constructor(initialState?: Partial<AdaptiveSessionState>, userProfile?: UserProfile) {
     this.dynamicGenerator = new DynamicQuestionGenerator();
+    this.userProfile = userProfile;
     this.state = {
       responses: initialState?.responses || {},
       askedQuestions: initialState?.askedQuestions || [],
@@ -92,6 +97,7 @@ export class AdaptiveQuestioningEngine {
       synthesizedInsights: initialState?.synthesizedInsights || [],
       motivationInsights: initialState?.motivationInsights || [],
       archaeologyDepth: initialState?.archaeologyDepth || 0,
+      strengthProfile: initialState?.strengthProfile || null,
     };
   }
 
@@ -123,6 +129,7 @@ export class AdaptiveQuestioningEngine {
     this.runPatternRecognition();
     this.runInsightSynthesis();
     this.runMotivationArchaeology();
+    this.runStrengthValidation();
   }
 
   getNextQuestions(limit: number = 3): AdaptiveQuestion[] {
@@ -371,6 +378,54 @@ export class AdaptiveQuestioningEngine {
     }
   }
 
+  private runStrengthValidation() {
+    if (!this.userProfile || Object.keys(this.state.responses).length < 5) {
+      return;
+    }
+
+    const validationEngine = new StrengthValidationEngine(
+      this.state.responses,
+      this.userProfile
+    );
+
+    this.state.strengthProfile = validationEngine.validateStrengths();
+
+    for (const strength of this.state.strengthProfile.validated) {
+      for (const insight of strength.insights) {
+        const existing = this.state.discoveredInsights.find(i => i.insight === insight);
+
+        if (!existing) {
+          this.state.discoveredInsights.push({
+            type: 'strength',
+            area: 'work-style',
+            insight,
+            confidence: strength.confidence,
+            basedOn: strength.evidence.map(e => e.description),
+          });
+        }
+      }
+    }
+
+    for (const hiddenStrength of this.state.strengthProfile.summary.hiddenTalents) {
+      const strength = this.state.strengthProfile.validated.find(s => s.name === hiddenStrength);
+      if (strength) {
+        const existing = this.state.discoveredInsights.find(
+          i => i.insight.includes(hiddenStrength) && i.type === 'hidden-interest'
+        );
+
+        if (!existing) {
+          this.state.discoveredInsights.push({
+            type: 'hidden-interest',
+            area: 'work-style',
+            insight: `Hidden strength: ${hiddenStrength} - You consistently demonstrate this but may not recognize it as a core capability.`,
+            confidence: strength.confidence,
+            basedOn: strength.evidence.map(e => e.source),
+          });
+        }
+      }
+    }
+  }
+
   private getArchaeologyQuestions(): AdaptiveQuestion[] {
     const questions: AdaptiveQuestion[] = [];
     const responseValues = this.getResponseValues();
@@ -537,6 +592,7 @@ export class AdaptiveQuestioningEngine {
       insights: this.state.discoveredInsights,
       synthesizedInsights: this.state.synthesizedInsights,
       motivationInsights: this.state.motivationInsights,
+      strengthProfile: this.state.strengthProfile,
       gaps: this.state.identifiedGaps,
       progress: this.getExplorationProgress(),
       completion: this.getCompletionPercentage(),
@@ -547,5 +603,9 @@ export class AdaptiveQuestioningEngine {
 
   getMotivationInsights(): MotivationInsight[] {
     return this.state.motivationInsights;
+  }
+
+  getStrengthProfile(): StrengthProfile | null {
+    return this.state.strengthProfile;
   }
 }

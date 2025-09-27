@@ -1,17 +1,5 @@
 import { AdaptiveQuestion, ExplorationArea } from './question-banks';
-
-export interface CareerInteraction {
-  type: 'role_interest' | 'job_saved' | 'career_viewed' | 'chat_topic' | 'search_query';
-  content: string;
-  timestamp: Date;
-  metadata?: {
-    roleTitle?: string;
-    company?: string;
-    skills?: string[];
-    industry?: string;
-    jobFunction?: string;
-  };
-}
+import { CareerInteraction } from './interaction-tracker';
 
 export interface DynamicQuestionContext {
   interactions: CareerInteraction[];
