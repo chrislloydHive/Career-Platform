@@ -12,6 +12,8 @@ import { AuthenticityProfile } from '@/lib/authenticity/authentic-self-detector'
 import { AuthenticityDetectionPanel } from './AuthenticityDetectionPanel';
 import { NarrativeInsightGenerator, NarrativeInsight } from '@/lib/insights/narrative-insight-generator';
 import { NarrativeInsightCard } from './NarrativeInsightCard';
+import { ConfidenceEvolutionEngine, InsightEvolution, ConfidencePattern, EvolutionSummary } from '@/lib/insights/confidence-evolution';
+import { ConfidenceEvolutionPanel } from './ConfidenceEvolutionPanel';
 
 interface AdaptiveQuestionnaireProps {
   onComplete?: (profile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => void;
@@ -43,6 +45,10 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [authenticityProfile, setAuthenticityProfile] = useState<AuthenticityProfile | null>(null);
   const [showAuthenticityInsights, setShowAuthenticityInsights] = useState(false);
   const [narrativeInsights, setNarrativeInsights] = useState<NarrativeInsight[]>([]);
+  const [confidenceEvolutions, setConfidenceEvolutions] = useState<InsightEvolution[]>([]);
+  const [confidencePatterns, setConfidencePatterns] = useState<ConfidencePattern[]>([]);
+  const [evolutionSummary, setEvolutionSummary] = useState<EvolutionSummary | null>(null);
+  const [showConfidenceEvolution, setShowConfidenceEvolution] = useState(false);
 
   useEffect(() => {
     loadNextQuestions();
@@ -95,6 +101,20 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         newInsights
       );
       setNarrativeInsights(narrativeGen.generateNarrativeInsights());
+    }
+
+    if (newInsights.length >= 3) {
+      const confidenceEngine = new ConfidenceEvolutionEngine(
+        engine.getState().responses,
+        newInsights
+      );
+      setConfidenceEvolutions(confidenceEngine.getEvolutions());
+      setConfidencePatterns(confidenceEngine.getPatterns());
+      setEvolutionSummary(confidenceEngine.getEvolutionSummary());
+
+      if (!showConfidenceEvolution && Object.keys(engine.getState().responses).length >= 5) {
+        setShowConfidenceEvolution(true);
+      }
     }
 
     if (newInsights.length >= 2) {
@@ -630,6 +650,17 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       {narrativeInsights.length > 0 && (
         <div className="mb-6">
           <NarrativeInsightCard narrativeInsights={narrativeInsights} />
+        </div>
+      )}
+
+      {/* Confidence Evolution Panel */}
+      {showConfidenceEvolution && evolutionSummary && (
+        <div className="mb-6">
+          <ConfidenceEvolutionPanel
+            evolutions={confidenceEvolutions}
+            patterns={confidencePatterns}
+            summary={evolutionSummary}
+          />
         </div>
       )}
 
