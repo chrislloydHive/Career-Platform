@@ -28,7 +28,10 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [insights, setInsights] = useState<DiscoveredInsight[]>([]);
   const [synthesizedInsights, setSynthesizedInsights] = useState<SynthesizedInsight[]>([]);
   const [gaps, setGaps] = useState<IdentifiedGap[]>([]);
-  const [showProgress, setShowProgress] = useState(false);
+  const [showProgress, setShowProgress] = useState(true);
+  const [showInsightNotification, setShowInsightNotification] = useState(false);
+  const [latestInsightNotification, setLatestInsightNotification] = useState<DiscoveredInsight | null>(null);
+  const [skippedQuestions, setSkippedQuestions] = useState<AdaptiveQuestion[]>([]);
   const [showSynthesized, setShowSynthesized] = useState(true);
   const [careerMatcher, setCareerMatcher] = useState<RealtimeCareerMatcher | null>(null);
   const [topCareers, setTopCareers] = useState<CareerFitScore[]>([]);
@@ -72,6 +75,10 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     if (newInsights.length > previousCount) {
       const latest = newInsights[newInsights.length - 1];
       onInsightDiscovered?.(latest);
+
+      setLatestInsightNotification(latest);
+      setShowInsightNotification(true);
+      setTimeout(() => setShowInsightNotification(false), 5000);
     }
 
     setInsights(newInsights);
@@ -119,12 +126,27 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   };
 
   const handleSkip = () => {
+    if (currentQuestion) {
+      setSkippedQuestions(prev => [...prev, currentQuestion]);
+    }
+
     if (currentQuestionIndex < currentQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       resetResponse();
     } else {
       loadNextQuestions();
     }
+  };
+
+  const handleComeBackLater = () => {
+    handleSkip();
+  };
+
+  const handleAnswerSkippedQuestion = (question: AdaptiveQuestion) => {
+    setCurrentQuestions([question]);
+    setCurrentQuestionIndex(0);
+    setSkippedQuestions(prev => prev.filter(q => q.id !== question.id));
+    resetResponse();
   };
 
   const handleComplete = () => {
@@ -274,48 +296,93 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-8">
-      <div className="flex gap-8">
-        {/* Main Content */}
-        <div className="flex-1 max-w-4xl">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-100">Adaptive Career Exploration</h1>
-          <button
-            onClick={() => setShowProgress(!showProgress)}
-            className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors text-sm"
-          >
-            {showProgress ? 'Hide' : 'Show'} Progress
-          </button>
-        </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
-          <div
-            className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="text-sm text-gray-400 mt-2">{progress}% explored</p>
-      </div>
-
-      {/* Progress Detail */}
-      {showProgress && (
-        <div className="mb-8 bg-gray-800 rounded-lg border border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-100 mb-4">Exploration Areas</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {explorationProgress.map(area => (
-              <div key={area.area} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-750">
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-1 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm text-gray-300">{getAreaLabel(area.area)}</span>
-                </div>
-                <span className="text-xs text-gray-500">
-                  {area.depth}/{area.totalQuestions}
-                </span>
+      {/* Real-time Insight Notification */}
+      {showInsightNotification && latestInsightNotification && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+          <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg shadow-2xl p-4 max-w-sm border-2 border-blue-400">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
               </div>
-            ))}
+              <div className="flex-1">
+                <div className="text-xs font-semibold text-white/90 mb-1">Pattern Detected!</div>
+                <p className="text-sm text-white font-medium">{latestInsightNotification.insight}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="flex-1 bg-white/20 rounded-full h-1">
+                    <div
+                      className="bg-white h-1 rounded-full"
+                      style={{ width: `${latestInsightNotification.confidence * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-white/90">{Math.round(latestInsightNotification.confidence * 100)}%</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowInsightNotification(false)}
+                className="text-white/70 hover:text-white"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      <div className="flex gap-8">
+        {/* Main Content */}
+        <div className="flex-1 max-w-4xl">
+      {/* Header with Adaptive Intelligence Indicator */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-100 mb-1">Adaptive Career Exploration</h1>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span>AI adapting questions based on your responses</span>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold text-blue-400">{progress}%</div>
+            <div className="text-xs text-gray-500">explored</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 8 Exploration Areas Progress */}
+      <div className="mb-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-blue-500/30 p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-lg font-bold text-gray-100">8 Exploration Areas</h3>
+          <span className="text-xs text-gray-500">{explorationProgress.filter(a => a.depth > 0).length}/8 started</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {explorationProgress.map(area => {
+            const percentage = area.totalQuestions > 0 ? (area.depth / area.totalQuestions) * 100 : 0;
+            return (
+              <div key={area.area} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-200">{getAreaLabel(area.area)}</span>
+                  <span className="text-xs text-gray-400">{area.depth}/{area.totalQuestions}</span>
+                </div>
+                <div className="w-full bg-gray-700/50 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full transition-all duration-500 ${
+                      percentage === 0 ? 'bg-gray-600' :
+                      percentage < 50 ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                      percentage < 100 ? 'bg-gradient-to-r from-cyan-500 to-blue-500' :
+                      'bg-gradient-to-r from-green-500 to-emerald-600'
+                    }`}
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Question Card */}
       <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-8 mb-6">
@@ -340,49 +407,139 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
         {renderQuestionInput()}
 
-        {/* Confidence Level */}
+        {/* Confidence Level Slider */}
         {response !== null && (
           <div className="mt-6 pt-6 border-t border-gray-700">
-            <p className="text-sm text-gray-400 mb-3">How certain are you about this answer?</p>
-            <div className="flex gap-2">
-              {[
-                { value: 'certain', label: 'Very Certain', color: 'bg-green-600' },
-                { value: 'somewhat-sure', label: 'Somewhat Sure', color: 'bg-yellow-600' },
-                { value: 'uncertain', label: 'Uncertain', color: 'bg-orange-600' },
-              ].map(level => (
-                <button
-                  key={level.value}
-                  onClick={() => setConfidenceLevel(level.value as typeof confidenceLevel)}
-                  className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                    confidenceLevel === level.value
-                      ? `${level.color} text-white`
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  {level.label}
-                </button>
-              ))}
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm text-gray-400">How confident are you in this answer?</p>
+              <span className={`text-sm font-semibold ${
+                confidenceLevel === 'certain' ? 'text-green-400' :
+                confidenceLevel === 'somewhat-sure' ? 'text-yellow-400' :
+                'text-orange-400'
+              }`}>
+                {confidenceLevel === 'certain' ? 'Very Confident' :
+                 confidenceLevel === 'somewhat-sure' ? 'Somewhat Sure' :
+                 'Uncertain'}
+              </span>
+            </div>
+            <div className="space-y-3">
+              <div className="relative">
+                <div className="flex justify-between text-xs text-gray-500 mb-2">
+                  <span>Uncertain</span>
+                  <span>Somewhat</span>
+                  <span>Very Sure</span>
+                </div>
+                <div className="flex gap-2">
+                  {[
+                    { value: 'uncertain', label: 'Low', color: 'bg-orange-600' },
+                    { value: 'somewhat-sure', label: 'Medium', color: 'bg-yellow-600' },
+                    { value: 'certain', label: 'High', color: 'bg-green-600' },
+                  ].map((level, idx) => (
+                    <button
+                      key={level.value}
+                      onClick={() => setConfidenceLevel(level.value as typeof confidenceLevel)}
+                      className={`flex-1 h-3 rounded-full transition-all ${
+                        confidenceLevel === level.value
+                          ? `${level.color} scale-110 shadow-lg`
+                          : 'bg-gray-700 hover:bg-gray-600'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 italic">
+                Your confidence helps us understand which insights are strongest
+              </p>
             </div>
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={handleSubmitResponse}
-            disabled={response === null}
-            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-700 disabled:cursor-not-allowed font-medium"
-          >
-            Continue
-          </button>
-          <button
-            onClick={handleSkip}
-            className="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Skip
-          </button>
+        <div className="space-y-3 mt-6">
+          <div className="flex gap-3">
+            <button
+              onClick={handleSubmitResponse}
+              disabled={response === null}
+              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-700 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+            >
+              Continue
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+            <button
+              onClick={handleComeBackLater}
+              className="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
+              title="Save this question for later"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Come Back Later
+            </button>
+          </div>
+          {skippedQuestions.length > 0 && (
+            <div className="text-xs text-gray-500 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              {skippedQuestions.length} question{skippedQuestions.length !== 1 ? 's' : ''} saved for later
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Dynamic Adaptation Indicator */}
+      {insights.length > 0 && (
+        <div className="mb-6 bg-blue-900/20 border border-blue-700/50 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-blue-500/20 rounded-lg">
+              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-blue-300 mb-1">Questions Adapting to Your Responses</h4>
+              <p className="text-xs text-gray-400">
+                Based on your answers so far, we&apos;ve detected {insights.length} pattern{insights.length !== 1 ? 's' : ''}.
+                The next questions will explore these insights further.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Skipped Questions - Come Back Later */}
+      {skippedQuestions.length > 0 && (
+        <div className="mb-6 bg-gray-800 rounded-lg border border-gray-700 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-100 flex items-center gap-2">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Saved for Later ({skippedQuestions.length})
+            </h3>
+          </div>
+          <div className="space-y-3">
+            {skippedQuestions.map((question) => (
+              <div key={question.id} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="text-xs text-gray-500 mb-1">{getAreaLabel(question.area)}</div>
+                    <p className="text-sm text-gray-300">{question.text}</p>
+                  </div>
+                  <button
+                    onClick={() => handleAnswerSkippedQuestion(question)}
+                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors whitespace-nowrap"
+                  >
+                    Answer Now
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Synthesized Insights - Priority Display */}
       {synthesizedInsights.length > 0 && (
