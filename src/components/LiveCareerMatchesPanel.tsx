@@ -193,7 +193,7 @@ export function LiveCareerMatchesPanel({
                         </svg>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-gray-300 leading-tight">
-                            <span className="font-medium text-blue-400">{factor.factor}:</span> {factor.explanation}
+                            <span className="font-medium text-blue-400">{factor.factor}</span>
                           </p>
                           <div className="flex items-center gap-1 mt-0.5">
                             <div className="flex-1 bg-gray-700/30 rounded-full h-1">
