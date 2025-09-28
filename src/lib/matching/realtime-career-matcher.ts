@@ -138,12 +138,37 @@ export class RealtimeCareerMatcher {
     else if (dataCompleteness < 0.7) confidenceMultiplier = 0.85;
     else if (dataCompleteness < 0.9) confidenceMultiplier = 0.95;
 
-    const finalScore = totalScore * confidenceMultiplier;
+    let finalScore = totalScore * confidenceMultiplier;
+
+    const normalizedScore = this.normalizeScore(finalScore, career);
 
     return {
-      score: Math.min(finalScore, 95),
+      score: Math.min(normalizedScore, 95),
       factors: factors.sort((a, b) => b.contribution - a.contribution),
     };
+  }
+
+  private normalizeScore(rawScore: number, career: { title: string; category: string }): number {
+    const allScores = Array.from(this.careerScores.values()).map(c => {
+      if (c.careerTitle === career.title) return rawScore;
+      return c.currentScore;
+    });
+
+    if (allScores.length < 3) return rawScore;
+
+    const sortedScores = [...allScores].sort((a, b) => b - a);
+    const max = sortedScores[0];
+    const min = sortedScores[sortedScores.length - 1];
+    const range = max - min;
+
+    if (range < 15) {
+      const avgScore = allScores.reduce((sum, s) => sum + s, 0) / allScores.length;
+      const deviation = rawScore - avgScore;
+      const amplifiedScore = avgScore + (deviation * 2.5);
+      return Math.max(35, Math.min(95, amplifiedScore));
+    }
+
+    return rawScore;
   }
 
   private calculateDataCompleteness(): number {
@@ -242,23 +267,26 @@ export class RealtimeCareerMatcher {
 
     switch (area) {
       case 'work-style':
-        if (title.includes('freelance') || title.includes('remote')) return 1.2;
+        if (title.includes('freelance') || title.includes('remote')) return 1.4;
         return 1.0;
 
       case 'people-interaction':
-        if (title.includes('manager') || title.includes('success') || title.includes('sales') || title.includes('marketing') || title.includes('coordinator')) return 1.3;
+        if (title.includes('manager') || title.includes('success') || title.includes('sales') || title.includes('marketing') || title.includes('coordinator')) return 1.6;
+        if (title.includes('engineer') || title.includes('analyst') || title.includes('developer')) return 0.7;
         return 1.0;
 
       case 'problem-solving':
-        if (title.includes('analyst') || title.includes('consultant') || title.includes('architect') || title.includes('engineer')) return 1.3;
+        if (title.includes('analyst') || title.includes('consultant') || title.includes('architect') || title.includes('engineer')) return 1.6;
+        if (title.includes('coordinator') || title.includes('assistant')) return 0.7;
         return 1.0;
 
       case 'creativity':
-        if (title.includes('design') || title.includes('creative') || title.includes('content') || category.includes('design')) return 1.3;
-        return 0.8;
+        if (title.includes('design') || title.includes('creative') || title.includes('content') || category.includes('design')) return 1.7;
+        if (title.includes('analyst') || title.includes('accountant') || title.includes('compliance')) return 0.6;
+        return 0.9;
 
       case 'structure-flexibility':
-        if (title.includes('freelance') || title.includes('consultant') || title.includes('entrepreneur')) return 1.2;
+        if (title.includes('freelance') || title.includes('consultant') || title.includes('entrepreneur')) return 1.5;
         if (title.includes('coordinator') || title.includes('operations')) return 0.9;
         return 1.0;
 
@@ -287,6 +315,7 @@ export class RealtimeCareerMatcher {
           i.insight.toLowerCase().includes('creative') ||
           i.insight.toLowerCase().includes('visual')
         );
+
         const marketingInsights = insights.some(i =>
           i.insight.toLowerCase().includes('marketing') ||
           i.insight.toLowerCase().includes('brand') ||
@@ -299,26 +328,29 @@ export class RealtimeCareerMatcher {
           i.insight.toLowerCase().includes('well-being')
         );
 
-        if (hasHealthcare && healthcareInsights) return 1.5;
-        if (hasTech && techInsights) return 1.5;
-        if (hasDesign && designInsights) return 1.5;
-        if (hasMarketing && marketingInsights) return 1.5;
+        if (hasHealthcare && healthcareInsights) return 1.8;
+        if (hasTech && techInsights) return 1.7;
+        if (hasDesign && designInsights) return 1.7;
+        if (hasMarketing && marketingInsights) return 1.6;
         if (hasWellness && wellnessInsights) return 1.5;
 
-        if (hasHealthcare || healthcareInsights) return 1.2;
-        if (hasTech || techInsights) return 1.2;
-        if (hasDesign || designInsights) return 1.2;
-        if (hasMarketing || marketingInsights) return 1.2;
-        if (hasWellness || wellnessInsights) return 1.2;
+        if (hasHealthcare || healthcareInsights) return 1.1;
+        if (hasTech || techInsights) return 1.1;
+        if (hasDesign || designInsights) return 1.1;
+        if (hasMarketing || marketingInsights) return 1.0;
+        if (hasWellness || wellnessInsights) return 1.0;
 
-        return 1.0;
+        return 0.95;
 
       case 'environment':
-        if (title.includes('remote') || title.includes('hybrid')) return 1.1;
+        if (title.includes('remote') || title.includes('hybrid')) return 1.3;
+        if (title.includes('office') || title.includes('on-site')) return 0.8;
         return 1.0;
 
       case 'learning-growth':
-        if (title.includes('specialist') || title.includes('coordinator') || title.includes('trainer') || title.includes('developer')) return 1.2;
+        if (title.includes('senior') || title.includes('lead') || title.includes('principal')) return 0.8;
+        if (title.includes('junior') || title.includes('associate') || title.includes('trainee')) return 1.4;
+        if (title.includes('specialist') || title.includes('coordinator') || title.includes('trainer') || title.includes('developer')) return 1.3;
         return 1.0;
 
       default:
