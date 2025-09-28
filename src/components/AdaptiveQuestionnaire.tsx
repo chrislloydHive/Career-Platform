@@ -131,26 +131,45 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       const completionPercentage = engine.getCompletionPercentage();
       const lastQuestionId = currentQuestion?.id || null;
 
+      const payload = {
+        state,
+        insights,
+        synthesizedInsights,
+        gaps,
+        authenticityProfile,
+        narrativeInsights,
+        confidenceEvolutions,
+        lastQuestionId,
+        completionPercentage,
+      };
+
+      console.log('Saving questionnaire state...', {
+        insightsCount: insights.length,
+        synthesizedCount: synthesizedInsights.length,
+        gapsCount: gaps.length,
+        narrativeCount: narrativeInsights.length,
+        completionPercentage,
+      });
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
       const response = await fetch('/api/questionnaire', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          state,
-          insights,
-          synthesizedInsights,
-          gaps,
-          authenticityProfile,
-          narrativeInsights,
-          confidenceEvolutions,
-          lastQuestionId,
-          completionPercentage,
-        }),
+        body: JSON.stringify(payload),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
+        console.log('Save successful');
       } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Save failed:', response.status, errorData);
         setSaveStatus('error');
       }
     } catch (error) {
