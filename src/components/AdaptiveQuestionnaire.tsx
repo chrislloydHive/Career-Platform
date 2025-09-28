@@ -604,13 +604,27 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             </button>
             <button
               onClick={async () => {
+                console.log('Restart Questionnaire button clicked');
                 if (confirm('Are you sure you want to restart the questionnaire? This will clear all your answers.')) {
                   try {
-                    await fetch('/api/questionnaire', { method: 'DELETE' });
-                    window.location.reload();
+                    console.log('Calling DELETE /api/questionnaire');
+                    const response = await fetch('/api/questionnaire', { method: 'DELETE' });
+                    console.log('DELETE response:', response.status, response.statusText);
+
+                    if (response.ok) {
+                      console.log('Restart successful, reloading page');
+                      window.location.reload();
+                    } else {
+                      const errorData = await response.json().catch(() => ({}));
+                      console.error('Restart failed:', errorData);
+                      alert('Failed to restart questionnaire. Please try again.');
+                    }
                   } catch (error) {
                     console.error('Failed to restart:', error);
+                    alert('An error occurred while restarting. Please try again.');
                   }
+                } else {
+                  console.log('Restart cancelled by user');
                 }
               }}
               className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
@@ -769,13 +783,27 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               </div>
               <button
                 onClick={async () => {
+                  console.log('Reset button clicked');
                   if (confirm('Are you sure you want to reset the assessment? This will clear all your answers and start over.')) {
                     try {
-                      await fetch('/api/questionnaire', { method: 'DELETE' });
-                      window.location.reload();
+                      console.log('Calling DELETE /api/questionnaire');
+                      const response = await fetch('/api/questionnaire', { method: 'DELETE' });
+                      console.log('DELETE response:', response.status, response.statusText);
+
+                      if (response.ok) {
+                        console.log('Reset successful, reloading page');
+                        window.location.reload();
+                      } else {
+                        const errorData = await response.json().catch(() => ({}));
+                        console.error('Reset failed:', errorData);
+                        alert('Failed to reset questionnaire. Please try again.');
+                      }
                     } catch (error) {
                       console.error('Failed to reset:', error);
+                      alert('An error occurred while resetting. Please try again.');
                     }
+                  } else {
+                    console.log('Reset cancelled by user');
                   }
                 }}
                 className="px-3 py-1.5 bg-gray-700 text-gray-300 hover:bg-gray-600 rounded-lg text-xs font-medium transition-colors flex items-center gap-2"

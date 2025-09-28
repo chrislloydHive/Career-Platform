@@ -713,6 +713,181 @@ export const valuesQuestions: AdaptiveQuestion[] = [
       { value: 'minimal', label: 'Don\'t need much recognition' },
     ],
   },
+  {
+    id: 'val-industry-mission',
+    area: 'values',
+    type: 'scenario',
+    text: 'Which of these mission statements resonates most with you?',
+    options: [
+      {
+        value: 'healthcare',
+        label: 'Improving health outcomes and helping people live better lives',
+        insight: 'Healthcare and wellness interest - values helping people directly'
+      },
+      {
+        value: 'tech',
+        label: 'Building innovative technology that solves real problems',
+        insight: 'Technology and innovation interest - excited by creating solutions'
+      },
+      {
+        value: 'design',
+        label: 'Creating beautiful, user-friendly experiences that delight people',
+        insight: 'Design and user experience interest - aesthetics and usability matter'
+      },
+      {
+        value: 'marketing',
+        label: 'Connecting people with products and ideas that improve their lives',
+        insight: 'Marketing and communication interest - storytelling and connection'
+      },
+      {
+        value: 'wellness',
+        label: 'Promoting holistic well-being and sustainable, healthy lifestyles',
+        insight: 'Wellness and lifestyle interest - preventative care and balance'
+      },
+    ],
+    insightTriggers: [
+      {
+        pattern: (responses) => responses['val-industry-mission'] === 'healthcare',
+        insight: 'Healthcare industry alignment - drawn to direct patient impact and health outcomes',
+        hiddenInterest: 'Healthcare, medical, patient care, health tech'
+      },
+      {
+        pattern: (responses) => responses['val-industry-mission'] === 'tech',
+        insight: 'Technology industry alignment - innovation and problem-solving through software',
+        hiddenInterest: 'Software, SaaS, tech startups, engineering'
+      },
+      {
+        pattern: (responses) => responses['val-industry-mission'] === 'design',
+        insight: 'Design industry alignment - user-centered thinking and visual communication',
+        hiddenInterest: 'UX/UI, product design, creative agencies'
+      },
+      {
+        pattern: (responses) => responses['val-industry-mission'] === 'marketing',
+        insight: 'Marketing industry alignment - brand building and audience connection',
+        hiddenInterest: 'Marketing, advertising, content strategy, brand'
+      },
+      {
+        pattern: (responses) => responses['val-industry-mission'] === 'wellness',
+        insight: 'Wellness industry alignment - holistic health and lifestyle optimization',
+        hiddenInterest: 'Wellness, fitness, nutrition, mental health, coaching'
+      },
+    ],
+  },
+  {
+    id: 'val-work-substance',
+    area: 'values',
+    type: 'multiple-choice',
+    text: 'What would make your work feel most meaningful?',
+    options: [
+      {
+        value: 'direct-help',
+        label: 'Directly helping individuals overcome challenges',
+        insight: 'Service-oriented - healthcare, counseling, support roles'
+      },
+      {
+        value: 'build-tools',
+        label: 'Building tools that empower others to work smarter',
+        insight: 'Tool builder - technology, software, productivity'
+      },
+      {
+        value: 'creative-expression',
+        label: 'Expressing creativity and bringing ideas to life',
+        insight: 'Creative focus - design, content, artistic work'
+      },
+      {
+        value: 'influence-decisions',
+        label: 'Influencing how people think and make decisions',
+        insight: 'Influencer focus - marketing, sales, persuasion'
+      },
+      {
+        value: 'optimize-systems',
+        label: 'Optimizing systems and making things run smoothly',
+        insight: 'Systems thinker - operations, analytics, efficiency'
+      },
+    ],
+    insightTriggers: [
+      {
+        pattern: (responses) => responses['val-work-substance'] === 'direct-help',
+        insight: 'Direct service orientation - suited for healthcare, counseling, customer success',
+        hiddenInterest: 'Healthcare, patient care, customer success, support'
+      },
+      {
+        pattern: (responses) => responses['val-work-substance'] === 'build-tools',
+        insight: 'Builder mentality - suited for tech, product development, engineering',
+        hiddenInterest: 'Technology, software engineering, product management'
+      },
+      {
+        pattern: (responses) => responses['val-work-substance'] === 'creative-expression',
+        insight: 'Creative drive - suited for design, content, marketing creative',
+        hiddenInterest: 'Design, content creation, creative direction, brand'
+      },
+      {
+        pattern: (responses) => responses['val-work-substance'] === 'influence-decisions',
+        insight: 'Persuasion orientation - suited for marketing, sales, communications',
+        hiddenInterest: 'Marketing, sales, PR, communications, advocacy'
+      },
+    ],
+  },
+  {
+    id: 'val-exciting-projects',
+    area: 'values',
+    type: 'scenario',
+    text: 'Which project would you be most excited to work on?',
+    options: [
+      {
+        value: 'patient-app',
+        label: 'An app that helps patients manage chronic conditions',
+        insight: 'Healthcare technology interest'
+      },
+      {
+        value: 'ai-platform',
+        label: 'An AI platform that automates complex business processes',
+        insight: 'Enterprise technology and automation interest'
+      },
+      {
+        value: 'brand-campaign',
+        label: 'A brand campaign that changes how people think about sustainability',
+        insight: 'Marketing and social impact interest'
+      },
+      {
+        value: 'design-system',
+        label: 'A design system that makes products more accessible',
+        insight: 'Design and accessibility interest'
+      },
+      {
+        value: 'wellness-program',
+        label: 'A corporate wellness program that reduces burnout',
+        insight: 'Wellness and organizational health interest'
+      },
+    ],
+    insightTriggers: [
+      {
+        pattern: (responses) => responses['val-exciting-projects'] === 'patient-app',
+        insight: 'Healthcare technology passion - combines tech skills with health impact',
+        hiddenInterest: 'Digital health, health tech, patient care technology'
+      },
+      {
+        pattern: (responses) => responses['val-exciting-projects'] === 'ai-platform',
+        insight: 'Enterprise technology passion - automation and business efficiency',
+        hiddenInterest: 'SaaS, B2B tech, AI/ML, automation'
+      },
+      {
+        pattern: (responses) => responses['val-exciting-projects'] === 'brand-campaign',
+        insight: 'Brand marketing passion - storytelling with purpose',
+        hiddenInterest: 'Brand marketing, social impact marketing, campaigns'
+      },
+      {
+        pattern: (responses) => responses['val-exciting-projects'] === 'design-system',
+        insight: 'Design systems passion - scalable, accessible design',
+        hiddenInterest: 'Product design, design systems, accessibility'
+      },
+      {
+        pattern: (responses) => responses['val-exciting-projects'] === 'wellness-program',
+        insight: 'Workplace wellness passion - employee health and culture',
+        hiddenInterest: 'Corporate wellness, HR, employee experience'
+      },
+    ],
+  },
 ];
 
 export const environmentQuestions: AdaptiveQuestion[] = [
@@ -814,6 +989,23 @@ export const learningGrowthQuestions: AdaptiveQuestion[] = [
         value: 'random',
         label: 'Whatever sparks my curiosity in the moment',
         insight: 'Curiosity-driven, broad interests'
+      },
+    ],
+    insightTriggers: [
+      {
+        pattern: (responses) => responses['lg-1'] === 'technical',
+        insight: 'Technical learning orientation - technology and engineering interest',
+        hiddenInterest: 'Software, engineering, technical roles'
+      },
+      {
+        pattern: (responses) => responses['lg-1'] === 'creative',
+        insight: 'Creative learning orientation - design and content interest',
+        hiddenInterest: 'Design, creative, content, marketing'
+      },
+      {
+        pattern: (responses) => responses['lg-1'] === 'interpersonal',
+        insight: 'People-focused learning - healthcare, HR, customer success interest',
+        hiddenInterest: 'Healthcare, customer success, HR, coaching'
       },
     ],
   },

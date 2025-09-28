@@ -264,8 +264,53 @@ export class RealtimeCareerMatcher {
 
       case 'values':
         const hasHealthcare = title.includes('health') || category.includes('health');
-        const hasSocial = insights.some(i => i.insight.toLowerCase().includes('impact') || i.insight.toLowerCase().includes('help'));
-        if (hasHealthcare && hasSocial) return 1.3;
+        const hasTech = title.includes('tech') || title.includes('software') || title.includes('engineer') || category.includes('tech');
+        const hasDesign = title.includes('design') || title.includes('ux') || title.includes('ui') || category.includes('design');
+        const hasMarketing = title.includes('market') || title.includes('brand') || title.includes('content') || category.includes('marketing');
+        const hasWellness = title.includes('wellness') || title.includes('fitness') || category.includes('wellness');
+
+        const healthcareInsights = insights.some(i =>
+          i.insight.toLowerCase().includes('healthcare') ||
+          i.insight.toLowerCase().includes('patient') ||
+          i.insight.toLowerCase().includes('health impact') ||
+          i.insight.toLowerCase().includes('medical')
+        );
+        const techInsights = insights.some(i =>
+          i.insight.toLowerCase().includes('technology') ||
+          i.insight.toLowerCase().includes('innovation') ||
+          i.insight.toLowerCase().includes('software') ||
+          i.insight.toLowerCase().includes('build tools')
+        );
+        const designInsights = insights.some(i =>
+          i.insight.toLowerCase().includes('design') ||
+          i.insight.toLowerCase().includes('user experience') ||
+          i.insight.toLowerCase().includes('creative') ||
+          i.insight.toLowerCase().includes('visual')
+        );
+        const marketingInsights = insights.some(i =>
+          i.insight.toLowerCase().includes('marketing') ||
+          i.insight.toLowerCase().includes('brand') ||
+          i.insight.toLowerCase().includes('influence') ||
+          i.insight.toLowerCase().includes('storytelling')
+        );
+        const wellnessInsights = insights.some(i =>
+          i.insight.toLowerCase().includes('wellness') ||
+          i.insight.toLowerCase().includes('holistic') ||
+          i.insight.toLowerCase().includes('well-being')
+        );
+
+        if (hasHealthcare && healthcareInsights) return 1.5;
+        if (hasTech && techInsights) return 1.5;
+        if (hasDesign && designInsights) return 1.5;
+        if (hasMarketing && marketingInsights) return 1.5;
+        if (hasWellness && wellnessInsights) return 1.5;
+
+        if (hasHealthcare || healthcareInsights) return 1.2;
+        if (hasTech || techInsights) return 1.2;
+        if (hasDesign || designInsights) return 1.2;
+        if (hasMarketing || marketingInsights) return 1.2;
+        if (hasWellness || wellnessInsights) return 1.2;
+
         return 1.0;
 
       case 'environment':
