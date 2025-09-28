@@ -58,6 +58,8 @@ export async function POST(request: NextRequest) {
       : '';
 
     const skillsArray = career.requiredSkills?.map(s => s.skill) || [];
+    const dailyTasksArray = career.dailyTasks?.map(t => t.task) || [];
+    const careerProgressionArray = career.careerProgression?.map(cp => cp.title) || [];
     const alternativeTitlesArray = career.alternativeTitles || [];
     const relatedRolesArray = career.relatedRoles || [];
     const keywordsArray = career.keywords || [];
@@ -78,28 +80,28 @@ export async function POST(request: NextRequest) {
         ${career.category || 'business'},
         ${salaryRange},
         ${career.education?.minimumDegree || ''},
-        ${skillsArray},
+        ${sql.array(skillsArray, 'text')},
         ${0},
         ${0},
         ${0},
         ${0},
-        ${[]},
-        ${[]},
-        ${career.dailyTasks?.map(t => t.task) || []},
-        ${career.careerProgression?.map(cp => cp.title) || []},
-        ${[]},
+        ${sql.array([], 'text')},
+        ${sql.array([], 'text')},
+        ${sql.array(dailyTasksArray, 'text')},
+        ${sql.array(careerProgressionArray, 'text')},
+        ${sql.array([], 'text')},
         ${JSON.stringify({})},
         ${JSON.stringify(career.salaryRanges || [])},
         ${JSON.stringify(career.careerProgression || [])},
         ${'overview'},
-        ${alternativeTitlesArray},
+        ${sql.array(alternativeTitlesArray, 'text')},
         ${JSON.stringify(career.dailyTasks || [])},
         ${JSON.stringify(career.industryInsights || [])},
         ${JSON.stringify(career.workEnvironment || {})},
         ${JSON.stringify(career.jobOutlook || {})},
         ${JSON.stringify(career.education || {})},
-        ${relatedRolesArray},
-        ${keywordsArray}
+        ${sql.array(relatedRolesArray, 'text')},
+        ${sql.array(keywordsArray, 'text')}
       )
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
