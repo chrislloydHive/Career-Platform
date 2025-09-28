@@ -151,17 +151,23 @@ export default function ExplorePage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowSaveDialog(true)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                   hasUnsavedResults
-                    ? 'bg-yellow-600 hover:bg-yellow-500 text-white'
+                    ? 'bg-yellow-600 hover:bg-yellow-500 text-white ring-2 ring-yellow-400/50 animate-pulse'
                     : 'bg-blue-600 hover:bg-blue-500 text-white'
                 }`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                Save Assessment
+                {hasUnsavedResults ? 'Save Assessment (Unsaved!)' : 'Save Assessment'}
               </button>
+              {hasUnsavedResults && !saveMessage && (
+                <div className="px-3 py-1 rounded-lg text-sm bg-yellow-900/50 text-yellow-400 border border-yellow-700/50 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                  Unsaved results - remember to save!
+                </div>
+              )}
               {saveMessage && (
                 <div className={`px-3 py-1 rounded-lg text-sm ${
                   saveMessage.includes('success')
