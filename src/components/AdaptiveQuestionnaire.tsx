@@ -680,6 +680,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               Restart Questionnaire
             </button>
           </div>
+          </div>
         </div>
       </div>
     );
