@@ -5,7 +5,6 @@ import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
 import { DiscoveredInsight } from '@/lib/adaptive-questions/adaptive-engine';
-import Link from 'next/link';
 
 export default function ExplorePage() {
   const [showResults, setShowResults] = useState(false);
@@ -28,14 +27,6 @@ export default function ExplorePage() {
         <Navigation
           title="Your Career Profile"
           subtitle="Based on adaptive exploration"
-          actions={
-            <Link
-              href="/career-match"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-            >
-              Find Matches
-            </Link>
-          }
         />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -396,16 +387,10 @@ export default function ExplorePage() {
                 setShowResults(false);
                 setProfile(null);
               }}
-              className="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Restart Exploration
             </button>
-            <Link
-              href="/career-match"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Find Career Matches
-            </Link>
           </div>
         </main>
       </div>
