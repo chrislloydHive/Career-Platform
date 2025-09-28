@@ -205,27 +205,77 @@ export default function ExplorePage() {
                     <h2 className="text-lg font-bold text-blue-400 mb-3">
                       Core Values
                     </h2>
-                    <p className="text-gray-300 mb-3 italic text-sm">
+                    <p className="text-gray-400 text-xs mb-3">
+                      Your values hierarchy reveals what drives your career decisions and workplace satisfaction.
+                    </p>
+                    <p className="text-gray-300 mb-4 italic text-sm">
                       &ldquo;{profile.patterns.valueHierarchy.coreMotivation}&rdquo;
                     </p>
-                    <div className="space-y-2">
+
+                    <div className="space-y-3">
                       {profile.patterns.valueHierarchy.topValues.map((value, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-900/50 rounded-lg p-2.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xl font-bold text-indigo-400">#{index + 1}</span>
-                            <span className="text-gray-200 capitalize text-sm">{value.value}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-20 h-2 bg-gray-700 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-blue-500"
-                                style={{ width: `${value.priority * 10}%` }}
-                              />
+                        <div key={index} className="bg-gray-900/50 rounded-lg p-3 border border-gray-700/30">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg font-bold text-indigo-400">#{index + 1}</span>
+                              <span className="text-gray-200 capitalize font-medium">{value.value}</span>
                             </div>
-                            <span className="text-xs text-gray-400">{Math.round(value.confidence * 100)}%</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-blue-500"
+                                  style={{ width: `${value.priority * 10}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-gray-400">{Math.round(value.confidence * 100)}%</span>
+                            </div>
+                          </div>
+
+                          {/* Value explanation */}
+                          <div className="text-xs text-gray-400 mb-2">
+                            {value.value === 'autonomy' && 'Having control over your work and decisions'}
+                            {value.value === 'creativity' && 'Expressing innovation and original thinking'}
+                            {value.value === 'stability' && 'Seeking security and predictable outcomes'}
+                            {value.value === 'achievement' && 'Accomplishing goals and measurable success'}
+                            {value.value === 'collaboration' && 'Working effectively with others toward shared goals'}
+                            {value.value === 'impact' && 'Making a meaningful difference in the world'}
+                            {value.value === 'learning' && 'Continuous growth and skill development'}
+                            {value.value === 'recognition' && 'Receiving acknowledgment for your contributions'}
+                            {value.value === 'flexibility' && 'Adapting to change and varied work environments'}
+                            {value.value === 'leadership' && 'Guiding and influencing others toward success'}
+                            {!['autonomy', 'creativity', 'stability', 'achievement', 'collaboration', 'impact', 'learning', 'recognition', 'flexibility', 'leadership'].includes(value.value) &&
+                              'A core principle that guides your career decisions'}
+                          </div>
+
+                          {/* Career implications for this value */}
+                          <div className="text-xs text-blue-300">
+                            <span className="font-medium">Career fit: </span>
+                            {value.value === 'autonomy' && 'Freelance, remote work, entrepreneurship, consulting'}
+                            {value.value === 'creativity' && 'Design, marketing, arts, innovation roles, R&D'}
+                            {value.value === 'stability' && 'Government, education, established corporations, finance'}
+                            {value.value === 'achievement' && 'Sales, competitive industries, goal-driven roles'}
+                            {value.value === 'collaboration' && 'Team-based roles, project management, cross-functional work'}
+                            {value.value === 'impact' && 'Non-profit, healthcare, education, social enterprises'}
+                            {value.value === 'learning' && 'Technology, research, training, academic roles'}
+                            {value.value === 'recognition' && 'Public-facing roles, awards-based fields, thought leadership'}
+                            {value.value === 'flexibility' && 'Consulting, varied project work, dynamic industries'}
+                            {value.value === 'leadership' && 'Management, executive roles, team lead positions'}
+                            {!['autonomy', 'creativity', 'stability', 'achievement', 'collaboration', 'impact', 'learning', 'recognition', 'flexibility', 'leadership'].includes(value.value) &&
+                              'Roles that align with and reinforce this core value'}
                           </div>
                         </div>
                       ))}
+                    </div>
+
+                    {/* Additional context */}
+                    <div className="mt-4 p-3 bg-blue-900/20 rounded-lg border border-blue-700/30">
+                      <h4 className="text-xs font-semibold text-blue-400 mb-2">💡 How to use this information:</h4>
+                      <ul className="text-xs text-gray-300 space-y-1">
+                        <li>• Prioritize roles that align with your top 3 values</li>
+                        <li>• Ask about these values during interviews</li>
+                        <li>• Use them to evaluate job offers and career moves</li>
+                        <li>• Consider how company culture supports these values</li>
+                      </ul>
                     </div>
                   </div>
                 )}
