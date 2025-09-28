@@ -101,7 +101,7 @@ export function CareerComparisonTool({ initialCareers = [] }: CareerComparisonTo
             </svg>
             <h3 className="text-2xl font-semibold text-gray-100 mb-3">No Careers Found</h3>
             <p className="text-gray-400 mb-6 max-w-md mx-auto">
-              You don't have any careers saved yet. Research and save some careers first to use the comparison tool.
+              You don&apos;t have any careers saved yet. Research and save some careers first to use the comparison tool.
             </p>
           </div>
         </div>

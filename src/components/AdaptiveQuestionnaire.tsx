@@ -747,6 +747,8 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           <div className="space-y-3">
             {[...synthesizedInsights.slice(-2).reverse(), ...insights.slice(-3).reverse()].slice(0, 3).map((insight, index) => {
               const isSynthesized = 'title' in insight;
+              const synthInsight = isSynthesized ? insight as SynthesizedInsight : null;
+              const regularInsight = !isSynthesized ? insight as DiscoveredInsight : null;
               return (
                 <div
                   key={index}
@@ -765,11 +767,11 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                         </span>
                       </div>
                       <p className="text-sm font-medium text-gray-100 leading-relaxed">
-                        {isSynthesized ? (insight as any).title : insight.insight}
+                        {isSynthesized ? synthInsight?.title : regularInsight?.insight}
                       </p>
-                      {isSynthesized && (
+                      {isSynthesized && synthInsight && (
                         <p className="text-xs text-gray-400 mt-1.5">
-                          {(insight as any).description}
+                          {synthInsight.description}
                         </p>
                       )}
                     </div>

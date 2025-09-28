@@ -4,6 +4,25 @@ import { useState, useMemo, useEffect } from 'react';
 import type { JobCategory, CareerCategory, ExperienceLevel } from '@/types/career';
 import type { SavedItem } from '@/types/saved-items';
 
+interface CareerRecommendation {
+  jobTitle: string;
+  category: string;
+  matchScore: number;
+  reasons: Array<{
+    factor: string;
+    explanation: string;
+    confidence: number;
+  }>;
+  newInsight?: string;
+}
+
+interface RecommendationMetadata {
+  exploredCount: number;
+  searchCount: number;
+  chatCount?: number;
+  questionnaireCompletion: number;
+}
+
 interface CareerExplorerProps {
   onCareerSelect?: (career: JobCategory) => void;
   onTriggerAIResearch?: (searchQuery: string) => void;
@@ -20,10 +39,10 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
   const [isLoadingUserCareers, setIsLoadingUserCareers] = useState(true);
   const [savedCareerIds, setSavedCareerIds] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<CareerRecommendation[]>([]);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
-  const [recommendationMetadata, setRecommendationMetadata] = useState<any>(null);
+  const [recommendationMetadata, setRecommendationMetadata] = useState<RecommendationMetadata | null>(null);
 
   useEffect(() => {
     async function loadUserCareers() {
@@ -71,6 +90,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
     if (shouldShowRecommendations && recommendations.length === 0) {
       loadRecommendations();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userCareers.length, isLoadingUserCareers]);
 
   const loadRecommendations = async () => {
@@ -194,11 +214,8 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
     }
 
     return { filteredCareers: careers, hasExactMatch: exactMatch };
-  }, [selectedCategory, searchQuery, experienceLevel, userCareers]);
+  }, [selectedCategory, searchQuery, userCareers]);
 
-  const getCategoryIcon = () => {
-    return null;
-  };
 
   const getCategoryLabel = (category: CareerCategory | 'all') => {
     return category.charAt(0).toUpperCase() + category.slice(1);
@@ -585,7 +602,6 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
             const relevantSalary = experienceLevel !== 'all'
               ? career.salaryRanges?.find(range => range.experienceLevel === experienceLevel)
               : career.salaryRanges?.[0];
-            const medianSalary = relevantSalary?.median || 0;
             const salaryRange = relevantSalary
               ? `$${relevantSalary.min.toLocaleString()} - $${relevantSalary.max.toLocaleString()}`
               : null;
