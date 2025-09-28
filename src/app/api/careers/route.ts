@@ -57,13 +57,6 @@ export async function POST(request: NextRequest) {
       ? `$${career.salaryRanges[0].min.toLocaleString()} - $${career.salaryRanges[0].max.toLocaleString()}`
       : '';
 
-    const skillsArray = career.requiredSkills?.map(s => s.skill) || [];
-    const dailyTasksArray = career.dailyTasks?.map(t => t.task) || [];
-    const careerProgressionArray = career.careerProgression?.map(cp => cp.title) || [];
-    const alternativeTitlesArray = career.alternativeTitles || [];
-    const relatedRolesArray = career.relatedRoles || [];
-    const keywordsArray = career.keywords || [];
-
     const result = await sql`
       INSERT INTO career_research (
         id, user_id, title, description, category, salary_range, education_required,
@@ -80,28 +73,28 @@ export async function POST(request: NextRequest) {
         ${career.category || 'business'},
         ${salaryRange},
         ${career.education?.minimumDegree || ''},
-        ${sql.array(skillsArray, 'text')},
+        ${JSON.stringify(career.requiredSkills?.map(s => s.skill) || [])},
         ${0},
         ${0},
         ${0},
         ${0},
-        ${sql.array([], 'text')},
-        ${sql.array([], 'text')},
-        ${sql.array(dailyTasksArray, 'text')},
-        ${sql.array(careerProgressionArray, 'text')},
-        ${sql.array([], 'text')},
+        ${JSON.stringify([])},
+        ${JSON.stringify([])},
+        ${JSON.stringify(career.dailyTasks?.map(t => t.task) || [])},
+        ${JSON.stringify(career.careerProgression?.map(cp => cp.title) || [])},
+        ${JSON.stringify([])},
         ${JSON.stringify({})},
         ${JSON.stringify(career.salaryRanges || [])},
         ${JSON.stringify(career.careerProgression || [])},
         ${'overview'},
-        ${sql.array(alternativeTitlesArray, 'text')},
+        ${JSON.stringify(career.alternativeTitles || [])},
         ${JSON.stringify(career.dailyTasks || [])},
         ${JSON.stringify(career.industryInsights || [])},
         ${JSON.stringify(career.workEnvironment || {})},
         ${JSON.stringify(career.jobOutlook || {})},
         ${JSON.stringify(career.education || {})},
-        ${sql.array(relatedRolesArray, 'text')},
-        ${sql.array(keywordsArray, 'text')}
+        ${JSON.stringify(career.relatedRoles || [])},
+        ${JSON.stringify(career.keywords || [])}
       )
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
