@@ -202,7 +202,7 @@ export function LiveCareerMatchesPanel({
                 {career.matchFactors.length > 0 && (
                   <div className="space-y-1.5">
                     {career.matchFactors.slice(0, 2).map((factor, idx) => {
-                      const barColor = idx === 0 ? 'bg-yellow-500' : 'bg-orange-500';
+                      const barColor = idx === 0 ? 'bg-yellow-600' : 'bg-orange-600';
                       return (
                         <div key={idx} className="flex items-start gap-2">
                           <svg className="w-3 h-3 text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
