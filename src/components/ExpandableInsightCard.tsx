@@ -4,14 +4,14 @@ import { useState } from 'react';
 import { DiscoveredInsight } from '@/lib/adaptive-questions/adaptive-engine';
 import { SynthesizedInsight } from '@/lib/adaptive-questions/insight-synthesis';
 import { CareerFitScore } from '@/lib/matching/realtime-career-matcher';
-import { getQuestionById } from '@/lib/adaptive-questions/question-banks';
+import { getQuestionById, ExplorationArea } from '@/lib/adaptive-questions/question-banks';
 
 interface ExpandableInsightCardProps {
   insight: DiscoveredInsight | SynthesizedInsight;
   responses: Record<string, { questionId: string; response: unknown; timestamp: Date }>;
   topCareers?: CareerFitScore[];
   onExpand?: () => void;
-  getAreaLabel: (area: string) => string;
+  getAreaLabel: (area: ExplorationArea) => string;
 }
 
 type TabType = 'evidence' | 'careers' | 'explore';
@@ -53,7 +53,7 @@ export function ExpandableInsightCard({
           area: question.area,
         };
       })
-      .filter(Boolean);
+      .filter((item): item is { questionId: string; questionText: string; responseValue: unknown; area: ExplorationArea } => item !== null);
   };
 
   const getRelatedCareers = () => {
@@ -217,7 +217,7 @@ export function ExpandableInsightCard({
                 {evidence.length === 0 ? (
                   <p className="text-sm text-gray-400 italic">No direct evidence available for this insight.</p>
                 ) : (
-                  evidence.map((item: any, idx) => (
+                  evidence.map((item, idx) => (
                     <div key={idx} className="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50">
                       <div className="flex items-start gap-2 mb-2">
                         <div className="p-1 bg-blue-500/10 rounded">
@@ -243,7 +243,7 @@ export function ExpandableInsightCard({
             {activeTab === 'careers' && (
               <div className="space-y-2">
                 {relatedCareers.length === 0 ? (
-                  <p className="text-sm text-gray-400 italic">This insight doesn't directly affect any specific careers yet. Keep answering questions to see connections!</p>
+                  <p className="text-sm text-gray-400 italic">This insight doesn&apos;t directly affect any specific careers yet. Keep answering questions to see connections!</p>
                 ) : (
                   <>
                     <p className="text-xs text-gray-400 mb-3">This insight affects your match scores for:</p>

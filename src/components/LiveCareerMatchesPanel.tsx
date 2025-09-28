@@ -12,8 +12,8 @@ interface LiveCareerMatchesPanelProps {
 
 function AnimatedNumber({ value, duration = 600 }: { value: number; duration?: number }) {
   const [displayValue, setDisplayValue] = useState(value);
-  const frameRef = useRef<number>();
-  const startTimeRef = useRef<number>();
+  const frameRef = useRef<number | undefined>(undefined);
+  const startTimeRef = useRef<number | undefined>(undefined);
   const startValueRef = useRef(value);
 
   useEffect(() => {
