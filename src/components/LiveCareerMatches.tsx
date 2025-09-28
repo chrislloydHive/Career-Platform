@@ -39,13 +39,13 @@ export function LiveCareerMatches({
   const getTrendIcon = (trend: CareerFitScore['trend']) => {
     switch (trend) {
       case 'rising':
-        return '📈';
+        return '↗';
       case 'falling':
-        return '📉';
+        return '↘';
       case 'stable':
-        return '➡️';
+        return '→';
       case 'new':
-        return '✨';
+        return 'NEW';
     }
   };
 
@@ -72,7 +72,7 @@ export function LiveCareerMatches({
             </div>
             <div className="flex-1">
               <div className="font-bold text-white text-lg mb-1">
-                {displayedUpdate.change > 0 ? '🎉 Career Match Updated!' : 'Match Updated'}
+                {displayedUpdate.change > 0 ? 'Career Match Updated!' : 'Match Updated'}
               </div>
               <p className="text-white/90 text-sm">{displayedUpdate.message}</p>
               <div className="mt-2 flex items-center gap-2">
@@ -182,7 +182,7 @@ export function LiveCareerMatches({
       {risingCareers.length > 0 && (
         <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg border border-green-700/50 p-6">
           <h3 className="text-lg font-bold text-gray-100 mb-4 flex items-center gap-2">
-            <span className="text-2xl">🚀</span>
+            <span className="text-2xl font-bold text-blue-400">+</span>
             Rising Matches
           </h3>
           <p className="text-sm text-gray-400 mb-4">

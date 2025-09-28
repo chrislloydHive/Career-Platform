@@ -14,7 +14,9 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.64.0",
     "@vercel/postgres": "^0.10.0",
+    "bcryptjs": "^3.0.2",
     "next": "15.5.4",
+    "next-auth": "^5.0.0-beta.29",
     "puppeteer": "^13.5.2",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-stealth": "^2.11.1",
@@ -29,6 +31,7 @@
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",

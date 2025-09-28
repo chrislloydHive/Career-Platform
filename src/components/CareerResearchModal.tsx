@@ -125,14 +125,31 @@ export function CareerResearchModal({ isOpen, onClose, onSaveCareer, initialJobT
                 <textarea
                   value={searchResults}
                   onChange={(e) => setSearchResults(e.target.value)}
-                  placeholder="Paste information you've found about this career (job descriptions, salary data, etc.)"
+                  placeholder="Paste information you've found about this career..."
                   rows={8}
                   className="w-full px-4 py-3 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isResearching}
                 />
-                <p className="text-sm text-gray-400 mt-2">
-                  AI will generate comprehensive career data even without additional information, but providing context helps create more accurate profiles.
-                </p>
+                <div className="mt-2 space-y-2">
+                  <p className="text-sm text-gray-400">
+                    AI will generate comprehensive career data even without additional information, but providing context helps create more accurate profiles.
+                  </p>
+                  <details className="text-sm">
+                    <summary className="text-blue-400 cursor-pointer hover:text-blue-300">
+                      What kind of information is helpful?
+                    </summary>
+                    <ul className="mt-2 space-y-1 text-gray-400 list-disc list-inside pl-2">
+                      <li>Job descriptions or postings</li>
+                      <li>Salary ranges and compensation data</li>
+                      <li>Required skills and qualifications</li>
+                      <li>Day-to-day responsibilities</li>
+                      <li>Career progression paths</li>
+                      <li>Industry trends and outlook</li>
+                      <li>Work environment details (remote, office, etc.)</li>
+                      <li>Education and certification requirements</li>
+                    </ul>
+                  </details>
+                </div>
               </div>
 
               {error && (

@@ -190,7 +190,7 @@ export default function Home() {
 
       <Navigation
         title="Job Search"
-        subtitle="Finding Louisa's Next Career"
+        subtitle="Discover Your Next Career Opportunity"
         actions={
           jobs.length > 0 ? (
             <button

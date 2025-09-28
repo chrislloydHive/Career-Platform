@@ -76,7 +76,7 @@ export class AnthropicClient {
 
     const response = await this.client.messages.create({
       model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 2048,
+      max_tokens: 4096,
       system: systemPrompt + '\n\nIMPORTANT: You must respond with ONLY valid JSON. Do not wrap your response in markdown code blocks or include any explanatory text.',
       messages,
     });

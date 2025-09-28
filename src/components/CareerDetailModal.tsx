@@ -7,17 +7,34 @@ import { LiveCareerInsights } from './LiveCareerInsights';
 interface CareerDetailModalProps {
   career: JobCategory | null;
   onClose: () => void;
+  onViewSimilar?: (category: string) => void;
 }
 
-export function CareerDetailModal({ career, onClose }: CareerDetailModalProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'progression' | 'skills' | 'insights' | 'livedata'>('overview');
+export function CareerDetailModal({ career, onClose, onViewSimilar }: CareerDetailModalProps) {
+  const [activeTab, setActiveTab] = useState<'overview' | 'progression' | 'skills' | 'insights' | 'livedata'>(
+    (career?.activeTab as 'overview' | 'progression' | 'skills' | 'insights' | 'livedata') || 'overview'
+  );
 
   if (!career) return null;
 
+  const handleTabChange = async (newTab: typeof activeTab) => {
+    setActiveTab(newTab);
+
+    try {
+      await fetch('/api/careers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ careerId: career.id, activeTab: newTab }),
+      });
+    } catch (error) {
+      console.error('Failed to save active tab:', error);
+    }
+  };
+
   const getTrendIcon = (trend: 'growing' | 'stable' | 'declining') => {
-    if (trend === 'growing') return '📈';
-    if (trend === 'declining') return '📉';
-    return '📊';
+    if (trend === 'growing') return '↗';
+    if (trend === 'declining') return '↘';
+    return '→';
   };
 
   const getTrendColor = (trend: 'growing' | 'stable' | 'declining') => {
@@ -72,7 +89,7 @@ export function CareerDetailModal({ career, onClose }: CareerDetailModalProps) {
             ].map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                onClick={() => handleTabChange(tab.id as typeof activeTab)}
                 className={`px-4 py-3 font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-400'
@@ -228,36 +245,42 @@ export function CareerDetailModal({ career, onClose }: CareerDetailModalProps) {
                             </span>
                           </div>
 
-                          <div className="mb-4">
-                            <p className="text-sm text-gray-400 mb-1">Typical Salary Range</p>
-                            <p className="text-lg font-semibold text-green-400">
-                              ${stage.typicalSalaryRange.min.toLocaleString()} - ${stage.typicalSalaryRange.max.toLocaleString()}
-                            </p>
-                            <p className="text-sm text-gray-400">Median: ${stage.typicalSalaryRange.median.toLocaleString()}</p>
-                          </div>
-
-                          <div className="mb-4">
-                            <p className="text-sm font-medium text-gray-300 mb-2">Key Responsibilities</p>
-                            <ul className="space-y-1">
-                              {stage.keyResponsibilities.map((resp, ridx) => (
-                                <li key={ridx} className="text-sm text-gray-400 flex items-start">
-                                  <span className="text-blue-400 mr-2">•</span>
-                                  {resp}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div>
-                            <p className="text-sm font-medium text-gray-300 mb-2">Required Skills</p>
-                            <div className="flex flex-wrap gap-2">
-                              {stage.requiredSkills.map((skill, sidx) => (
-                                <span key={sidx} className="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">
-                                  {skill}
-                                </span>
-                              ))}
+                          {stage.typicalSalaryRange && (
+                            <div className="mb-4">
+                              <p className="text-sm text-gray-400 mb-1">Typical Salary Range</p>
+                              <p className="text-lg font-semibold text-green-400">
+                                ${stage.typicalSalaryRange.min.toLocaleString()} - ${stage.typicalSalaryRange.max.toLocaleString()}
+                              </p>
+                              <p className="text-sm text-gray-400">Median: ${stage.typicalSalaryRange.median.toLocaleString()}</p>
                             </div>
-                          </div>
+                          )}
+
+                          {stage.keyResponsibilities && stage.keyResponsibilities.length > 0 && (
+                            <div className="mb-4">
+                              <p className="text-sm font-medium text-gray-300 mb-2">Key Responsibilities</p>
+                              <ul className="space-y-1">
+                                {stage.keyResponsibilities.map((resp, ridx) => (
+                                  <li key={ridx} className="text-sm text-gray-400 flex items-start">
+                                    <span className="text-blue-400 mr-2">•</span>
+                                    {resp}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {stage.requiredSkills && stage.requiredSkills.length > 0 && (
+                            <div>
+                              <p className="text-sm font-medium text-gray-300 mb-2">Required Skills</p>
+                              <div className="flex flex-wrap gap-2">
+                                {stage.requiredSkills.map((skill, sidx) => (
+                                  <span key={sidx} className="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">
+                                    {skill}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -428,7 +451,15 @@ export function CareerDetailModal({ career, onClose }: CareerDetailModalProps) {
             <button className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors">
               Save Career
             </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+              onClick={() => {
+                if (onViewSimilar) {
+                  onViewSimilar(career.category);
+                  onClose();
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               View Similar Careers
             </button>
           </div>

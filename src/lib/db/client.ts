@@ -3,9 +3,24 @@ import { sql } from '@vercel/postgres';
 export async function initializeDatabase() {
   try {
     await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        name TEXT NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+    `;
+
+    await sql`
       CREATE TABLE IF NOT EXISTS user_profiles (
         id SERIAL PRIMARY KEY,
-        user_id TEXT UNIQUE NOT NULL DEFAULT 'louisa',
+        user_id TEXT UNIQUE NOT NULL,
         name TEXT NOT NULL,
         location TEXT,
         bio TEXT,
@@ -22,18 +37,20 @@ export async function initializeDatabase() {
         preferred_locations JSONB NOT NULL DEFAULT '[]'::jsonb,
         career_preferences JSONB NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `;
 
     await sql`
       CREATE TABLE IF NOT EXISTS interaction_history (
         id SERIAL PRIMARY KEY,
-        user_id TEXT NOT NULL DEFAULT 'louisa',
+        user_id TEXT NOT NULL,
         action TEXT NOT NULL,
         context TEXT NOT NULL,
         ai_learning TEXT,
-        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `;
 
@@ -48,11 +65,12 @@ export async function initializeDatabase() {
     await sql`
       CREATE TABLE IF NOT EXISTS ai_insights (
         id SERIAL PRIMARY KEY,
-        user_id TEXT NOT NULL DEFAULT 'louisa',
+        user_id TEXT NOT NULL,
         insight TEXT NOT NULL,
         confidence DECIMAL(3,2) NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
         source TEXT NOT NULL,
-        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `;
 
@@ -67,13 +85,14 @@ export async function initializeDatabase() {
     await sql`
       CREATE TABLE IF NOT EXISTS saved_items (
         id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL DEFAULT 'louisa',
+        user_id TEXT NOT NULL,
         item_type TEXT NOT NULL CHECK (item_type IN ('job', 'career')),
         item_data JSONB NOT NULL,
         notes TEXT,
         tags JSONB DEFAULT '[]'::jsonb,
         saved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        last_modified TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        last_modified TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       );
     `;
 

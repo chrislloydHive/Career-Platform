@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 interface NavigationProps {
   title?: string;
@@ -14,9 +15,14 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/login');
-    router.refresh();
+    try {
+      await signOut({ redirect: false, callbackUrl: '/login' });
+      router.push('/login');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout error:', error);
+      router.push('/login');
+    }
   };
 
   const navItems = [

@@ -157,8 +157,8 @@ export function ExportDialog({ jobs, isOpen, onClose, searchCriteria }: ExportDi
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { value: 'excel' as ExportFormat, label: 'Excel (.xlsx)', icon: '📊' },
-                    { value: 'csv' as ExportFormat, label: 'CSV', icon: '📄' },
+                    { value: 'excel' as ExportFormat, label: 'Excel (.xlsx)', icon: 'XLS' },
+                    { value: 'csv' as ExportFormat, label: 'CSV', icon: 'CSV' },
                     { value: 'json' as ExportFormat, label: 'JSON', icon: '{ }' },
                   ].map(({ value, label, icon }) => (
                     <button

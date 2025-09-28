@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { careerResearchAI } from '@/lib/ai/career-research-ai';
 import { anthropicClient } from '@/lib/ai/anthropic-client';
-import { getUserProfile, buildShortUserContext, addInteraction } from '@/lib/storage/user-profile';
+import { getUserProfile, buildShortUserContext, addInteraction, getQuestionnaireInsights, buildUserContextPrompt } from '@/lib/storage/user-profile-db';
+import { auth } from '@/lib/auth/config';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { jobTitle, searchResults, additionalContext } = await request.json();
 
     if (!jobTitle) {
@@ -21,10 +27,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userProfile = await getUserProfile();
-    const userContext = buildShortUserContext(userProfile);
+    const userProfile = await getUserProfile(session.user.id);
+    const questionnaireData = await getQuestionnaireInsights(session.user.id);
+    const userContext = questionnaireData
+      ? buildUserContextPrompt(userProfile, questionnaireData)
+      : buildShortUserContext(userProfile);
 
-    await addInteraction('career_research', jobTitle);
+    await addInteraction(session.user.id, 'career_research', jobTitle);
 
     const careerProfile = await careerResearchAI.generateCareerProfile(
       jobTitle,

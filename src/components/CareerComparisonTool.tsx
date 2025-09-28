@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { JobCategory } from '@/types/career';
-import { careerResearchService } from '@/lib/career-research/career-service';
 
 interface CareerComparisonToolProps {
   initialCareers?: JobCategory[];
@@ -14,9 +13,25 @@ export function CareerComparisonTool({ initialCareers = [] }: CareerComparisonTo
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [allCareers, setAllCareers] = useState<JobCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const categories = careerResearchService.getAllCategories();
-  const allCareers = categories.flatMap(cat => careerResearchService.findByCategory(cat));
+  useEffect(() => {
+    async function loadUserCareers() {
+      try {
+        const response = await fetch('/api/careers');
+        if (response.ok) {
+          const data = await response.json();
+          setAllCareers(data.careers || []);
+        }
+      } catch (error) {
+        console.error('Failed to load careers:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadUserCareers();
+  }, []);
 
   const searchResults = searchQuery.trim()
     ? allCareers.filter(career =>
@@ -57,6 +72,43 @@ export function CareerComparisonTool({ initialCareers = [] }: CareerComparisonTo
     URL.revokeObjectURL(url);
   };
 
+  if (isLoading) {
+    return (
+      <div className="bg-gray-900 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-gray-400">Loading careers...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (allCareers.length === 0) {
+    return (
+      <div className="bg-gray-900 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-100 mb-2">Career Comparison Tool</h1>
+            <p className="text-gray-400">
+              Compare up to 3 careers side-by-side to make informed decisions
+            </p>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
+            <svg className="w-20 h-20 mx-auto mb-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3 className="text-2xl font-semibold text-gray-100 mb-3">No Careers Found</h3>
+            <p className="text-gray-400 mb-6 max-w-md mx-auto">
+              You don't have any careers saved yet. Research and save some careers first to use the comparison tool.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (selectedCareers.length === 0) {
     return (
       <div className="bg-gray-900 min-h-screen">
@@ -74,7 +126,7 @@ export function CareerComparisonTool({ initialCareers = [] }: CareerComparisonTo
             </svg>
             <h3 className="text-2xl font-semibold text-gray-100 mb-3">Start Your Comparison</h3>
             <p className="text-gray-400 mb-6 max-w-md mx-auto">
-              Search and select careers you want to compare. You can add up to 3 careers.
+              Search and select careers you want to compare. You can add up to 3 careers from your saved list.
             </p>
             <button
               onClick={() => setIsSearching(true)}

@@ -2,25 +2,28 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import type { JobCategory, CareerCategory, ExperienceLevel } from '@/types/career';
-import { careerResearchService } from '@/lib/career-research/career-service';
 import type { SavedItem } from '@/types/saved-items';
 
 interface CareerExplorerProps {
   onCareerSelect?: (career: JobCategory) => void;
   onTriggerAIResearch?: (searchQuery: string) => void;
+  onToggleComparison?: () => void;
+  filterCategory?: CareerCategory | 'all';
 }
 
-export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerExplorerProps) {
-  const [selectedCategory, setSelectedCategory] = useState<CareerCategory | 'all'>('all');
+export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleComparison, filterCategory }: CareerExplorerProps) {
+  const [selectedCategory, setSelectedCategory] = useState<CareerCategory | 'all'>(filterCategory || 'all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [salaryRange, setSalaryRange] = useState<{ min: number; max: number }>({
-    min: 0,
-    max: 500000,
-  });
-  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | 'all'>('entry');
+  const [filterKeywords, setFilterKeywords] = useState('');
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | 'all'>('all');
   const [userCareers, setUserCareers] = useState<JobCategory[]>([]);
   const [isLoadingUserCareers, setIsLoadingUserCareers] = useState(true);
   const [savedCareerIds, setSavedCareerIds] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [recommendationMetadata, setRecommendationMetadata] = useState<any>(null);
 
   useEffect(() => {
     async function loadUserCareers() {
@@ -40,6 +43,12 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
   }, []);
 
   useEffect(() => {
+    if (filterCategory) {
+      setSelectedCategory(filterCategory);
+    }
+  }, [filterCategory]);
+
+  useEffect(() => {
     async function loadSavedCareers() {
       try {
         const response = await fetch('/api/saved-items');
@@ -56,6 +65,30 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
     }
     loadSavedCareers();
   }, []);
+
+  useEffect(() => {
+    const shouldShowRecommendations = userCareers.length >= 2 && !isLoadingUserCareers;
+    if (shouldShowRecommendations && recommendations.length === 0) {
+      loadRecommendations();
+    }
+  }, [userCareers.length, isLoadingUserCareers]);
+
+  const loadRecommendations = async () => {
+    try {
+      setIsLoadingRecommendations(true);
+      const response = await fetch('/api/recommendations');
+      if (response.ok) {
+        const data = await response.json();
+        setRecommendations(data.recommendations || []);
+        setRecommendationMetadata(data.metadata);
+        setShowRecommendations(data.recommendations.length > 0);
+      }
+    } catch (error) {
+      console.error('Failed to load recommendations:', error);
+    } finally {
+      setIsLoadingRecommendations(false);
+    }
+  };
 
   const handleSaveCareer = async (career: JobCategory) => {
     const isSaved = savedCareerIds.includes(career.id);
@@ -83,56 +116,85 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
     }
   };
 
-  const categories = careerResearchService.getAllCategories();
+  const handleDeleteCareer = async (career: JobCategory) => {
+    if (!confirm(`Are you sure you want to delete "${career.title}"? This cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/careers/${career.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setUserCareers(prev => prev.filter(c => c.id !== career.id));
+        setSavedCareerIds(prev => prev.filter(id => id !== career.id));
+      } else {
+        console.error('Failed to delete career');
+        alert('Failed to delete career. Please try again.');
+      }
+    } catch (error) {
+      console.error('Failed to delete career:', error);
+      alert('Failed to delete career. Please try again.');
+    }
+  };
+
+  const categories: CareerCategory[] = useMemo(() => {
+    const uniqueCategories = new Set<CareerCategory>();
+    userCareers.forEach(career => {
+      if (career.category) {
+        uniqueCategories.add(career.category as CareerCategory);
+      }
+    });
+    return Array.from(uniqueCategories).sort();
+  }, [userCareers]);
 
   const { filteredCareers, hasExactMatch } = useMemo(() => {
-    let careers: JobCategory[] = [];
+    let careers: JobCategory[] = userCareers;
 
-    if (selectedCategory === 'all') {
-      careers = [
-        ...categories.flatMap(cat => careerResearchService.findByCategory(cat)),
-        ...userCareers
-      ];
-    } else {
-      careers = [
-        ...careerResearchService.findByCategory(selectedCategory),
-        ...userCareers.filter(c => c.category === selectedCategory)
-      ];
+    if (selectedCategory !== 'all') {
+      careers = careers.filter(c => c.category === selectedCategory);
     }
 
     let exactMatch = false;
 
     if (searchQuery.trim()) {
       const searchLower = searchQuery.toLowerCase().trim();
+      const searchWords = searchLower.split(/\s+/);
 
-      exactMatch = careers.some(career =>
-        career.title.toLowerCase() === searchLower ||
-        career.alternativeTitles.some(t => t.toLowerCase() === searchLower)
-      );
+      const isFuzzyMatch = (title: string) => {
+        const titleLower = title.toLowerCase();
+        const titleWords = titleLower.split(/\s+/);
+
+        if (searchWords.length !== titleWords.length) return false;
+
+        return searchWords.every((searchWord, idx) => {
+          const titleWord = titleWords[idx];
+          const minLen = Math.min(searchWord.length, titleWord.length);
+          const commonPrefix = Math.floor(minLen * 0.7);
+
+          return searchWord.substring(0, commonPrefix) === titleWord.substring(0, commonPrefix);
+        });
+      };
+
+      exactMatch = careers.some(career => {
+        if (career.title.toLowerCase() === searchLower) return true;
+        if (isFuzzyMatch(career.title)) return true;
+        return career.alternativeTitles?.some(t =>
+          t.toLowerCase() === searchLower || isFuzzyMatch(t)
+        ) ?? false;
+      });
 
       careers = careers.filter(career =>
         career.title.toLowerCase().includes(searchLower) ||
-        career.description.toLowerCase().includes(searchLower) ||
-        career.keywords.some(k => k.toLowerCase().includes(searchLower)) ||
-        career.alternativeTitles.some(t => t.toLowerCase().includes(searchLower))
+        career.description?.toLowerCase().includes(searchLower) ||
+        (career.keywords?.some(k => k.toLowerCase().includes(searchLower)) ?? false) ||
+        (career.alternativeTitles?.some(t => t.toLowerCase().includes(searchLower)) ?? false)
       );
     }
-
-    if (experienceLevel !== 'all') {
-      careers = careers.filter(career =>
-        career.salaryRanges.some(range => range.experienceLevel === experienceLevel)
-      );
-    }
-
-    careers = careers.filter(career => {
-      const salariesInRange = career.salaryRanges.filter(
-        range => range.median >= salaryRange.min && range.median <= salaryRange.max
-      );
-      return salariesInRange.length > 0;
-    });
 
     return { filteredCareers: careers, hasExactMatch: exactMatch };
-  }, [selectedCategory, searchQuery, salaryRange, experienceLevel, categories, userCareers]);
+  }, [selectedCategory, searchQuery, experienceLevel, userCareers]);
 
   const getCategoryIcon = () => {
     return null;
@@ -146,11 +208,24 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
     <div className="bg-gray-900 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-100 mb-2">Career Explorer</h1>
-          <p className="text-gray-400">
-            Discover career paths that match your interests and goals
-          </p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-100 mb-2">Career Explorer</h1>
+            <p className="text-gray-400">
+              Discover career paths that match your interests and goals
+            </p>
+          </div>
+          {onToggleComparison && (
+            <button
+              onClick={onToggleComparison}
+              className="px-4 py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Compare Careers
+            </button>
+          )}
         </div>
 
         {/* Category Filter */}
@@ -196,7 +271,12 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
                   id="search"
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSuggestions(e.target.value.length > 2);
+                  }}
+                  onFocus={() => setShowSuggestions(searchQuery.length > 2)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   placeholder="Job title or keywords..."
                   className="w-full bg-gray-900 text-gray-100 border border-gray-600 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -213,7 +293,69 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
+
+                {/* Suggestions Dropdown */}
+                {showSuggestions && searchQuery.length > 2 && filteredCareers.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredCareers.slice(0, 5).map((career) => (
+                      <button
+                        key={career.id}
+                        onClick={() => {
+                          setSearchQuery(career.title);
+                          setShowSuggestions(false);
+                          onCareerSelect?.(career);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors border-b border-gray-700 last:border-b-0"
+                      >
+                        <div className="font-medium text-gray-100">{career.title}</div>
+                        <div className="text-sm text-gray-400 truncate">{career.description}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* No Match - Show AI Research Option */}
+                {showSuggestions && searchQuery.length > 2 && filteredCareers.length === 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg">
+                    <button
+                      onClick={() => {
+                        setShowSuggestions(false);
+                        const query = filterKeywords ? `${searchQuery} (${filterKeywords})` : searchQuery;
+                        onTriggerAIResearch?.(query);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <div>
+                          <div className="font-medium text-gray-100">No matches found</div>
+                          <div className="text-sm text-blue-400">
+                            Research &quot;{searchQuery}&quot; with AI
+                            {filterKeywords && <span className="text-gray-400"> • Filters: {filterKeywords}</span>}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                )}
               </div>
+            </div>
+
+            {/* Filter Keywords */}
+            <div>
+              <label htmlFor="filter-keywords" className="block text-sm font-medium text-gray-300 mb-2">
+                Filters
+              </label>
+              <input
+                id="filter-keywords"
+                type="text"
+                value={filterKeywords}
+                onChange={(e) => setFilterKeywords(e.target.value)}
+                placeholder="e.g., remote, creative, analytical..."
+                className="w-full bg-gray-900 text-gray-100 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             {/* Experience Level */}
@@ -234,33 +376,10 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
                 <option value="executive">Executive</option>
               </select>
             </div>
-
-            {/* Salary Range */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Salary Range
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  value={salaryRange.min}
-                  onChange={(e) => setSalaryRange({ ...salaryRange, min: Number(e.target.value) })}
-                  placeholder="Min"
-                  className="w-1/2 bg-gray-900 text-gray-100 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="number"
-                  value={salaryRange.max}
-                  onChange={(e) => setSalaryRange({ ...salaryRange, max: Number(e.target.value) })}
-                  placeholder="Max"
-                  className="w-1/2 bg-gray-900 text-gray-100 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
           </div>
 
           {/* Active Filters Summary */}
-          {(searchQuery || experienceLevel !== 'all' || selectedCategory !== 'all') && (
+          {(searchQuery || experienceLevel !== 'all' || selectedCategory !== 'all' || filterKeywords) && (
             <div className="mt-4 pt-4 border-t border-gray-700">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm text-gray-400">Active filters:</span>
@@ -279,12 +398,17 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
                     &quot;{searchQuery}&quot;
                   </span>
                 )}
+                {filterKeywords && (
+                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm">
+                    Filters: {filterKeywords}
+                  </span>
+                )}
                 <button
                   onClick={() => {
                     setSearchQuery('');
+                    setFilterKeywords('');
                     setExperienceLevel('all');
                     setSelectedCategory('all');
-                    setSalaryRange({ min: 0, max: 500000 });
                   }}
                   className="text-sm text-blue-400 hover:text-blue-300"
                 >
@@ -319,9 +443,13 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
                     ? `We found ${filteredCareers.length} similar career${filteredCareers.length !== 1 ? 's' : ''}, but not an exact match for "${searchQuery}".`
                     : `We couldn't find any careers matching "${searchQuery}".`
                   } Would you like to use AI to research this specific career title?
+                  {filterKeywords && <span className="block mt-1 text-sm text-blue-300">Filters: {filterKeywords}</span>}
                 </p>
                 <button
-                  onClick={() => onTriggerAIResearch?.(searchQuery)}
+                  onClick={() => {
+                    const query = filterKeywords ? `${searchQuery} (${filterKeywords})` : searchQuery;
+                    onTriggerAIResearch?.(query);
+                  }}
                   className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium inline-flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,41 +462,178 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
           </div>
         )}
 
+        {/* AI Recommendations Panel */}
+        {showRecommendations && recommendations.length > 0 && (
+          <div className="mb-8 bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-blue-900/30 rounded-xl border-2 border-blue-500/40 p-6">
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-start gap-3">
+                <div className="p-3 bg-blue-500/20 rounded-lg">
+                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-100 mb-1">
+                    Recommended for You
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    Based on {recommendationMetadata?.exploredCount || 0} careers explored, {recommendationMetadata?.searchCount || 0} searches, and {recommendationMetadata?.questionnaireCompletion || 0}% self-discovery completion
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={loadRecommendations}
+                  disabled={isLoadingRecommendations}
+                  className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                  title="Refresh recommendations"
+                >
+                  <svg className={`w-4 h-4 ${isLoadingRecommendations ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
+                </button>
+                <button
+                  onClick={() => setShowRecommendations(false)}
+                  className="p-2 text-gray-400 hover:text-gray-300 rounded-lg transition-colors"
+                  title="Hide recommendations"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {recommendations.map((rec, index) => (
+                <div key={index} className="bg-gray-800/60 rounded-lg p-5 border border-blue-500/30 hover:border-blue-500/50 transition-all">
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h4 className="text-lg font-bold text-gray-100">{rec.jobTitle}</h4>
+                        <span className="px-3 py-1 bg-blue-600/30 text-blue-300 rounded-full text-xs font-semibold">
+                          {rec.matchScore}% Match
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-400 mb-3">
+                        {getCategoryLabel(rec.category as CareerCategory)}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const query = rec.jobTitle;
+                        onTriggerAIResearch?.(query);
+                      }}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      Explore
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    {rec.reasons.map((reason: any, rIdx: number) => (
+                      <div key={rIdx} className="flex items-start gap-2 text-sm">
+                        <svg className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        <div className="flex-1">
+                          <span className="font-semibold text-blue-300">{reason.factor}:</span>
+                          <span className="text-gray-300 ml-1">{reason.explanation}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {rec.newInsight && (
+                    <div className="mt-3 pt-3 border-t border-gray-700">
+                      <div className="flex items-start gap-2">
+                        <svg className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <p className="text-sm text-gray-300 italic">
+                          <span className="font-semibold text-yellow-400">New Insight:</span> {rec.newInsight}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Show Recommendations Button (if hidden) */}
+        {!showRecommendations && recommendations.length > 0 && !isLoadingUserCareers && (
+          <button
+            onClick={() => setShowRecommendations(true)}
+            className="w-full mb-6 p-4 bg-blue-900/20 hover:bg-blue-900/30 border-2 border-blue-500/40 hover:border-blue-500/60 rounded-lg transition-all flex items-center justify-center gap-2 text-blue-300 hover:text-blue-200 font-medium"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            View {recommendations.length} AI-Recommended Career{recommendations.length !== 1 ? 's' : ''} for You
+          </button>
+        )}
+
         {/* Career Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCareers.map((career) => {
-            const medianSalary = career.salaryRanges[0]?.median || 0;
-            const growthRate = career.jobOutlook.growthRate;
+            const relevantSalary = experienceLevel !== 'all'
+              ? career.salaryRanges?.find(range => range.experienceLevel === experienceLevel)
+              : career.salaryRanges?.[0];
+            const medianSalary = relevantSalary?.median || 0;
+            const salaryRange = relevantSalary
+              ? `$${relevantSalary.min.toLocaleString()} - $${relevantSalary.max.toLocaleString()}`
+              : null;
+            const growthRate = career.jobOutlook?.growthRate || 'N/A';
 
             return (
               <div
                 key={career.id}
                 className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-blue-500 transition-all group relative"
               >
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSaveCareer(career);
-                  }}
-                  className={`absolute top-4 right-4 p-2 rounded-lg transition-all ${
-                    savedCareerIds.includes(career.id)
-                      ? 'bg-yellow-600 text-white'
-                      : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                  }`}
-                  title={savedCareerIds.includes(career.id) ? 'Remove from saved' : 'Save career'}
-                >
-                  <svg className="w-5 h-5" fill={savedCareerIds.includes(career.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                </button>
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSaveCareer(career);
+                    }}
+                    className={`p-2 rounded-lg transition-all ${
+                      savedCareerIds.includes(career.id)
+                        ? 'bg-yellow-600 text-white'
+                        : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                    }`}
+                    title={savedCareerIds.includes(career.id) ? 'Remove from saved' : 'Save career'}
+                  >
+                    <svg className="w-5 h-5" fill={savedCareerIds.includes(career.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCareer(career);
+                    }}
+                    className="p-2 rounded-lg transition-all bg-gray-700 text-gray-400 hover:bg-red-600 hover:text-white"
+                    title="Delete career"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
 
                 <div className="cursor-pointer" onClick={() => onCareerSelect?.(career)}>
                   {/* Category Badge */}
-                  <div className="flex items-center justify-between mb-3 pr-12">
+                  <div className="flex items-center justify-between mb-3 pr-24">
                     <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-xs font-medium">
                       {getCategoryLabel(career.category)}
                     </span>
-                    {career.workEnvironment.remote && (
+                    {career.workEnvironment?.remote && (
                       <span className="px-2 py-1 bg-green-900/50 text-green-400 rounded text-xs">
                         Remote
                       </span>
@@ -387,41 +652,48 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch }: CareerEx
 
                 {/* Key Info */}
                 <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-300">
-                    <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    ${medianSalary.toLocaleString()} median
-                  </div>
+                  {salaryRange && (
+                    <div className="flex items-center text-sm text-gray-300">
+                      <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {salaryRange}
+                      {experienceLevel !== 'all' && <span className="ml-1 text-gray-500">({experienceLevel})</span>}
+                    </div>
+                  )}
                   <div className="flex items-center text-sm text-gray-300">
                     <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                     {growthRate} growth
                   </div>
-                  <div className="flex items-center text-sm text-gray-300">
-                    <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {career.requiredSkills.filter(s => s.importance === 'required').length} required skills
-                  </div>
+                  {career.requiredSkills && career.requiredSkills.length > 0 && (
+                    <div className="flex items-center text-sm text-gray-300">
+                      <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {career.requiredSkills.filter(s => s.importance === 'required').length} required skills
+                    </div>
+                  )}
                 </div>
 
                 {/* Competition Badge */}
-                <div className="pt-4 border-t border-gray-700">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-400">Competition</span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      career.jobOutlook.competitionLevel === 'low'
-                        ? 'bg-green-900/50 text-green-400'
-                        : career.jobOutlook.competitionLevel === 'medium'
-                        ? 'bg-yellow-900/50 text-yellow-400'
-                        : 'bg-red-900/50 text-red-400'
-                    }`}>
-                      {career.jobOutlook.competitionLevel}
-                    </span>
+                {career.jobOutlook?.competitionLevel && (
+                  <div className="pt-4 border-t border-gray-700">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400">Competition</span>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        career.jobOutlook.competitionLevel === 'low'
+                          ? 'bg-green-900/50 text-green-400'
+                          : career.jobOutlook.competitionLevel === 'medium'
+                          ? 'bg-yellow-900/50 text-yellow-400'
+                          : 'bg-red-900/50 text-red-400'
+                      }`}>
+                        {career.jobOutlook.competitionLevel}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
                 </div>
               </div>
             );

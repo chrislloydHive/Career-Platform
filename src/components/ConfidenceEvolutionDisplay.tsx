@@ -24,13 +24,13 @@ export function ConfidenceEvolutionDisplay({
   const getTrendIcon = (trend: InsightEvolution['trend']) => {
     switch (trend) {
       case 'strengthening':
-        return '📈';
+        return '↗';
       case 'weakening':
-        return '📉';
+        return '↘';
       case 'stable':
-        return '➡️';
+        return '→';
       case 'fluctuating':
-        return '〰️';
+        return '∿';
     }
   };
 
@@ -63,13 +63,13 @@ export function ConfidenceEvolutionDisplay({
   const getPatternIcon = (type: ConfidencePattern['type']) => {
     switch (type) {
       case 'strengthening':
-        return '💪';
+        return '↑';
       case 'evolving':
-        return '🔄';
+        return '↻';
       case 'validated':
         return '✓';
       case 'changing':
-        return '🔀';
+        return '⇄';
     }
   };
 

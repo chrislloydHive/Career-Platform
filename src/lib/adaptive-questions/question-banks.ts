@@ -388,6 +388,60 @@ export const problemSolvingQuestions: AdaptiveQuestion[] = [
     ],
   },
   {
+    id: 'ps-analytical-depth',
+    area: 'problem-solving',
+    type: 'scale',
+    text: 'How deep do you like to analyze a problem before starting to solve it?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Start solving quickly',
+      max: 'Thoroughly analyze first'
+    },
+  },
+  {
+    id: 'ps-data-comfort',
+    area: 'problem-solving',
+    type: 'scale',
+    text: 'How comfortable are you working with data and analytics to solve problems?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Prefer qualitative approaches',
+      max: 'Love working with data'
+    },
+  },
+  {
+    id: 'ps-failure-tolerance',
+    area: 'problem-solving',
+    type: 'scale',
+    text: 'How do you feel about potential failures when trying new approaches?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Avoid risk of failure',
+      max: 'Embrace failures as learning'
+    },
+  },
+  {
+    id: 'ps-iteration-speed',
+    area: 'problem-solving',
+    type: 'multiple-choice',
+    text: 'When experimenting with solutions, what\'s your typical approach?',
+    options: [
+      { value: 'quick-iterations', label: 'Quick iterations with frequent adjustments' },
+      { value: 'measured-iterations', label: 'Measured iterations with careful evaluation' },
+      { value: 'parallel-approaches', label: 'Test multiple approaches simultaneously' },
+      { value: 'single-focused', label: 'Focus deeply on one approach at a time' },
+    ],
+  },
+  {
+    id: 'ps-preference-clarify',
+    area: 'problem-solving',
+    type: 'open-ended',
+    text: 'You mentioned enjoying all types of problems equally. Can you describe a recent problem you found particularly satisfying to solve and what made it engaging?',
+  },
+  {
     id: 'ps-time-pressure',
     area: 'problem-solving',
     type: 'scale',
@@ -517,18 +571,6 @@ export const structureFlexibilityQuestions: AdaptiveQuestion[] = [
         insight: 'Values clear frameworks and defined processes'
       },
     ],
-    followUpConditions: [
-      {
-        if: (response) => response === 'excited' || response === 'comfortable',
-        then: ['sf-planning-style', 'sf-accountability'],
-        reason: 'Explore self-management and accountability preferences'
-      },
-      {
-        if: (response) => response === 'prefer-structure',
-        then: ['sf-structure-type', 'sf-adaptation'],
-        reason: 'Understand what type of structure is most helpful'
-      },
-    ],
   },
   {
     id: 'sf-change',
@@ -577,12 +619,280 @@ export const structureFlexibilityQuestions: AdaptiveQuestion[] = [
   },
 ];
 
+export const valuesQuestions: AdaptiveQuestion[] = [
+  {
+    id: 'val-1',
+    area: 'values',
+    type: 'scenario',
+    text: 'You receive two job offers with similar pay. What factor would most influence your decision?',
+    options: [
+      {
+        value: 'impact',
+        label: 'The potential to make a meaningful impact',
+        insight: 'Purpose-driven, mission-oriented'
+      },
+      {
+        value: 'growth',
+        label: 'Opportunities for learning and advancement',
+        insight: 'Growth-focused, career development priority'
+      },
+      {
+        value: 'culture',
+        label: 'Company culture and team fit',
+        insight: 'Relationship and environment focused'
+      },
+      {
+        value: 'stability',
+        label: 'Job security and company stability',
+        insight: 'Security and predictability valued'
+      },
+      {
+        value: 'flexibility',
+        label: 'Work-life balance and flexibility',
+        insight: 'Life balance and autonomy priority'
+      },
+    ],
+    followUpConditions: [
+      {
+        if: (response) => response === 'impact',
+        then: ['val-impact-type', 'val-measure-success'],
+        reason: 'Explore what kind of impact matters'
+      },
+    ],
+  },
+  {
+    id: 'val-impact-type',
+    area: 'values',
+    type: 'multiple-choice',
+    text: 'What type of impact is most meaningful to you?',
+    options: [
+      { value: 'social', label: 'Helping people or communities' },
+      { value: 'environmental', label: 'Protecting the environment' },
+      { value: 'innovation', label: 'Advancing technology or knowledge' },
+      { value: 'economic', label: 'Creating economic opportunity' },
+      { value: 'cultural', label: 'Enriching culture or art' },
+    ],
+  },
+  {
+    id: 'val-measure-success',
+    area: 'values',
+    type: 'open-ended',
+    text: 'How do you personally measure success in your career?',
+  },
+  {
+    id: 'val-compromise',
+    area: 'values',
+    type: 'scale',
+    text: 'Would you take a significant pay cut for work that aligns with your values?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Unlikely - compensation is key',
+      max: 'Absolutely - values come first'
+    },
+    insightTriggers: [
+      {
+        pattern: (responses) =>
+          typeof responses['val-compromise'] === 'number' &&
+          responses['val-compromise'] >= 4,
+        insight: 'Strong values alignment - willing to sacrifice for meaningful work',
+        hiddenInterest: 'Non-profit, social impact, mission-driven organizations'
+      },
+    ],
+  },
+  {
+    id: 'val-recognition',
+    area: 'values',
+    type: 'multiple-choice',
+    text: 'What kind of recognition is most important to you?',
+    options: [
+      { value: 'public', label: 'Public recognition and visibility' },
+      { value: 'peer', label: 'Respect from peers and colleagues' },
+      { value: 'leadership', label: 'Recognition from leadership' },
+      { value: 'results', label: 'Seeing tangible results of my work' },
+      { value: 'minimal', label: 'Don\'t need much recognition' },
+    ],
+  },
+];
+
+export const environmentQuestions: AdaptiveQuestion[] = [
+  {
+    id: 'env-1',
+    area: 'environment',
+    type: 'scenario',
+    text: 'What physical work environment helps you do your best work?',
+    options: [
+      {
+        value: 'home',
+        label: 'Quiet, private space at home',
+        insight: 'Values autonomy and control over environment'
+      },
+      {
+        value: 'office',
+        label: 'Collaborative office with team nearby',
+        insight: 'Energy from being around others'
+      },
+      {
+        value: 'flexible',
+        label: 'Mix of locations - variety keeps me engaged',
+        insight: 'Adaptable, values flexibility'
+      },
+      {
+        value: 'dynamic',
+        label: 'Dynamic spaces - cafes, coworking, travel',
+        insight: 'Stimulation-seeking, location independent'
+      },
+    ],
+  },
+  {
+    id: 'env-noise',
+    area: 'environment',
+    type: 'scale',
+    text: 'How do you handle noise and activity around you while working?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Need complete quiet',
+      max: 'Energized by activity'
+    },
+  },
+  {
+    id: 'env-commute',
+    area: 'environment',
+    type: 'scale',
+    text: 'How important is minimizing your commute time?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Don\'t mind a long commute',
+      max: 'Critical priority'
+    },
+  },
+  {
+    id: 'env-location',
+    area: 'environment',
+    type: 'multiple-choice',
+    text: 'Where do you see yourself living and working long-term?',
+    options: [
+      { value: 'urban', label: 'Major city - access to opportunities and culture' },
+      { value: 'suburban', label: 'Suburbs - balance of space and access' },
+      { value: 'rural', label: 'Rural area - nature and quieter life' },
+      { value: 'digital-nomad', label: 'Location independent - travel frequently' },
+      { value: 'undecided', label: 'Still figuring this out' },
+    ],
+  },
+];
+
+export const learningGrowthQuestions: AdaptiveQuestion[] = [
+  {
+    id: 'lg-1',
+    area: 'learning-growth',
+    type: 'scenario',
+    text: 'You have a free weekend to learn something new. What draws you in?',
+    options: [
+      {
+        value: 'technical',
+        label: 'A technical skill or tool',
+        insight: 'Skill-building and practical competence focus'
+      },
+      {
+        value: 'strategic',
+        label: 'Business strategy or leadership concepts',
+        insight: 'Strategic thinking and leadership interest'
+      },
+      {
+        value: 'creative',
+        label: 'Creative or artistic skill',
+        insight: 'Creative expression and aesthetics valued'
+      },
+      {
+        value: 'interpersonal',
+        label: 'Communication or interpersonal skills',
+        insight: 'People skills and relationships priority'
+      },
+      {
+        value: 'random',
+        label: 'Whatever sparks my curiosity in the moment',
+        insight: 'Curiosity-driven, broad interests'
+      },
+    ],
+  },
+  {
+    id: 'lg-depth',
+    area: 'learning-growth',
+    type: 'scale',
+    text: 'Do you prefer to develop deep expertise in one area or broad knowledge across many?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Deep specialist',
+      max: 'Broad generalist'
+    },
+    insightTriggers: [
+      {
+        pattern: (responses) =>
+          typeof responses['lg-depth'] === 'number' &&
+          responses['lg-depth'] <= 2,
+        insight: 'Specialist orientation - suited for deep technical or expert roles',
+        hiddenInterest: 'Research, specialized consulting, technical leadership'
+      },
+      {
+        pattern: (responses) =>
+          typeof responses['lg-depth'] === 'number' &&
+          responses['lg-depth'] >= 4,
+        insight: 'Generalist orientation - suited for cross-functional or strategic roles',
+        hiddenInterest: 'Product management, general management, entrepreneurship'
+      },
+    ],
+  },
+  {
+    id: 'lg-feedback',
+    area: 'learning-growth',
+    type: 'multiple-choice',
+    text: 'How do you prefer to receive feedback on your work?',
+    options: [
+      { value: 'direct', label: 'Direct and immediate feedback' },
+      { value: 'written', label: 'Written feedback I can review privately' },
+      { value: 'discussion', label: 'Collaborative discussion and dialogue' },
+      { value: 'self-assessment', label: 'Self-reflection with occasional check-ins' },
+      { value: 'results', label: 'Through results and outcomes' },
+    ],
+  },
+  {
+    id: 'lg-challenge',
+    area: 'learning-growth',
+    type: 'scale',
+    text: 'How do you feel when you\'re given a task slightly beyond your current abilities?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Anxious and uncomfortable',
+      max: 'Excited and motivated'
+    },
+  },
+  {
+    id: 'lg-teaching',
+    area: 'learning-growth',
+    type: 'scale',
+    text: 'How much do you enjoy teaching or mentoring others?',
+    scaleMin: 1,
+    scaleMax: 5,
+    scaleLabels: {
+      min: 'Not interested',
+      max: 'Love it - core to my identity'
+    },
+  },
+];
+
 export const allQuestionBanks = {
   'work-style': workStyleQuestions,
   'people-interaction': peopleInteractionQuestions,
   'problem-solving': problemSolvingQuestions,
   'creativity': creativityQuestions,
   'structure-flexibility': structureFlexibilityQuestions,
+  'values': valuesQuestions,
+  'environment': environmentQuestions,
+  'learning-growth': learningGrowthQuestions,
 };
 
 export function getQuestionById(id: string): AdaptiveQuestion | undefined {

@@ -67,13 +67,13 @@ export function InteractiveInsightExplorer({
   const getEvidenceIcon = (type: InsightEvidence['type']) => {
     switch (type) {
       case 'question-response':
-        return '❓';
+        return 'Q';
       case 'behavioral-pattern':
-        return '🔁';
+        return 'PAT';
       case 'experience':
-        return '💼';
+        return 'EXP';
       case 'cross-domain':
-        return '🔗';
+        return 'X';
     }
   };
 
@@ -160,10 +160,10 @@ export function InteractiveInsightExplorer({
                     : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                 }`}
               >
-                {tab === 'evidence' && '📊 Evidence'}
-                {tab === 'questions' && '💬 Explore Further'}
-                {tab === 'careers' && '🎯 Career Connections'}
-                {tab === 'refine' && '✏️ Refine'}
+                {tab === 'evidence' && 'Evidence'}
+                {tab === 'questions' && 'Explore Further'}
+                {tab === 'careers' && 'Career Connections'}
+                {tab === 'refine' && 'Refine'}
               </button>
             ))}
           </div>

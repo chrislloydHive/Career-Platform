@@ -15,9 +15,11 @@ export default function CareersPage() {
   const [showResearch, setShowResearch] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [aiSearchQuery, setAiSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState<string | undefined>(undefined);
 
-  const handleCareerSaved = (career: JobCategory) => {
+  const handleCareerSaved = async (career: JobCategory) => {
     setRefreshKey(prev => prev + 1);
+    window.location.reload();
   };
 
   const handleTriggerAIResearch = (searchQuery: string) => {
@@ -35,28 +37,29 @@ export default function CareersPage() {
       <Navigation
         title="Career Explorer"
         subtitle="Research career paths and opportunities"
-        actions={
-          <button
-            onClick={() => setShowComparison(!showComparison)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              showComparison
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            {showComparison ? 'Explorer' : 'Compare'}
-          </button>
-        }
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {showComparison ? (
-          <CareerComparisonTool />
+          <div>
+            <button
+              onClick={() => setShowComparison(false)}
+              className="mb-6 px-4 py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Explorer
+            </button>
+            <CareerComparisonTool />
+          </div>
         ) : (
           <CareerExplorer
             key={refreshKey}
             onCareerSelect={setSelectedCareer}
             onTriggerAIResearch={handleTriggerAIResearch}
+            onToggleComparison={() => setShowComparison(!showComparison)}
+            filterCategory={filterCategory as any}
           />
         )}
       </main>
@@ -64,6 +67,10 @@ export default function CareersPage() {
       <CareerDetailModal
         career={selectedCareer}
         onClose={() => setSelectedCareer(null)}
+        onViewSimilar={(category) => {
+          setFilterCategory(category);
+          setRefreshKey(prev => prev + 1);
+        }}
       />
 
       <CareerResearchModal

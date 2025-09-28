@@ -1,17 +1,14 @@
 import { sql } from '../db/client';
-import { UserProfile, LOUISA_PROFILE } from '@/types/user-profile';
+import { UserProfile } from '@/types/user-profile';
 
-const USER_ID = 'louisa';
-
-export async function getUserProfile(): Promise<UserProfile> {
+export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   try {
     const result = await sql`
-      SELECT * FROM user_profiles WHERE user_id = ${USER_ID}
+      SELECT * FROM user_profiles WHERE user_id = ${userId}
     `;
 
     if (result.rows.length === 0) {
-      await saveUserProfile(LOUISA_PROFILE);
-      return LOUISA_PROFILE;
+      return null;
     }
 
     const row = result.rows[0];
@@ -19,7 +16,7 @@ export async function getUserProfile(): Promise<UserProfile> {
     const interactions = await sql`
       SELECT action, context, ai_learning, timestamp
       FROM interaction_history
-      WHERE user_id = ${USER_ID}
+      WHERE user_id = ${userId}
       ORDER BY timestamp ASC
       LIMIT 1000
     `;
@@ -27,7 +24,7 @@ export async function getUserProfile(): Promise<UserProfile> {
     const insights = await sql`
       SELECT insight, confidence, source, timestamp
       FROM ai_insights
-      WHERE user_id = ${USER_ID}
+      WHERE user_id = ${userId}
       ORDER BY timestamp ASC
       LIMIT 500
     `;
@@ -66,22 +63,22 @@ export async function getUserProfile(): Promise<UserProfile> {
     return profile;
   } catch (error) {
     console.error('Error fetching user profile from database:', error);
-    return LOUISA_PROFILE;
+    return null;
   }
 }
 
-export async function saveUserProfile(profile: UserProfile): Promise<void> {
+export async function saveUserProfile(userId: string, profile: UserProfile): Promise<void> {
   try {
     const existing = await sql`
-      SELECT user_id FROM user_profiles WHERE user_id = ${USER_ID}
+      SELECT user_id FROM user_profiles WHERE user_id = ${userId}
     `;
 
     if (existing.rows.length > 0) {
       await sql`
         UPDATE user_profiles SET
           name = ${profile.name},
-          location = ${profile.location},
-          bio = ${profile.bio},
+          location = ${profile.location || ''},
+          bio = ${profile.bio || ''},
           linkedin_url = ${profile.linkedInUrl || null},
           resume_url = ${profile.resumeUrl || null},
           education = ${JSON.stringify(profile.education)},
@@ -95,7 +92,7 @@ export async function saveUserProfile(profile: UserProfile): Promise<void> {
           preferred_locations = ${JSON.stringify(profile.preferredLocations)},
           career_preferences = ${JSON.stringify(profile.careerPreferences)},
           last_updated = CURRENT_TIMESTAMP
-        WHERE user_id = ${USER_ID}
+        WHERE user_id = ${userId}
       `;
     } else {
       await sql`
@@ -105,10 +102,10 @@ export async function saveUserProfile(profile: UserProfile): Promise<void> {
           career_goals, preferred_industries, preferred_locations,
           career_preferences
         ) VALUES (
-          ${USER_ID},
+          ${userId},
           ${profile.name},
-          ${profile.location},
-          ${profile.bio},
+          ${profile.location || ''},
+          ${profile.bio || ''},
           ${profile.linkedInUrl || null},
           ${profile.resumeUrl || null},
           ${JSON.stringify(profile.education)},
@@ -130,15 +127,15 @@ export async function saveUserProfile(profile: UserProfile): Promise<void> {
   }
 }
 
-export async function addInteraction(action: string, context: string, aiLearning?: string): Promise<void> {
+export async function addInteraction(userId: string, action: string, context: string, aiLearning?: string): Promise<void> {
   try {
     await sql`
       INSERT INTO interaction_history (user_id, action, context, ai_learning)
-      VALUES (${USER_ID}, ${action}, ${context}, ${aiLearning || null})
+      VALUES (${userId}, ${action}, ${context}, ${aiLearning || null})
     `;
 
     const count = await sql`
-      SELECT COUNT(*) as count FROM interaction_history WHERE user_id = ${USER_ID}
+      SELECT COUNT(*) as count FROM interaction_history WHERE user_id = ${userId}
     `;
 
     const totalCount = parseInt(count.rows[0].count);
@@ -147,7 +144,7 @@ export async function addInteraction(action: string, context: string, aiLearning
         DELETE FROM interaction_history
         WHERE id IN (
           SELECT id FROM interaction_history
-          WHERE user_id = ${USER_ID}
+          WHERE user_id = ${userId}
           ORDER BY timestamp ASC
           LIMIT ${totalCount - 1000}
         )
@@ -155,7 +152,7 @@ export async function addInteraction(action: string, context: string, aiLearning
     }
 
     await sql`
-      UPDATE user_profiles SET last_updated = CURRENT_TIMESTAMP WHERE user_id = ${USER_ID}
+      UPDATE user_profiles SET last_updated = CURRENT_TIMESTAMP WHERE user_id = ${userId}
     `;
   } catch (error) {
     console.error('Failed to add interaction:', error);
@@ -163,15 +160,15 @@ export async function addInteraction(action: string, context: string, aiLearning
   }
 }
 
-export async function addAIInsight(insight: string, confidence: number, source: string): Promise<void> {
+export async function addAIInsight(userId: string, insight: string, confidence: number, source: string): Promise<void> {
   try {
     await sql`
       INSERT INTO ai_insights (user_id, insight, confidence, source)
-      VALUES (${USER_ID}, ${insight}, ${confidence}, ${source})
+      VALUES (${userId}, ${insight}, ${confidence}, ${source})
     `;
 
     const count = await sql`
-      SELECT COUNT(*) as count FROM ai_insights WHERE user_id = ${USER_ID}
+      SELECT COUNT(*) as count FROM ai_insights WHERE user_id = ${userId}
     `;
 
     const totalCount = parseInt(count.rows[0].count);
@@ -180,7 +177,7 @@ export async function addAIInsight(insight: string, confidence: number, source: 
         DELETE FROM ai_insights
         WHERE id IN (
           SELECT id FROM ai_insights
-          WHERE user_id = ${USER_ID}
+          WHERE user_id = ${userId}
           ORDER BY timestamp ASC
           LIMIT ${totalCount - 500}
         )
@@ -188,7 +185,7 @@ export async function addAIInsight(insight: string, confidence: number, source: 
     }
 
     await sql`
-      UPDATE user_profiles SET last_updated = CURRENT_TIMESTAMP WHERE user_id = ${USER_ID}
+      UPDATE user_profiles SET last_updated = CURRENT_TIMESTAMP WHERE user_id = ${userId}
     `;
   } catch (error) {
     console.error('Failed to add AI insight:', error);
@@ -196,7 +193,71 @@ export async function addAIInsight(insight: string, confidence: number, source: 
   }
 }
 
-export function buildUserContextPrompt(profile: UserProfile): string {
+export async function getQuestionnaireInsights(userId: string) {
+  try {
+    const result = await sql`
+      SELECT insights, synthesized_insights, gaps, authenticity_profile,
+             narrative_insights, completion_percentage
+      FROM questionnaire_state
+      WHERE user_id = ${userId}
+    `;
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error fetching questionnaire insights:', error);
+    return null;
+  }
+}
+
+export function buildUserContextPrompt(profile: UserProfile, questionnaireData?: any): string {
+  let questionnaireSection = '';
+
+  if (questionnaireData) {
+    const insights = questionnaireData.insights || [];
+    const synthesized = questionnaireData.synthesized_insights || [];
+    const gaps = questionnaireData.gaps || [];
+    const authenticityProfile = questionnaireData.authenticity_profile;
+    const narrativeInsights = questionnaireData.narrative_insights || [];
+    const completionPercentage = questionnaireData.completion_percentage || 0;
+
+    questionnaireSection = `
+## SELF-DISCOVERY QUESTIONNAIRE INSIGHTS (${completionPercentage}% Complete)
+
+### Discovered Patterns & Insights
+${insights.length > 0 ? insights.map((i: any) => `- ${i.insight} (${i.area}, ${Math.round(i.confidence * 100)}% confidence)`).join('\n') : '- No insights discovered yet'}
+
+### Cross-Domain Insights
+${synthesized.length > 0 ? synthesized.map((s: any) => `
+**${s.title}** (${s.type})
+${s.description}
+Implications:
+${s.implications.map((imp: string) => `  - ${imp}`).join('\n')}
+`).join('\n') : '- No cross-domain insights yet'}
+
+### Narrative Insights (User's Story)
+${narrativeInsights.length > 0 ? narrativeInsights.map((n: any) => `
+**${n.title}**
+${n.narrative}
+Key themes: ${n.themes.join(', ')}
+`).join('\n') : '- No narrative insights yet'}
+
+### Authenticity Profile
+${authenticityProfile ? `
+Authenticity Score: ${Math.round(authenticityProfile.authenticityScore * 100)}%
+Core Values: ${authenticityProfile.authenticPreferences?.map((p: any) => p.preference).join(', ') || 'N/A'}
+Self-Perception Gaps: ${authenticityProfile.selfPerceptionGaps?.length || 0} identified
+` : '- Not yet analyzed'}
+
+### Knowledge Gaps to Explore
+${gaps.length > 0 ? gaps.map((g: any) => `- ${g.gap} (${g.area}, ${g.importance} priority)`).join('\n') : '- No gaps identified yet'}
+
+`;
+  }
+
   return `
 # User Profile: ${profile.name}
 
@@ -205,7 +266,7 @@ ${profile.bio}
 
 ## Current Location
 ${profile.location}
-
+${questionnaireSection}
 ## CAREER PREFERENCES (CRITICAL FOR RECOMMENDATIONS)
 
 ### Ideal Role
@@ -288,18 +349,22 @@ ${interaction.aiLearning ? `  AI Learning: ${interaction.aiLearning}` : ''}
 
 IMPORTANT INSTRUCTIONS FOR AI:
 1. Use this profile context in ALL responses and recommendations
-2. Remember ${profile.name}'s unique combination: healthcare operations + marketing + fitness + visual merchandising
-3. Pay special attention to her values around helping people and structured environments
-4. Track patterns in her interactions and save insights using the addAIInsight function
-5. Consider her geographic preferences (${profile.preferredLocations.join(', ')})
+2. Remember ${profile.name}'s unique background, skills, and experience
+3. Pay special attention to their stated values and preferences
+4. Track patterns in interactions and save insights using the addAIInsight function
+5. Consider their geographic preferences (${profile.preferredLocations.join(', ')})
 6. Build on previous insights to develop deeper understanding over time
-7. Recognize her athletic discipline from Division I rowing (20+ hrs/week commitment)
-8. Honor her preference for roles that combine creativity with strategy
-9. Note her academic excellence (magna cum laude) and work ethic
-10. Always consider how opportunities align with her career goals and values
+7. Recognize their unique strengths: ${profile.strengths.slice(0, 3).join(', ')}
+8. Honor their career goals and ideal work environment preferences
+9. Consider their educational background and professional experience
+10. Always consider how opportunities align with their career goals and values
 `;
 }
 
 export function buildShortUserContext(profile: UserProfile): string {
-  return `User: ${profile.name}, ${profile.location}. Marketing grad with healthcare ops, fitness training, and visual merchandising experience. Seeking roles combining marketing + health/wellness. Values: helping people, structure, creativity, growth. Recent insights: ${profile.aiInsights.slice(-3).map(i => i.insight).join('; ')}`;
+  const topSkills = profile.skills.slice(0, 3).join(', ');
+  const topValues = profile.values.slice(0, 3).join(', ');
+  const recentInsights = profile.aiInsights.slice(-3).map(i => i.insight).join('; ');
+
+  return `User: ${profile.name}, ${profile.location}. Skills: ${topSkills}. ${profile.careerPreferences.idealRole}. Values: ${topValues}. Recent insights: ${recentInsights || 'None yet'}`;
 }

@@ -37,12 +37,12 @@ export function CareerMatchingQuestionnaire({ onComplete, enableRealTimeMatching
   };
 
   const categoryIcons = {
-    interests: '🎯',
-    skills: '🔧',
-    experience: '📊',
-    personality: '✨',
-    preferences: '⚙️',
-    education: '🎓',
+    interests: 'INT',
+    skills: 'SKL',
+    experience: 'EXP',
+    personality: 'PER',
+    preferences: 'PRF',
+    education: 'EDU',
   };
 
   const currentCategory = categories[currentStep];
@@ -380,7 +380,7 @@ export function CareerMatchingQuestionnaire({ onComplete, enableRealTimeMatching
           >
             <div>
               <h3 className="text-lg font-semibold text-gray-100 mb-1">
-                🎯 Live Career Matches
+                Live Career Matches
               </h3>
               <p className="text-sm text-gray-400">
                 Based on your current answers, here are your top matches

@@ -4,10 +4,16 @@ import { careerMatcher } from '@/lib/chat/career-matcher';
 import { careerChatAI } from '@/lib/ai/career-chat-ai';
 import { anthropicClient } from '@/lib/ai/anthropic-client';
 import { ChatQuery, ChatResponse } from '@/types/chat';
-import { getUserProfile, buildUserContextPrompt, addInteraction } from '@/lib/storage/user-profile';
+import { getUserProfile, buildUserContextPrompt, addInteraction, getQuestionnaireInsights } from '@/lib/storage/user-profile-db';
+import { auth } from '@/lib/auth/config';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json() as ChatQuery;
     const { text, context } = body;
 
@@ -21,10 +27,11 @@ export async function POST(request: NextRequest) {
     const conversationHistory = context?.previousMessages || [];
     const useAI = anthropicClient.isAvailable();
 
-    const userProfile = await getUserProfile();
-    const userContext = buildUserContextPrompt(userProfile);
+    const userProfile = await getUserProfile(session.user.id);
+    const questionnaireData = await getQuestionnaireInsights(session.user.id);
+    const userContext = buildUserContextPrompt(userProfile, questionnaireData);
 
-    await addInteraction('chat_query', text);
+    await addInteraction(session.user.id, 'chat_query', text);
 
     let intent;
     let message: string;

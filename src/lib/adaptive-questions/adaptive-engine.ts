@@ -139,6 +139,10 @@ export class AdaptiveQuestioningEngine {
     return { ...this.state };
   }
 
+  loadState(savedState: AdaptiveSessionState) {
+    this.state = { ...savedState };
+  }
+
   recordResponse(questionId: string, response: unknown, confidenceLevel?: 'certain' | 'somewhat-sure' | 'uncertain') {
     let question = getQuestionById(questionId);
 
@@ -612,11 +616,44 @@ export class AdaptiveQuestioningEngine {
   }
 
   getCompletionPercentage(): number {
-    const totalQuestions = Object.values(allQuestionBanks)
-      .flat()
-      .length;
-    const answeredQuestions = this.state.askedQuestions.length;
-    return Math.round((answeredQuestions / totalQuestions) * 100);
+    const totalAnswered = this.state.askedQuestions.length;
+    const totalInsights = this.state.discoveredInsights.length;
+    const areasExplored = Object.values(this.state.explorationDepth).filter(d => d > 0).length;
+
+    const targetQuestions = 50;
+    const targetInsights = 10;
+    const targetAreas = 8;
+
+    const questionProgress = Math.min(100, (totalAnswered / targetQuestions) * 100);
+    const insightProgress = Math.min(100, (totalInsights / targetInsights) * 100);
+    const areaProgress = Math.min(100, (areasExplored / targetAreas) * 100);
+
+    const questionWeight = 0.5;
+    const insightWeight = 0.3;
+    const areaWeight = 0.2;
+
+    return Math.round(
+      (questionProgress * questionWeight) +
+      (insightProgress * insightWeight) +
+      (areaProgress * areaWeight)
+    );
+  }
+
+  isComplete(): boolean {
+    const completionPercent = this.getCompletionPercentage();
+    const minInsights = 5;
+    const minResponses = 25;
+
+    return (
+      completionPercent >= 70 &&
+      this.state.discoveredInsights.length >= minInsights &&
+      Object.keys(this.state.responses).length >= minResponses
+    );
+  }
+
+  canFinish(): boolean {
+    return this.getCompletionPercentage() >= 40 ||
+           Object.keys(this.state.responses).length >= 15;
   }
 
   analyzeUserProfile(): {

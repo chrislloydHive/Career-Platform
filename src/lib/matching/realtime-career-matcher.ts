@@ -1,6 +1,7 @@
 import { DiscoveredInsight } from '../adaptive-questions/adaptive-engine';
 import { QuestionResponse } from '../adaptive-questions/adaptive-engine';
 import { UserProfile } from '@/types/user-profile';
+import { JobCategory } from '@/types/career';
 
 export interface CareerFitScore {
   careerTitle: string;
@@ -45,7 +46,8 @@ export class RealtimeCareerMatcher {
   constructor(
     private responses: Record<string, QuestionResponse>,
     private insights: DiscoveredInsight[],
-    private userProfile?: UserProfile
+    private userProfile?: UserProfile,
+    private userCareers?: JobCategory[]
   ) {
     this.calculateInitialScores();
   }
@@ -68,7 +70,12 @@ export class RealtimeCareerMatcher {
     }
   }
 
-  updateScores(newInsights: DiscoveredInsight[]): LiveCareerUpdate[] {
+  updateScores(newInsights: DiscoveredInsight[], newResponses?: Record<string, QuestionResponse>): LiveCareerUpdate[] {
+    this.insights = newInsights;
+    if (newResponses) {
+      this.responses = newResponses;
+    }
+
     const updates: LiveCareerUpdate[] = [];
 
     for (const [title, career] of this.careerScores.entries()) {
@@ -112,52 +119,163 @@ export class RealtimeCareerMatcher {
     const factors: MatchFactor[] = [];
     let totalScore = 0;
 
-    const autonomyScore = this.calculateAutonomyMatch(career);
-    if (autonomyScore.score > 0) {
-      factors.push(autonomyScore.factor);
-      totalScore += autonomyScore.score;
-    }
+    const areaScores = this.calculateAreaBasedMatches(career);
+    areaScores.forEach(areaScore => {
+      if (areaScore.score > 0) {
+        factors.push(areaScore.factor);
+        totalScore += areaScore.score;
+      }
+    });
 
-    const communicationScore = this.calculateCommunicationMatch(career);
-    if (communicationScore.score > 0) {
-      factors.push(communicationScore.factor);
-      totalScore += communicationScore.score;
-    }
+    const dataCompleteness = this.calculateDataCompleteness();
+    let confidenceMultiplier = 1.0;
 
-    const creativeScore = this.calculateCreativeMatch(career);
-    if (creativeScore.score > 0) {
-      factors.push(creativeScore.factor);
-      totalScore += creativeScore.score;
-    }
+    if (dataCompleteness < 0.3) confidenceMultiplier = 0.6;
+    else if (dataCompleteness < 0.5) confidenceMultiplier = 0.75;
+    else if (dataCompleteness < 0.7) confidenceMultiplier = 0.85;
+    else if (dataCompleteness < 0.9) confidenceMultiplier = 0.95;
 
-    const healthScore = this.calculateHealthMatch(career);
-    if (healthScore.score > 0) {
-      factors.push(healthScore.factor);
-      totalScore += healthScore.score;
-    }
-
-    const analyticalScore = this.calculateAnalyticalMatch(career);
-    if (analyticalScore.score > 0) {
-      factors.push(analyticalScore.factor);
-      totalScore += analyticalScore.score;
-    }
-
-    const learningScore = this.calculateLearningMatch(career);
-    if (learningScore.score > 0) {
-      factors.push(learningScore.factor);
-      totalScore += learningScore.score;
-    }
-
-    const flexibilityScore = this.calculateFlexibilityMatch(career);
-    if (flexibilityScore.score > 0) {
-      factors.push(flexibilityScore.factor);
-      totalScore += flexibilityScore.score;
-    }
+    const finalScore = totalScore * confidenceMultiplier;
 
     return {
-      score: Math.min(totalScore, 100),
+      score: Math.min(finalScore, 95),
       factors: factors.sort((a, b) => b.contribution - a.contribution),
     };
+  }
+
+  private calculateDataCompleteness(): number {
+    const totalPossibleResponses = 49;
+    const actualResponses = Object.keys(this.responses).length;
+    const insightCount = this.insights.length;
+
+    const responseCompleteness = actualResponses / totalPossibleResponses;
+    const insightCompleteness = Math.min(insightCount / 10, 1.0);
+
+    return (responseCompleteness * 0.7) + (insightCompleteness * 0.3);
+  }
+
+  getDataCompletenessPercentage(): number {
+    return Math.round(this.calculateDataCompleteness() * 100);
+  }
+
+  private calculateAreaBasedMatches(career: { title: string; category: string }): Array<{
+    score: number;
+    factor: MatchFactor;
+  }> {
+    const results: Array<{ score: number; factor: MatchFactor }> = [];
+
+    const areaInsights: Record<string, string[]> = {
+      'work-style': ['Work Style'],
+      'people-interaction': ['People & Collaboration'],
+      'problem-solving': ['Problem Solving'],
+      'creativity': ['Creative Thinking'],
+      'structure-flexibility': ['Structure & Flexibility'],
+      'values': ['Core Values'],
+      'environment': ['Work Environment'],
+      'learning-growth': ['Learning & Growth']
+    };
+
+    const questionPrefixToArea: Record<string, string> = {
+      'ws': 'work-style',
+      'cd': 'people-interaction',
+      'pi': 'people-interaction',
+      'ps': 'problem-solving',
+      'cr': 'creativity',
+      'sf': 'structure-flexibility',
+      'val': 'values',
+      'env': 'environment',
+      'lg': 'learning-growth'
+    };
+
+    Object.entries(areaInsights).forEach(([area, labels]) => {
+      const areaInsightsList = this.insights.filter(i => i.area === area);
+      const areaResponses = Object.entries(this.responses).filter(([qId]) => {
+        const prefix = qId.split('-')[0];
+        return questionPrefixToArea[prefix] === area;
+      });
+
+      const hasData = areaInsightsList.length > 0 || areaResponses.length > 0;
+
+      if (hasData) {
+        let avgConfidence = 0.7;
+        let basedOn: string[] = [];
+
+        if (areaInsightsList.length > 0) {
+          avgConfidence = areaInsightsList.reduce((sum, i) => sum + i.confidence, 0) / areaInsightsList.length;
+          basedOn = areaInsightsList.map(i => i.insight);
+        } else if (areaResponses.length > 0) {
+          avgConfidence = 0.5 + (areaResponses.length * 0.05);
+          basedOn = [`${areaResponses.length} responses in this area`];
+        }
+
+        const careerRelevance = this.calculateCareerRelevanceForArea(career, area, areaInsightsList);
+        const responseBoost = Math.min(areaResponses.length * 0.5, 3);
+        const score = (avgConfidence * careerRelevance * 15) + responseBoost;
+
+        if (score > 2) {
+          results.push({
+            score,
+            factor: {
+              factor: labels[0],
+              contribution: score,
+              strength: score > 12 ? 'strong' : score > 6 ? 'moderate' : 'weak',
+              basedOn
+            }
+          });
+        }
+      }
+    });
+
+    return results;
+  }
+
+  private calculateCareerRelevanceForArea(
+    career: { title: string; category: string },
+    area: string,
+    insights: DiscoveredInsight[]
+  ): number {
+    const title = career.title.toLowerCase();
+    const category = career.category.toLowerCase();
+
+    switch (area) {
+      case 'work-style':
+        if (title.includes('freelance') || title.includes('remote')) return 1.2;
+        return 1.0;
+
+      case 'people-interaction':
+        if (title.includes('manager') || title.includes('success') || title.includes('sales') || title.includes('marketing') || title.includes('coordinator')) return 1.3;
+        return 1.0;
+
+      case 'problem-solving':
+        if (title.includes('analyst') || title.includes('consultant') || title.includes('architect') || title.includes('engineer')) return 1.3;
+        return 1.0;
+
+      case 'creativity':
+        if (title.includes('design') || title.includes('creative') || title.includes('content') || category.includes('design')) return 1.3;
+        return 0.8;
+
+      case 'structure-flexibility':
+        if (title.includes('freelance') || title.includes('consultant') || title.includes('entrepreneur')) return 1.2;
+        if (title.includes('coordinator') || title.includes('operations')) return 0.9;
+        return 1.0;
+
+      case 'values':
+        const hasHealthcare = title.includes('health') || category.includes('health');
+        const hasSocial = insights.some(i => i.insight.toLowerCase().includes('impact') || i.insight.toLowerCase().includes('help'));
+        if (hasHealthcare && hasSocial) return 1.3;
+        return 1.0;
+
+      case 'environment':
+        if (title.includes('remote') || title.includes('hybrid')) return 1.1;
+        return 1.0;
+
+      case 'learning-growth':
+        if (title.includes('specialist') || title.includes('coordinator') || title.includes('trainer') || title.includes('developer')) return 1.2;
+        return 1.0;
+
+      default:
+        return 1.0;
+    }
   }
 
   private calculateAutonomyMatch(career: { title: string; category: string }): {
@@ -442,7 +560,14 @@ export class RealtimeCareerMatcher {
   }
 
   getAllCareers(): { title: string; category: string }[] {
-    return [
+    if (this.userCareers && this.userCareers.length > 0) {
+      return this.userCareers.map(career => ({
+        title: career.title,
+        category: this.mapCategoryToDisplayName(career.category)
+      }));
+    }
+
+    const defaultCareers = [
       { title: 'Digital Health Product Manager', category: 'Product' },
       { title: 'Healthcare Data Analyst', category: 'Data & Analytics' },
       { title: 'Patient Success Manager', category: 'Healthcare Operations' },
@@ -456,6 +581,85 @@ export class RealtimeCareerMatcher {
       { title: 'Healthcare Consultant', category: 'Consulting' },
       { title: 'Community Health Manager', category: 'Healthcare Operations' },
     ];
+
+    if (this.userProfile) {
+      const aiGeneratedCareers = this.generateCareersFromProfile();
+      return [...aiGeneratedCareers, ...defaultCareers].slice(0, 12);
+    }
+
+    return defaultCareers;
+  }
+
+  private mapCategoryToDisplayName(category: string): string {
+    const categoryMap: Record<string, string> = {
+      'tech': 'Technology',
+      'healthcare': 'Healthcare',
+      'marketing': 'Marketing',
+      'finance': 'Finance',
+      'business': 'Business',
+      'design': 'Design',
+      'education': 'Education',
+      'wellness': 'Wellness'
+    };
+    return categoryMap[category] || category;
+  }
+
+  private generateCareersFromProfile(): { title: string; category: string }[] {
+    if (!this.userProfile) return [];
+
+    const careers: { title: string; category: string }[] = [];
+    const skills = this.userProfile.skills || [];
+    const interests = this.userProfile.interests || [];
+    const preferredIndustries = this.userProfile.preferredIndustries || [];
+
+    if (skills.some(s => s.toLowerCase().includes('data') || s.toLowerCase().includes('analyt'))) {
+      careers.push({ title: 'Data Analyst', category: 'Data & Analytics' });
+      careers.push({ title: 'Business Intelligence Analyst', category: 'Data & Analytics' });
+    }
+
+    if (skills.some(s => s.toLowerCase().includes('product') || s.toLowerCase().includes('management'))) {
+      careers.push({ title: 'Product Manager', category: 'Product' });
+      careers.push({ title: 'Technical Product Manager', category: 'Product' });
+    }
+
+    if (skills.some(s => s.toLowerCase().includes('design') || s.toLowerCase().includes('ux'))) {
+      careers.push({ title: 'UX Designer', category: 'Design' });
+      careers.push({ title: 'Product Designer', category: 'Design' });
+    }
+
+    if (interests.some(i => i.toLowerCase().includes('market') || i.toLowerCase().includes('brand'))) {
+      careers.push({ title: 'Marketing Manager', category: 'Marketing' });
+      careers.push({ title: 'Content Strategist', category: 'Marketing' });
+    }
+
+    if (preferredIndustries.some(i => i.toLowerCase().includes('health') || i.toLowerCase().includes('medical'))) {
+      careers.push({ title: 'Healthcare Product Manager', category: 'Healthcare' });
+      careers.push({ title: 'Health Program Coordinator', category: 'Healthcare' });
+    }
+
+    if (preferredIndustries.some(i => i.toLowerCase().includes('tech') || i.toLowerCase().includes('software'))) {
+      careers.push({ title: 'Software Engineer', category: 'Technology' });
+      careers.push({ title: 'Solutions Architect', category: 'Technology' });
+    }
+
+    if (interests.some(i => i.toLowerCase().includes('teach') || i.toLowerCase().includes('train'))) {
+      careers.push({ title: 'Learning & Development Specialist', category: 'Education' });
+      careers.push({ title: 'Corporate Trainer', category: 'Education' });
+    }
+
+    if (this.insights.some(ins => ins.insight.toLowerCase().includes('autonomous') || ins.insight.toLowerCase().includes('independent'))) {
+      careers.push({ title: 'Consultant', category: 'Consulting' });
+      careers.push({ title: 'Freelance Specialist', category: 'Consulting' });
+    }
+
+    if (this.insights.some(ins => ins.insight.toLowerCase().includes('people') || ins.insight.toLowerCase().includes('relationship'))) {
+      careers.push({ title: 'Customer Success Manager', category: 'Customer Success' });
+      careers.push({ title: 'Account Manager', category: 'Sales' });
+    }
+
+    return careers.filter((career, index, self) =>
+      index === self.findIndex((c) => c.title === career.title)
+    );
   }
 
   getCareerScore(title: string): CareerFitScore | undefined {

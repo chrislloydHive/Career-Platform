@@ -156,7 +156,7 @@ export function ValuesHierarchyVisualizer({
 
       <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
         {renderValueTier(
-          '🎯 Core Values',
+          'Core Values',
           hierarchy.coreTier,
           'core',
           'Non-negotiable values that define your career decisions'

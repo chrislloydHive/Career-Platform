@@ -90,7 +90,7 @@ ${profile.bio}
 ## Current Location
 ${profile.location}
 
-## 🎯 CAREER PREFERENCES (CRITICAL FOR RECOMMENDATIONS)
+## CAREER PREFERENCES (CRITICAL FOR RECOMMENDATIONS)
 
 ### Ideal Role
 ${profile.careerPreferences.idealRole}

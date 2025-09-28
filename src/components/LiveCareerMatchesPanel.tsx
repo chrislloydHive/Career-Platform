@@ -7,12 +7,14 @@ interface LiveCareerMatchesPanelProps {
   topCareers: CareerFitScore[];
   risingCareers: CareerFitScore[];
   latestUpdate?: LiveCareerUpdate;
+  dataCompleteness?: number;
 }
 
 export function LiveCareerMatchesPanel({
   topCareers,
   risingCareers,
   latestUpdate,
+  dataCompleteness = 0,
 }: LiveCareerMatchesPanelProps) {
   const [animatingScores, setAnimatingScores] = useState<Set<string>>(new Set());
   const [previousScores, setPreviousScores] = useState<Map<string, number>>(new Map());
@@ -122,7 +124,19 @@ export function LiveCareerMatchesPanel({
               <span className="text-xs text-white/90 font-medium">Updating</span>
             </div>
           </div>
-          <p className="text-xs text-blue-100 mt-1">Building your profile dynamically</p>
+          <p className="text-xs text-blue-100 mt-1 mb-2">Building your profile dynamically</p>
+          <div className="flex items-center justify-between text-xs pt-2 border-t border-white/10">
+            <span className="text-white/80">Data Quality</span>
+            <div className="flex items-center gap-2">
+              <div className="w-20 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-white transition-all duration-500"
+                  style={{ width: `${dataCompleteness}%` }}
+                />
+              </div>
+              <span className="text-white font-medium">{dataCompleteness}%</span>
+            </div>
+          </div>
         </div>
 
         <div className="p-5 space-y-3">

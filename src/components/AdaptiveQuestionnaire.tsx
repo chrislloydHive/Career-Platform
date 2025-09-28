@@ -8,6 +8,7 @@ import { InteractiveInsightCards } from './InteractiveInsightCards';
 import { UserProfile } from '@/types/user-profile';
 import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/matching/realtime-career-matcher';
 import { LiveCareerMatchesPanel } from './LiveCareerMatchesPanel';
+import { JobCategory } from '@/types/career';
 import { AuthenticityProfile } from '@/lib/authenticity/authentic-self-detector';
 import { AuthenticityDetectionPanel } from './AuthenticityDetectionPanel';
 import { NarrativeInsightGenerator, NarrativeInsight } from '@/lib/insights/narrative-insight-generator';
@@ -53,11 +54,110 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [showConfidenceEvolution, setShowConfidenceEvolution] = useState(false);
   const [futureProjection, setFutureProjection] = useState<FutureSelfProjection | null>(null);
   const [showFutureProjection, setShowFutureProjection] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [isLoading, setIsLoading] = useState(true);
+  const [userCareers, setUserCareers] = useState<JobCategory[]>([]);
 
   useEffect(() => {
-    loadNextQuestions();
+    loadSavedState();
+    loadUserCareers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const loadUserCareers = async () => {
+    try {
+      const response = await fetch('/api/careers');
+      if (response.ok) {
+        const data = await response.json();
+        setUserCareers(data.careers || []);
+      }
+    } catch (error) {
+      console.error('Failed to load user careers:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      const timeoutId = setTimeout(() => {
+        saveState();
+      }, 2000);
+      return () => clearTimeout(timeoutId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [insights, synthesizedInsights, gaps, authenticityProfile, narrativeInsights, confidenceEvolutions, isLoading]);
+
+  const loadSavedState = async () => {
+    try {
+      const response = await fetch('/api/questionnaire');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.state) {
+          engine.loadState(data.state);
+          setInsights(data.insights || []);
+          setSynthesizedInsights(data.synthesizedInsights || []);
+          setGaps(data.gaps || []);
+          if (data.authenticityProfile) {
+            setAuthenticityProfile(data.authenticityProfile);
+          }
+          setNarrativeInsights(data.narrativeInsights || []);
+          setConfidenceEvolutions(data.confidenceEvolutions || []);
+
+          const nextQuestions = engine.getNextQuestions(1);
+          if (nextQuestions.length > 0) {
+            setCurrentQuestions(nextQuestions);
+            setCurrentQuestionIndex(0);
+            resetResponse();
+          } else {
+            loadNextQuestions();
+          }
+        } else {
+          loadNextQuestions();
+        }
+      } else {
+        loadNextQuestions();
+      }
+    } catch (error) {
+      console.error('Failed to load saved state:', error);
+      loadNextQuestions();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const saveState = async () => {
+    try {
+      setSaveStatus('saving');
+      const state = engine.getState();
+      const completionPercentage = engine.getCompletionPercentage();
+      const lastQuestionId = currentQuestion?.id || null;
+
+      const response = await fetch('/api/questionnaire', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          state,
+          insights,
+          synthesizedInsights,
+          gaps,
+          authenticityProfile,
+          narrativeInsights,
+          confidenceEvolutions,
+          lastQuestionId,
+          completionPercentage,
+        }),
+      });
+
+      if (response.ok) {
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
+      } else {
+        setSaveStatus('error');
+      }
+    } catch (error) {
+      console.error('Failed to save state:', error);
+      setSaveStatus('error');
+    }
+  };
 
   const loadNextQuestions = () => {
     const nextQuestions = engine.getNextQuestions(1);
@@ -69,15 +169,28 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   };
 
   const resetResponse = () => {
-    setResponse(null);
-    setScaleValue(3);
+    const nextQuestion = currentQuestions[currentQuestionIndex + 1] || currentQuestions[0];
+    if (nextQuestion?.type === 'scale') {
+      setResponse(3);
+      setScaleValue(3);
+    } else {
+      setResponse(null);
+      setScaleValue(3);
+    }
     setTextInput('');
     setConfidenceLevel('certain');
   };
 
   const currentQuestion = currentQuestions[currentQuestionIndex];
 
-  const handleSubmitResponse = () => {
+  // Set initial response for scale questions
+  useEffect(() => {
+    if (currentQuestion?.type === 'scale' && response === null) {
+      setResponse(3);
+    }
+  }, [currentQuestion, response]);
+
+  const handleSubmitResponse = async () => {
     if (!currentQuestion || response === null) return;
 
     engine.recordResponse(currentQuestion.id, response, confidenceLevel);
@@ -131,9 +244,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       }
     }
 
-    if (newInsights.length >= 2) {
-      updateCareerMatches(newInsights);
-    }
+    updateCareerMatches(newInsights);
 
     const authProfile = engine.getAuthenticityProfile();
     if (authProfile) {
@@ -149,19 +260,24 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     } else {
       loadNextQuestions();
     }
+
+    await saveState();
   };
 
   const updateCareerMatches = (currentInsights: DiscoveredInsight[]) => {
     const responses = engine.getState().responses;
+    const responseCount = Object.keys(responses).length;
+
+    if (responseCount < 3) return;
 
     if (!careerMatcher) {
-      const matcher = new RealtimeCareerMatcher(responses, currentInsights, userProfile);
+      const matcher = new RealtimeCareerMatcher(responses, currentInsights, userProfile, userCareers);
       setCareerMatcher(matcher);
       setTopCareers(matcher.getTopCareers(5));
       setRisingCareers(matcher.getRisingCareers(3));
       setShowCareerMatches(true);
     } else {
-      const updates = careerMatcher.updateScores(currentInsights);
+      const updates = careerMatcher.updateScores(currentInsights, responses);
       setTopCareers(careerMatcher.getTopCareers(5));
       setRisingCareers(careerMatcher.getRisingCareers(3));
 
@@ -173,7 +289,12 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
   const handleSkip = () => {
     if (currentQuestion) {
-      setSkippedQuestions(prev => [...prev, currentQuestion]);
+      setSkippedQuestions(prev => {
+        if (prev.some(q => q.id === currentQuestion.id)) {
+          return prev;
+        }
+        return [...prev, currentQuestion];
+      });
     }
 
     if (currentQuestionIndex < currentQuestions.length - 1) {
@@ -315,23 +436,50 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto p-8">
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-12 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading your questionnaire...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!currentQuestion) {
     return (
       <div className="max-w-4xl mx-auto p-8">
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-12 text-center">
-          <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-gray-100 mb-4">
             Exploration Complete!
           </h2>
           <p className="text-gray-400 mb-6">
             You&apos;ve completed the adaptive career exploration. Review your insights and discovered interests below.
           </p>
-          <button
-            onClick={handleComplete}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            View Full Profile
-          </button>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={handleComplete}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              View Full Profile
+            </button>
+            <button
+              onClick={async () => {
+                if (confirm('Are you sure you want to restart the questionnaire? This will clear all your answers.')) {
+                  try {
+                    await fetch('/api/questionnaire', { method: 'DELETE' });
+                    window.location.reload();
+                  } catch (error) {
+                    console.error('Failed to restart:', error);
+                  }
+                }
+              }}
+              className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Restart Questionnaire
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -342,34 +490,49 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-8">
-      {/* Real-time Insight Notification */}
+      {/* Real-time Insight Notification - Celebratory */}
       {showInsightNotification && latestInsightNotification && (
         <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg shadow-2xl p-4 max-w-sm border-2 border-blue-400">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <div className="bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 rounded-xl shadow-2xl p-5 max-w-md border-2 border-amber-300 relative overflow-hidden">
+            {/* Sparkle effect */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+              <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-ping" />
+              <div className="absolute top-4 right-8 w-1 h-1 bg-white rounded-full animate-ping delay-100" />
+              <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-white rounded-full animate-ping delay-200" />
+            </div>
+
+            <div className="flex items-start gap-3 relative">
+              <div className="p-2.5 bg-white/30 rounded-xl animate-bounce">
+                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-xs font-semibold text-white/90 mb-1">Pattern Detected!</div>
-                <p className="text-sm text-white font-medium">{latestInsightNotification.insight}</p>
-                <div className="mt-2 flex items-center gap-2">
-                  <div className="flex-1 bg-white/20 rounded-full h-1">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">New Insight!</span>
+                  <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs font-semibold text-white">
+                    #{insights.length + synthesizedInsights.length}
+                  </span>
+                </div>
+                <p className="text-base text-white font-semibold leading-snug">{latestInsightNotification.insight}</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <div className="flex-1 bg-white/30 rounded-full h-2">
                     <div
-                      className="bg-white h-1 rounded-full"
+                      className="bg-white h-2 rounded-full transition-all duration-500"
                       style={{ width: `${latestInsightNotification.confidence * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs text-white/90">{Math.round(latestInsightNotification.confidence * 100)}%</span>
+                  <span className="text-xs text-white font-bold">{Math.round(latestInsightNotification.confidence * 100)}%</span>
+                </div>
+                <div className="mt-2 text-xs text-white/80">
+                  {getAreaLabel(latestInsightNotification.area)}
                 </div>
               </div>
               <button
                 onClick={() => setShowInsightNotification(false)}
-                className="text-white/70 hover:text-white"
+                className="text-white/70 hover:text-white transition-colors"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </button>
@@ -392,30 +555,61 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-blue-400">{progress}%</div>
-            <div className="text-xs text-gray-500">explored</div>
+            <div className="flex items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="text-3xl font-bold text-blue-400">{progress}%</div>
+                </div>
+                <div className="text-xs text-gray-500">explored</div>
+              </div>
+              <div className="border-l border-gray-700 pl-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <div className="text-2xl font-bold text-amber-400">{insights.length + synthesizedInsights.length}</div>
+                </div>
+                <div className="text-xs text-gray-500">insights</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 mt-2 justify-end">
+              {saveStatus === 'saving' && (
+                <div className="text-xs text-gray-500">Saving...</div>
+              )}
+              {saveStatus === 'saved' && (
+                <div className="text-xs text-green-400 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Saved
+                </div>
+              )}
+              {saveStatus === 'error' && (
+                <div className="text-xs text-red-400">Save failed</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* 8 Exploration Areas Progress */}
-      <div className="mb-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-blue-500/30 p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-bold text-gray-100">8 Exploration Areas</h3>
+      <div className="mb-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-lg border border-blue-500/30 p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-gray-100">8 Exploration Areas</h3>
           <span className="text-xs text-gray-500">{explorationProgress.filter(a => a.depth > 0).length}/8 started</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {explorationProgress.map(area => {
-            const percentage = area.totalQuestions > 0 ? (area.depth / area.totalQuestions) * 100 : 0;
+            const percentage = Math.min(100, area.totalQuestions > 0 ? (area.depth / area.totalQuestions) * 100 : 0);
             return (
-              <div key={area.area} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-200">{getAreaLabel(area.area)}</span>
+              <div key={area.area} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700 hover:border-blue-500/50 transition-all">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-medium text-gray-200">{getAreaLabel(area.area)}</span>
                   <span className="text-xs text-gray-400">{area.depth}/{area.totalQuestions}</span>
                 </div>
-                <div className="w-full bg-gray-700/50 rounded-full h-2">
+                <div className="w-full bg-gray-700/50 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className={`h-2 rounded-full transition-all duration-500 ${
+                    className={`h-1.5 rounded-full transition-all duration-500 ${
                       percentage === 0 ? 'bg-gray-600' :
                       percentage < 50 ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
                       percentage < 100 ? 'bg-gradient-to-r from-cyan-500 to-blue-500' :
@@ -435,7 +629,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="h-6 w-1 bg-blue-500 rounded-full"></div>
-            <span className="text-sm font-semibold text-blue-400">
+            <span className="text-lg font-bold text-blue-400">
               {getAreaLabel(currentQuestion.area)}
             </span>
           </div>
@@ -535,6 +729,79 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       </div>
 
+      {/* Latest Insights - Compact Preview Above the Fold */}
+      {(insights.length > 0 || synthesizedInsights.length > 0) && (
+        <div className="mb-6 bg-gradient-to-br from-amber-900/20 via-amber-800/10 to-amber-900/20 rounded-xl border-2 border-amber-500/30 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <h3 className="text-lg font-bold text-amber-100">Latest Insights Discovered</h3>
+              <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full text-xs font-semibold">
+                {insights.length + synthesizedInsights.length} total
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {[...synthesizedInsights.slice(-2).reverse(), ...insights.slice(-3).reverse()].slice(0, 3).map((insight, index) => {
+              const isSynthesized = 'title' in insight;
+              return (
+                <div
+                  key={index}
+                  className="bg-gray-800/60 rounded-lg p-4 border-l-4 border-amber-500 hover:bg-gray-800/80 transition-all"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        {isSynthesized && (
+                          <span className="px-2 py-0.5 rounded text-xs font-semibold bg-purple-600 text-white">
+                            CROSS-DOMAIN
+                          </span>
+                        )}
+                        <span className="text-xs font-medium text-amber-400">
+                          {getAreaLabel(insight.area)}
+                        </span>
+                      </div>
+                      <p className="text-sm font-medium text-gray-100 leading-relaxed">
+                        {isSynthesized ? (insight as any).title : insight.insight}
+                      </p>
+                      {isSynthesized && (
+                        <p className="text-xs text-gray-400 mt-1.5">
+                          {(insight as any).description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-amber-400 font-medium bg-amber-500/10 px-2 py-1 rounded">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      {Math.round(insight.confidence * 100)}%
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {(insights.length + synthesizedInsights.length) > 3 && (
+            <button
+              onClick={() => {
+                const insightsSection = document.getElementById('all-insights-section');
+                insightsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="mt-4 w-full py-2 text-sm text-amber-300 hover:text-amber-200 font-medium flex items-center justify-center gap-1 hover:bg-amber-500/10 rounded-lg transition-all"
+            >
+              View all {insights.length + synthesizedInsights.length} insights
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Dynamic Adaptation Indicator */}
       {insights.length > 0 && (
         <div className="mb-6 bg-blue-900/20 border border-blue-700/50 rounded-lg p-4">
@@ -589,13 +856,13 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       {/* Synthesized Insights - Priority Display */}
       {synthesizedInsights.length > 0 && (
-        <div className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-lg border-2 border-blue-600/60 p-6 mb-6">
+        <div id="all-insights-section" className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-lg border-2 border-blue-600/60 p-6 mb-6 scroll-mt-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
               <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Cross-Domain Insights ({synthesizedInsights.length})
+              All Insights ({insights.length + synthesizedInsights.length})
             </h3>
             <button
               onClick={() => setShowSynthesized(!showSynthesized)}
@@ -724,12 +991,13 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
 
         {/* Sticky Sidebar - Live Career Matches */}
-        {showCareerMatches && (
+        {showCareerMatches && careerMatcher && (
           <div className="hidden lg:block w-96 flex-shrink-0">
             <LiveCareerMatchesPanel
               topCareers={topCareers}
               risingCareers={risingCareers}
               latestUpdate={latestUpdate}
+              dataCompleteness={careerMatcher.getDataCompletenessPercentage()}
             />
           </div>
         )}

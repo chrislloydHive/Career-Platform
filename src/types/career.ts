@@ -71,6 +71,7 @@ export interface JobCategory {
   };
   relatedRoles: string[];
   keywords: string[];
+  activeTab?: string;
 }
 
 export interface CareerResearchQuery {
