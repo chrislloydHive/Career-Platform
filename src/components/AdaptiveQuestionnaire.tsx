@@ -18,6 +18,7 @@ import { ConfidenceEvolutionPanel } from './ConfidenceEvolutionPanel';
 import { FutureSelfProjection } from '@/lib/future-modeling/future-self-projector';
 import { FutureCareerPathVisualizer } from './FutureCareerPathVisualizer';
 import { CareerSuggestion } from '@/lib/ai/career-suggestions-ai';
+import { ExpandableInsightCard } from './ExpandableInsightCard';
 
 interface AdaptiveQuestionnaireProps {
   onComplete?: (profile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => void;
@@ -1035,48 +1036,15 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           </div>
 
           <div className="space-y-3">
-            {[...synthesizedInsights.slice(-2).reverse(), ...insights.slice(-3).reverse()].slice(0, 3).map((insight, index) => {
-              const isSynthesized = 'title' in insight;
-              const synthInsight = isSynthesized ? insight as SynthesizedInsight : null;
-              const regularInsight = !isSynthesized ? insight as DiscoveredInsight : null;
-              return (
-                <div
-                  key={index}
-                  className="bg-gray-800/60 rounded-lg p-4 border-l-4 border-blue-500 hover:bg-gray-800/80 transition-all"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        {isSynthesized && (
-                          <span className="px-2 py-0.5 rounded text-xs font-semibold bg-purple-600 text-white">
-                            CROSS-DOMAIN
-                          </span>
-                        )}
-                        {!isSynthesized && regularInsight?.area && (
-                          <span className="text-xs font-medium text-blue-400">
-                            {getAreaLabel(regularInsight.area)}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm font-medium text-gray-100 leading-relaxed">
-                        {isSynthesized ? synthInsight?.title : regularInsight?.insight}
-                      </p>
-                      {isSynthesized && synthInsight && (
-                        <p className="text-xs text-gray-400 mt-1.5">
-                          {synthInsight.description}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-blue-400 font-medium bg-blue-500/10 px-2 py-1 rounded">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      {Math.round(insight.confidence * 100)}%
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {[...synthesizedInsights.slice(-2).reverse(), ...insights.slice(-3).reverse()].slice(0, 3).map((insight, index) => (
+              <ExpandableInsightCard
+                key={index}
+                insight={insight}
+                responses={engine.getState().responses}
+                topCareers={topCareers}
+                getAreaLabel={getAreaLabel}
+              />
+            ))}
           </div>
 
           {(insights.length + synthesizedInsights.length) > 3 && (
