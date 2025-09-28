@@ -137,7 +137,7 @@ export default function AssessmentsPage() {
             </svg>
             <h3 className="text-xl font-semibold text-gray-300 mb-2">No Saved Assessments</h3>
             <p className="text-gray-500 mb-6">
-              You haven't saved any assessment results yet. Complete an assessment and save it to see it here.
+              You haven&apos;t saved any assessment results yet. Complete an assessment and save it to see it here.
             </p>
             <a
               href="/explore"

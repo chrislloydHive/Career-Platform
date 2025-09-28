@@ -26,12 +26,12 @@ export function ExitWarningDialog({
           </div>
           <div>
             <h2 className="text-lg font-bold text-gray-100">Unsaved Assessment Results</h2>
-            <p className="text-sm text-gray-400">You're about to leave without saving</p>
+            <p className="text-sm text-gray-400">You&apos;re about to leave without saving</p>
           </div>
         </div>
 
         <p className="text-gray-300 mb-6">
-          You have completed an assessment but haven't saved the results yet. Your valuable insights and career recommendations will be lost if you leave now.
+          You have completed an assessment but haven&apos;t saved the results yet. Your valuable insights and career recommendations will be lost if you leave now.
         </p>
 
         <div className="flex flex-col gap-3">
