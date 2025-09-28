@@ -348,16 +348,119 @@ export default function ExplorePage() {
               <h2 className="text-xl font-bold text-purple-400 mb-4">
                 All Discovered Insights
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {profile.insights.map((insight, index) => (
-                  <div key={index} className="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50">
-                    <div className="text-sm font-medium text-gray-200 mb-1">{insight.category}</div>
-                    <div className="text-xs text-gray-400 mb-2">{Math.round(insight.confidence * 100)}% confidence</div>
-                    <div className="text-xs text-purple-300">
-                      Area: {insight.area.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+              <p className="text-gray-400 text-sm mb-6">
+                Comprehensive analysis of patterns detected across your responses. Each insight represents a validated discovery about your career preferences and behaviors.
+              </p>
+
+              {/* Insights Summary Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-700/50">
+                  <div className="text-lg font-bold text-purple-400">{profile.insights.length}</div>
+                  <div className="text-xs text-gray-400">Total Insights</div>
+                </div>
+                <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-700/50">
+                  <div className="text-lg font-bold text-purple-400">
+                    {Math.round((profile.insights.reduce((sum, i) => sum + i.confidence, 0) / profile.insights.length) * 100) || 0}%
+                  </div>
+                  <div className="text-xs text-gray-400">Avg Confidence</div>
+                </div>
+                <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-700/50">
+                  <div className="text-lg font-bold text-purple-400">
+                    {new Set(profile.insights.map(i => i.area)).size}
+                  </div>
+                  <div className="text-xs text-gray-400">Areas Explored</div>
+                </div>
+                <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-700/50">
+                  <div className="text-lg font-bold text-purple-400">
+                    {profile.insights.filter(i => i.confidence > 0.8).length}
+                  </div>
+                  <div className="text-xs text-gray-400">High Confidence</div>
+                </div>
+              </div>
+
+              {/* Insights by Area */}
+              {Array.from(new Set(profile.insights.map(i => i.area))).map(area => {
+                const areaInsights = profile.insights.filter(i => i.area === area);
+                const areaName = area.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+                return (
+                  <div key={area} className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-200 mb-3 flex items-center gap-2">
+                      <span className="w-3 h-3 bg-purple-500 rounded-full"></span>
+                      {areaName} ({areaInsights.length} insights)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {areaInsights.map((insight, index) => (
+                        <div key={index} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50 hover:border-purple-500/50 transition-colors">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-200 mb-1">{insight.category || insight.insight}</div>
+                              <div className="text-xs text-gray-400 mb-2">
+                                {insight.insight && insight.insight !== insight.category ? insight.insight : 'Pattern detected in your responses'}
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                insight.confidence > 0.8
+                                  ? 'bg-green-900/50 text-green-400'
+                                  : insight.confidence > 0.6
+                                  ? 'bg-yellow-900/50 text-yellow-400'
+                                  : 'bg-gray-700 text-gray-400'
+                              }`}>
+                                {Math.round(insight.confidence * 100)}%
+                              </span>
+                              <span className={`px-2 py-0.5 rounded text-xs ${
+                                insight.type === 'strength'
+                                  ? 'bg-blue-900/50 text-blue-400'
+                                  : insight.type === 'preference'
+                                  ? 'bg-green-900/50 text-green-400'
+                                  : insight.type === 'hidden-interest'
+                                  ? 'bg-purple-900/50 text-purple-400'
+                                  : 'bg-gray-700 text-gray-400'
+                              }`}>
+                                {insight.type?.replace('-', ' ') || 'insight'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Career implications for this insight */}
+                          <div className="text-xs text-purple-300 bg-purple-900/20 rounded p-2 mt-2">
+                            <span className="font-medium">💡 Career relevance: </span>
+                            {insight.type === 'strength' && 'Leverage this in role selection and skill development'}
+                            {insight.type === 'preference' && 'Seek work environments that match this preference'}
+                            {insight.type === 'hidden-interest' && 'Explore careers that tap into this emerging interest'}
+                            {(!insight.type || !['strength', 'preference', 'hidden-interest'].includes(insight.type)) &&
+                              'Consider how this pattern influences your career decisions'}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                );
+              })}
+
+              {/* Additional context */}
+              <div className="mt-6 p-4 bg-purple-900/20 rounded-lg border border-purple-700/30">
+                <h4 className="text-sm font-semibold text-purple-400 mb-2">🔍 Understanding Your Insights</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-300">
+                  <div>
+                    <p className="font-medium mb-1">Confidence Levels:</p>
+                    <ul className="space-y-0.5">
+                      <li>• <span className="text-green-400">80-100%</span> - Strong patterns, high reliability</li>
+                      <li>• <span className="text-yellow-400">60-79%</span> - Moderate patterns, worth exploring</li>
+                      <li>• <span className="text-gray-400">Below 60%</span> - Emerging patterns, needs validation</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-medium mb-1">How to Use:</p>
+                    <ul className="space-y-0.5">
+                      <li>• Focus on high-confidence insights first</li>
+                      <li>• Look for patterns across multiple areas</li>
+                      <li>• Use insights to guide career exploration</li>
+                      <li>• Validate insights through real-world testing</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
