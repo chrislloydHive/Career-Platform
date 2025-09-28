@@ -43,13 +43,41 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[Questionnaire API] POST request received');
     const session = await auth();
     if (!session?.user?.id) {
+      console.error('[Questionnaire API] Unauthorized - no session');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    console.log('[Questionnaire API] User ID:', session.user.id);
     const data = await request.json();
+    console.log('[Questionnaire API] Data received:', {
+      hasState: !!data.state,
+      insightsCount: data.insights?.length || 0,
+      lastQuestionId: data.lastQuestionId,
+      completionPercentage: data.completionPercentage
+    });
 
+    console.log('[Questionnaire API] Preparing data for database save');
+    const stateJson = JSON.stringify(data.state);
+    const insightsJson = JSON.stringify(data.insights || []);
+    const synthesizedInsightsJson = JSON.stringify(data.synthesizedInsights || []);
+    const gapsJson = JSON.stringify(data.gaps || []);
+    const authenticityProfileJson = data.authenticityProfile ? JSON.stringify(data.authenticityProfile) : null;
+    const narrativeInsightsJson = JSON.stringify(data.narrativeInsights || []);
+    const confidenceEvolutionsJson = JSON.stringify(data.confidenceEvolutions || []);
+
+    console.log('[Questionnaire API] JSON sizes:', {
+      state: stateJson.length,
+      insights: insightsJson.length,
+      synthesizedInsights: synthesizedInsightsJson.length,
+      gaps: gapsJson.length,
+      narrativeInsights: narrativeInsightsJson.length,
+      confidenceEvolutions: confidenceEvolutionsJson.length,
+    });
+
+    console.log('[Questionnaire API] Executing SQL INSERT/UPDATE...');
     await sql`
       INSERT INTO questionnaire_state (
         user_id,
@@ -65,51 +93,43 @@ export async function POST(request: NextRequest) {
         updated_at
       ) VALUES (
         ${session.user.id},
-        ${JSON.stringify(data.state)},
-        ${JSON.stringify(data.insights || [])},
-        ${JSON.stringify(data.synthesizedInsights || [])},
-        ${JSON.stringify(data.gaps || [])},
-        ${data.authenticityProfile ? JSON.stringify(data.authenticityProfile) : null},
-        ${JSON.stringify(data.narrativeInsights || [])},
-        ${JSON.stringify(data.confidenceEvolutions || [])},
+        ${stateJson}::jsonb,
+        ${insightsJson}::jsonb,
+        ${synthesizedInsightsJson}::jsonb,
+        ${gapsJson}::jsonb,
+        ${authenticityProfileJson}::jsonb,
+        ${narrativeInsightsJson}::jsonb,
+        ${confidenceEvolutionsJson}::jsonb,
         ${data.lastQuestionId || null},
         ${data.completionPercentage || 0},
         NOW()
       )
       ON CONFLICT (user_id)
       DO UPDATE SET
-        state = ${JSON.stringify(data.state)},
-        insights = ${JSON.stringify(data.insights || [])},
-        synthesized_insights = ${JSON.stringify(data.synthesizedInsights || [])},
-        gaps = ${JSON.stringify(data.gaps || [])},
-        authenticity_profile = ${data.authenticityProfile ? JSON.stringify(data.authenticityProfile) : null},
-        narrative_insights = ${JSON.stringify(data.narrativeInsights || [])},
-        confidence_evolutions = ${JSON.stringify(data.confidenceEvolutions || [])},
+        state = ${stateJson}::jsonb,
+        insights = ${insightsJson}::jsonb,
+        synthesized_insights = ${synthesizedInsightsJson}::jsonb,
+        gaps = ${gapsJson}::jsonb,
+        authenticity_profile = ${authenticityProfileJson}::jsonb,
+        narrative_insights = ${narrativeInsightsJson}::jsonb,
+        confidence_evolutions = ${confidenceEvolutionsJson}::jsonb,
         last_question_id = ${data.lastQuestionId || null},
         completion_percentage = ${data.completionPercentage || 0},
         updated_at = NOW()
     `;
 
-    // Also update user profile with insights
-    if (data.insights && data.insights.length > 0) {
-      const insightTexts = data.insights.map((i: { insight: string }) => i.insight);
+    console.log('[Questionnaire API] SQL executed successfully');
 
-      await sql`
-        INSERT INTO ai_insights (user_id, insight, confidence, source)
-        SELECT
-          ${session.user.id},
-          unnest(${insightTexts}::text[]),
-          0.85,
-          'self-discovery-questionnaire'
-        ON CONFLICT DO NOTHING
-      `;
-    }
-
+    console.log('[Questionnaire API] Request completed successfully');
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error saving questionnaire state:', error);
+    console.error('[Questionnaire API] ERROR saving questionnaire state:', error);
+    console.error('[Questionnaire API] Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
-      { error: 'Failed to save questionnaire state' },
+      { error: 'Failed to save questionnaire state', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

@@ -154,8 +154,12 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       });
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      const timeoutId = setTimeout(() => {
+        console.error('Save request timed out after 15 seconds');
+        controller.abort();
+      }, 15000); // 15s timeout
 
+      console.log('Sending POST request to /api/questionnaire...');
       const response = await fetch('/api/questionnaire', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -164,6 +168,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       });
 
       clearTimeout(timeoutId);
+      console.log('Response received:', response.status, response.statusText);
 
       if (response.ok) {
         setSaveStatus('saved');
@@ -171,21 +176,33 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         console.log('Save successful');
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Save failed:', response.status, errorData);
+        console.error('Save failed with status:', response.status);
+        console.error('Error data:', errorData);
         setSaveStatus('error');
       }
     } catch (error) {
-      console.error('Failed to save state:', error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error('Save request was aborted (timeout or manual abort)');
+      } else {
+        console.error('Failed to save state - exception thrown:', error);
+      }
       setSaveStatus('error');
     }
   };
 
   const loadNextQuestions = () => {
+    console.log('loadNextQuestions called');
     const nextQuestions = engine.getNextQuestions(1);
+    console.log('Next questions received:', nextQuestions.length);
+
     if (nextQuestions.length > 0) {
+      console.log('Setting next question:', nextQuestions[0].id);
       setCurrentQuestions(nextQuestions);
       setCurrentQuestionIndex(0);
       resetResponse();
+    } else {
+      console.log('No more questions available - questionnaire complete');
+      handleComplete();
     }
   };
 
@@ -565,20 +582,20 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const explorationProgress = engine.getExplorationProgress();
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-8">
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 lg:p-8">
       {/* Debug Panel */}
       {debugMode && (
-        <div className="fixed bottom-4 right-4 z-50 bg-yellow-600 text-black rounded-lg shadow-2xl p-4 max-w-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-sm">🛠️ DEBUG MODE</h3>
+        <div className="fixed bottom-4 right-4 z-50 bg-yellow-600 text-black rounded-lg shadow-2xl p-3 sm:p-4 max-w-xs sm:max-w-sm">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <h3 className="font-bold text-xs sm:text-sm">🛠️ DEBUG MODE</h3>
             <button
               onClick={() => setDebugMode(false)}
-              className="text-black hover:text-gray-700"
+              className="text-black hover:text-gray-700 text-sm"
             >
               ✕
             </button>
           </div>
-          <div className="space-y-2 text-xs">
+          <div className="space-y-1.5 sm:space-y-2 text-xs">
             <p><strong>Question:</strong> {currentQuestion?.id}</p>
             <p><strong>Type:</strong> {currentQuestion?.type}</p>
             <p><strong>Response:</strong> {response !== null ? String(response) : 'none'}</p>
@@ -586,9 +603,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             <p><strong>Insights:</strong> {insights.length}</p>
             <button
               onClick={quickSubmit}
-              className="w-full mt-2 px-3 py-2 bg-black text-yellow-400 rounded font-bold hover:bg-gray-800"
+              className="w-full mt-2 px-3 py-2 bg-black text-yellow-400 rounded font-bold hover:bg-gray-800 text-xs sm:text-sm"
             >
-              ⚡ Quick Submit (Auto-answer)
+              ⚡ Quick Submit
             </button>
           </div>
         </div>
@@ -596,8 +613,8 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       {/* Real-time Insight Notification - Celebratory */}
       {showInsightNotification && latestInsightNotification && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
-          <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-xl shadow-2xl p-5 max-w-md border-2 border-blue-400/50 relative overflow-hidden">
+        <div className="fixed top-4 right-4 left-4 sm:left-auto z-50 animate-slide-in-right">
+          <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-xl shadow-2xl p-4 sm:p-5 max-w-md border-2 border-blue-400/50 relative overflow-hidden">
             {/* Sparkle effect */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
               <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-ping" />
@@ -645,21 +662,21 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )}
 
-      <div className="flex gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Main Content */}
-        <div className="flex-1 max-w-4xl">
+        <div className="flex-1 max-w-full lg:max-w-4xl">
       {/* Header with Adaptive Intelligence Indicator */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-100 mb-1">Adaptive Career Exploration</h1>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-100 mb-1">Adaptive Career Exploration</h1>
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span>AI adapting questions based on your responses</span>
+              <span>AI adapting questions</span>
             </div>
           </div>
-          <div className="text-right">
-            <div className="flex items-center gap-4">
+          <div className="text-left sm:text-right">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <div className="text-3xl font-bold text-blue-400">{progress}%</div>
@@ -729,21 +746,21 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       </div>
 
       {/* Question Card */}
-      <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-8 mb-6">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="h-6 w-1 bg-blue-500 rounded-full"></div>
-            <span className="text-lg font-bold text-blue-400">
+      <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-4 sm:p-6 lg:p-8 mb-6">
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <div className="h-5 sm:h-6 w-1 bg-blue-500 rounded-full"></div>
+            <span className="text-base sm:text-lg font-bold text-blue-400">
               {getAreaLabel(currentQuestion.area)}
             </span>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs">
+              <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs">
                 {currentQuestion.type}
               </span>
             </div>
-            <h2 className="text-xl font-semibold text-gray-100 leading-relaxed">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-100 leading-relaxed">
               {currentQuestion.text}
             </h2>
           </div>
@@ -799,12 +816,12 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         )}
 
         {/* Actions */}
-        <div className="space-y-3 mt-6">
-          <div className="flex gap-3">
+        <div className="space-y-3 mt-4 sm:mt-6">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleSubmitResponse}
               disabled={response === null || isSubmitting}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-700 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+              className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-700 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               {isSubmitting ? (
                 <>
@@ -825,13 +842,14 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             </button>
             <button
               onClick={handleComeBackLater}
-              className="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
+              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
               title="Save this question for later"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Come Back Later
+              <span className="hidden sm:inline">Come Back Later</span>
+              <span className="sm:hidden">Later</span>
             </button>
           </div>
           {skippedQuestions.length > 0 && (

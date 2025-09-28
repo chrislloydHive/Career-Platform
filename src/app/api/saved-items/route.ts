@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSavedItems, saveJob, saveCareer, removeSavedItem } from '@/lib/storage/saved-items';
+import { getSavedItems, saveJob, saveCareer, removeSavedItem } from '@/lib/storage/saved-items-db';
+import { auth } from '@/lib/auth/config';
 
 export async function GET() {
   try {

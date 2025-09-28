@@ -36,14 +36,6 @@ export function CareerMatchingQuestionnaire({ onComplete, enableRealTimeMatching
     education: 'Your Education',
   };
 
-  const categoryIcons = {
-    interests: 'INT',
-    skills: 'SKL',
-    experience: 'EXP',
-    personality: 'PER',
-    preferences: 'PRF',
-    education: 'EDU',
-  };
 
   const currentCategory = categories[currentStep];
   const currentQuestions = careerQuestionnaire.filter(q => q.category === currentCategory);
@@ -339,7 +331,6 @@ export function CareerMatchingQuestionnaire({ onComplete, enableRealTimeMatching
                   : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
               }`}
             >
-              <span>{categoryIcons[category]}</span>
               <span className="text-sm">{categoryLabels[category]}</span>
               {isCompleted && <span className="text-xs">✓</span>}
             </button>
@@ -349,8 +340,7 @@ export function CareerMatchingQuestionnaire({ onComplete, enableRealTimeMatching
 
       <div className="bg-gray-800 rounded-lg p-8 border border-gray-700 mb-6">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-100 mb-2 flex items-center gap-2">
-            <span>{categoryIcons[currentCategory]}</span>
+          <h2 className="text-2xl font-bold text-gray-100 mb-2">
             {categoryLabels[currentCategory]}
           </h2>
           <p className="text-gray-400">Answer these questions to help us find your ideal career match</p>

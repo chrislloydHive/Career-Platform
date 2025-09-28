@@ -128,9 +128,12 @@ export class RealtimeCareerMatcher {
     });
 
     const dataCompleteness = this.calculateDataCompleteness();
+    const responseCount = Object.keys(this.responses).length;
     let confidenceMultiplier = 1.0;
 
-    if (dataCompleteness < 0.3) confidenceMultiplier = 0.6;
+    if (responseCount < 10) confidenceMultiplier = 0.45;
+    else if (responseCount < 15) confidenceMultiplier = 0.55;
+    else if (responseCount < 20) confidenceMultiplier = 0.65;
     else if (dataCompleteness < 0.5) confidenceMultiplier = 0.75;
     else if (dataCompleteness < 0.7) confidenceMultiplier = 0.85;
     else if (dataCompleteness < 0.9) confidenceMultiplier = 0.95;
@@ -149,9 +152,9 @@ export class RealtimeCareerMatcher {
     const insightCount = this.insights.length;
 
     const responseCompleteness = actualResponses / totalPossibleResponses;
-    const insightCompleteness = Math.min(insightCount / 10, 1.0);
+    const insightCompleteness = Math.min(insightCount / 15, 1.0);
 
-    return (responseCompleteness * 0.7) + (insightCompleteness * 0.3);
+    return (responseCompleteness * 0.8) + (insightCompleteness * 0.2);
   }
 
   getDataCompletenessPercentage(): number {
@@ -204,13 +207,13 @@ export class RealtimeCareerMatcher {
           avgConfidence = areaInsightsList.reduce((sum, i) => sum + i.confidence, 0) / areaInsightsList.length;
           basedOn = areaInsightsList.map(i => i.insight);
         } else if (areaResponses.length > 0) {
-          avgConfidence = 0.5 + (areaResponses.length * 0.05);
+          avgConfidence = Math.min(0.4 + (areaResponses.length * 0.03), 0.7);
           basedOn = [`${areaResponses.length} responses in this area`];
         }
 
         const careerRelevance = this.calculateCareerRelevanceForArea(career, area, areaInsightsList);
-        const responseBoost = Math.min(areaResponses.length * 0.5, 3);
-        const score = (avgConfidence * careerRelevance * 15) + responseBoost;
+        const responseBoost = Math.min(areaResponses.length * 0.3, 2);
+        const score = (avgConfidence * careerRelevance * 12) + responseBoost;
 
         if (score > 2) {
           results.push({

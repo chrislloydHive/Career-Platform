@@ -1,13 +1,19 @@
 import { sql } from '../db/client';
 import { SavedItem, SavedJob, SavedCareer } from '@/types/saved-items';
 import { ScoredJob, JobCategory } from '@/types';
+import { auth } from '@/lib/auth/config';
 
-const USER_ID = 'louisa';
+async function getCurrentUserId(): Promise<string | null> {
+  const session = await auth();
+  return session?.user?.id || null;
+}
 
 export async function getSavedItems(): Promise<SavedItem[]> {
+  const userId = await getCurrentUserId();
+  if (!userId) return [];
   try {
     const result = await sql`
-      SELECT * FROM saved_items WHERE user_id = ${USER_ID}
+      SELECT * FROM saved_items WHERE user_id = ${userId}
       ORDER BY saved_at DESC
     `;
 
@@ -40,12 +46,15 @@ export async function getSavedItems(): Promise<SavedItem[]> {
 }
 
 export async function saveJob(job: ScoredJob, notes?: string, tags?: string[]): Promise<SavedJob> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not authenticated');
+
   try {
     const itemId = `job-${job.id}`;
     const savedAt = new Date();
 
     const existing = await sql`
-      SELECT id FROM saved_items WHERE id = ${itemId}
+      SELECT id FROM saved_items WHERE id = ${itemId} AND user_id = ${userId}
     `;
 
     if (existing.rows.length > 0) {
@@ -55,14 +64,14 @@ export async function saveJob(job: ScoredJob, notes?: string, tags?: string[]): 
           notes = ${notes || null},
           tags = ${JSON.stringify(tags || [])},
           last_modified = CURRENT_TIMESTAMP
-        WHERE id = ${itemId}
+        WHERE id = ${itemId} AND user_id = ${userId}
       `;
     } else {
       await sql`
         INSERT INTO saved_items (id, user_id, item_type, item_data, notes, tags, saved_at)
         VALUES (
           ${itemId},
-          ${USER_ID},
+          ${userId},
           'job',
           ${JSON.stringify(job)},
           ${notes || null},
@@ -87,12 +96,15 @@ export async function saveJob(job: ScoredJob, notes?: string, tags?: string[]): 
 }
 
 export async function saveCareer(career: JobCategory, notes?: string, tags?: string[]): Promise<SavedCareer> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not authenticated');
+
   try {
     const itemId = `career-${career.id}`;
     const savedAt = new Date();
 
     const existing = await sql`
-      SELECT id FROM saved_items WHERE id = ${itemId}
+      SELECT id FROM saved_items WHERE id = ${itemId} AND user_id = ${userId}
     `;
 
     if (existing.rows.length > 0) {
@@ -102,14 +114,14 @@ export async function saveCareer(career: JobCategory, notes?: string, tags?: str
           notes = ${notes || null},
           tags = ${JSON.stringify(tags || [])},
           last_modified = CURRENT_TIMESTAMP
-        WHERE id = ${itemId}
+        WHERE id = ${itemId} AND user_id = ${userId}
       `;
     } else {
       await sql`
         INSERT INTO saved_items (id, user_id, item_type, item_data, notes, tags, saved_at)
         VALUES (
           ${itemId},
-          ${USER_ID},
+          ${userId},
           'career',
           ${JSON.stringify(career)},
           ${notes || null},
@@ -134,9 +146,12 @@ export async function saveCareer(career: JobCategory, notes?: string, tags?: str
 }
 
 export async function removeSavedItem(itemId: string): Promise<void> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not authenticated');
+
   try {
     await sql`
-      DELETE FROM saved_items WHERE id = ${itemId} AND user_id = ${USER_ID}
+      DELETE FROM saved_items WHERE id = ${itemId} AND user_id = ${userId}
     `;
   } catch (error) {
     console.error('Failed to remove saved item from database:', error);
@@ -145,12 +160,15 @@ export async function removeSavedItem(itemId: string): Promise<void> {
 }
 
 export async function updateSavedItemNotes(itemId: string, notes: string): Promise<void> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not authenticated');
+
   try {
     await sql`
       UPDATE saved_items SET
         notes = ${notes},
         last_modified = CURRENT_TIMESTAMP
-      WHERE id = ${itemId} AND user_id = ${USER_ID}
+      WHERE id = ${itemId} AND user_id = ${userId}
     `;
   } catch (error) {
     console.error('Failed to update saved item notes:', error);
@@ -159,12 +177,15 @@ export async function updateSavedItemNotes(itemId: string, notes: string): Promi
 }
 
 export async function updateSavedItemTags(itemId: string, tags: string[]): Promise<void> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not authenticated');
+
   try {
     await sql`
       UPDATE saved_items SET
         tags = ${JSON.stringify(tags)},
         last_modified = CURRENT_TIMESTAMP
-      WHERE id = ${itemId} AND user_id = ${USER_ID}
+      WHERE id = ${itemId} AND user_id = ${userId}
     `;
   } catch (error) {
     console.error('Failed to update saved item tags:', error);
@@ -175,10 +196,13 @@ export async function updateSavedItemTags(itemId: string, tags: string[]): Promi
 export async function isSaved(type: 'job', id: string): Promise<boolean>;
 export async function isSaved(type: 'career', id: string): Promise<boolean>;
 export async function isSaved(type: 'job' | 'career', id: string): Promise<boolean> {
+  const userId = await getCurrentUserId();
+  if (!userId) return false;
+
   try {
     const itemId = `${type}-${id}`;
     const result = await sql`
-      SELECT id FROM saved_items WHERE id = ${itemId} AND user_id = ${USER_ID}
+      SELECT id FROM saved_items WHERE id = ${itemId} AND user_id = ${userId}
     `;
     return result.rows.length > 0;
   } catch (error) {

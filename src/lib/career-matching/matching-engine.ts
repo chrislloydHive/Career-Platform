@@ -464,15 +464,42 @@ export class CareerMatchingEngine {
   }
 
   private calculateOverallScore(reasoning: MatchReasoning): number {
-    const weightedScore =
-      reasoning.interestsAlignment.score * reasoning.interestsAlignment.weight +
-      reasoning.skillsMatch.score * reasoning.skillsMatch.weight +
-      reasoning.experienceAlignment.score * reasoning.experienceAlignment.weight +
-      reasoning.personalityFit.score * reasoning.personalityFit.weight +
-      reasoning.preferencesMatch.score * reasoning.preferencesMatch.weight +
-      reasoning.educationFit.score * reasoning.educationFit.weight;
+    const scores = [
+      { score: reasoning.interestsAlignment.score, weight: reasoning.interestsAlignment.weight },
+      { score: reasoning.skillsMatch.score, weight: reasoning.skillsMatch.weight },
+      { score: reasoning.experienceAlignment.score, weight: reasoning.experienceAlignment.weight },
+      { score: reasoning.personalityFit.score, weight: reasoning.personalityFit.weight },
+      { score: reasoning.preferencesMatch.score, weight: reasoning.preferencesMatch.weight },
+      { score: reasoning.educationFit.score, weight: reasoning.educationFit.weight },
+    ];
 
-    return Math.round(weightedScore);
+    // Apply non-linear transformation to spread scores
+    const transformedScores = scores.map(({ score, weight }) => {
+      // Exponential transformation: penalize low scores, reward high scores
+      let transformed = score;
+      if (score < 50) {
+        // Scores below 50 get penalized more heavily
+        transformed = Math.pow(score / 100, 1.5) * 100;
+      } else if (score > 75) {
+        // Scores above 75 get boosted
+        transformed = 50 + Math.pow((score - 50) / 50, 0.8) * 50;
+      }
+      return transformed * weight;
+    });
+
+    const weightedScore = transformedScores.reduce((sum, score) => sum + score, 0);
+
+    // Apply final non-linear scaling to increase spread
+    let finalScore = weightedScore;
+    if (weightedScore > 70) {
+      // Boost high scores more
+      finalScore = 70 + ((weightedScore - 70) / 30) * 30 * 1.2;
+    } else if (weightedScore < 60) {
+      // Penalize low scores more
+      finalScore = weightedScore * 0.85;
+    }
+
+    return Math.round(Math.min(100, Math.max(0, finalScore)));
   }
 
   private calculateConfidence(reasoning: MatchReasoning, profile: UserProfile, career: JobCategory): number {

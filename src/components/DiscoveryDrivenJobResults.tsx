@@ -24,15 +24,15 @@ export function DiscoveryDrivenJobResults({
   const getCategoryIcon = (category: SearchTerm['category']) => {
     switch (category) {
       case 'role':
-        return 'ROL';
+        return 'Role';
       case 'skill':
-        return 'SKL';
+        return 'Skill';
       case 'value':
-        return 'VAL';
+        return 'Value';
       case 'industry':
-        return 'IND';
+        return 'Industry';
       case 'work-style':
-        return 'WRK';
+        return 'Work Style';
     }
   };
 

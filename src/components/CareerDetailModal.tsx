@@ -14,8 +14,43 @@ export function CareerDetailModal({ career, onClose, onViewSimilar }: CareerDeta
   const [activeTab, setActiveTab] = useState<'overview' | 'progression' | 'skills' | 'insights' | 'livedata'>(
     (career?.activeTab as 'overview' | 'progression' | 'skills' | 'insights' | 'livedata') || 'overview'
   );
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   if (!career) return null;
+
+  const handleSaveCareer = async () => {
+    setIsSaving(true);
+    setSaveStatus('idle');
+
+    try {
+      const response = await fetch('/api/saved-items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'career',
+          item: career,
+          notes: '',
+          tags: [],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Save career failed:', response.status, errorData);
+        throw new Error('Failed to save career');
+      }
+
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (error) {
+      console.error('Error saving career:', error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleTabChange = async (newTab: typeof activeTab) => {
     setActiveTab(newTab);
@@ -44,13 +79,13 @@ export function CareerDetailModal({ career, onClose, onViewSimilar }: CareerDeta
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 flex items-start justify-center p-4">
-      <div className="bg-gray-900 rounded-lg shadow-2xl max-w-4xl w-full my-8 border border-gray-700">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 flex items-start justify-center p-0 sm:p-4">
+      <div className="bg-gray-900 rounded-none sm:rounded-lg shadow-2xl max-w-4xl w-full min-h-screen sm:min-h-0 sm:my-8 border-0 sm:border border-gray-700">
         {/* Header */}
-        <div className="bg-gray-800 px-6 py-4 border-b border-gray-700 flex items-start justify-between rounded-t-lg">
+        <div className="bg-gray-800 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-700 flex items-start justify-between rounded-none sm:rounded-t-lg">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-100 mb-1">{career.title}</h2>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-1">{career.title}</h2>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
               <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm">
                 {career.category}
               </span>
@@ -448,8 +483,37 @@ export function CareerDetailModal({ career, onClose, onViewSimilar }: CareerDeta
             Close
           </button>
           <div className="flex gap-3">
-            <button className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors">
-              Save Career
+            <button
+              onClick={handleSaveCareer}
+              disabled={isSaving || saveStatus === 'success'}
+              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                saveStatus === 'success'
+                  ? 'bg-green-600 text-white'
+                  : saveStatus === 'error'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : saveStatus === 'success' ? (
+                <>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Saved!
+                </>
+              ) : saveStatus === 'error' ? (
+                'Failed to Save'
+              ) : (
+                'Save Career'
+              )}
             </button>
             <button
               onClick={() => {

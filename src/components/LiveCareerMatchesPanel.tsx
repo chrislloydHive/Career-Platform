@@ -103,9 +103,9 @@ export function LiveCareerMatchesPanel({
   };
 
   return (
-    <div className="sticky top-4 space-y-4">
+    <div className="lg:sticky lg:top-4 space-y-4">
       {showUpdateBanner && latestUpdate && (
-        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg p-4 shadow-lg animate-pulse">
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg p-3 sm:p-4 shadow-lg animate-pulse">
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -115,16 +115,16 @@ export function LiveCareerMatchesPanel({
         </div>
       )}
 
-      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl border-2 border-blue-500/30 shadow-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-5 py-4">
+      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-lg sm:rounded-xl border-2 border-blue-500/30 shadow-2xl overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-4 sm:px-5 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-white">Live Career Matches</h3>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-xs text-white/90 font-medium">Updating</span>
+            <h3 className="text-base sm:text-lg font-bold text-white">Live Career Matches</h3>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-xs text-white/90 font-medium hidden sm:inline">Updating</span>
             </div>
           </div>
-          <p className="text-xs text-blue-100 mt-1 mb-2">Building your profile dynamically</p>
+          <p className="text-xs text-blue-100 mt-1 mb-2 hidden sm:block">Building your profile dynamically</p>
           <div className="flex items-center justify-between text-xs pt-2 border-t border-white/10">
             <span className="text-white/80">Data Quality</span>
             <div className="flex items-center gap-2">
@@ -139,21 +139,21 @@ export function LiveCareerMatchesPanel({
           </div>
         </div>
 
-        <div className="p-5 space-y-3">
+        <div className="p-3 sm:p-4 lg:p-5 space-y-2 sm:space-y-3">
           {topCareers.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-500/20 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center py-6 sm:py-8">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 rounded-full bg-blue-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-400">Keep answering to see your matches!</p>
+              <p className="text-xs sm:text-sm text-gray-400">Keep answering to see your matches!</p>
             </div>
           ) : (
             topCareers.map((career, index) => (
               <div
                 key={career.careerTitle}
-                className={`group relative bg-gray-800/50 hover:bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all duration-300 ${
+                className={`group relative bg-gray-800/50 hover:bg-gray-800 rounded-lg p-3 sm:p-4 border border-gray-700 hover:border-blue-500/50 transition-all duration-300 ${
                   animatingScores.has(career.careerTitle) ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
                 }`}
               >
