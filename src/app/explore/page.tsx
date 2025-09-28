@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
 import { CareerFitScore } from '@/lib/matching/realtime-career-matcher';
 import { enrichStrength, enrichPreference, enrichHiddenInterest } from '@/lib/insights/insight-enrichment';
+import { CareerPathVisualization } from '@/components/CareerPathVisualization';
+import { generateCareerPaths } from '@/lib/career-paths/career-path-generator';
 
 type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
   topCareers?: CareerFitScore[];
@@ -20,6 +22,15 @@ export default function ExplorePage() {
     setProfile(exportedProfile);
     setShowResults(true);
   };
+
+  const careerPaths = useMemo(() => {
+    if (!profile || !profile.topCareers) return [];
+    return generateCareerPaths(
+      profile.topCareers,
+      profile.insights,
+      profile.analysis.strengths
+    );
+  }, [profile]);
 
   if (showResults && profile) {
     return (
@@ -158,6 +169,11 @@ export default function ExplorePage() {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Career Path Roadmaps */}
+          {careerPaths.length > 0 && (
+            <CareerPathVisualization trajectories={careerPaths} />
           )}
 
           {/* Cross-Domain Insights - Featured Section */}
