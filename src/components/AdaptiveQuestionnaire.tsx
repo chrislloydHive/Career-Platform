@@ -68,6 +68,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [processingMessage, setProcessingMessage] = useState('');
   const [isSmartQuestion, setIsSmartQuestion] = useState(false);
   const [questionSource, setQuestionSource] = useState<'base' | 'followup' | 'gap'>('base');
+  const [showConfidenceWidget, setShowConfidenceWidget] = useState(false);
 
   useEffect(() => {
     loadSavedState();
@@ -931,6 +932,20 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                 </div>
                 <div className="text-xs text-gray-500">insights</div>
               </div>
+              {evolutionSummary && confidenceEvolutions.length > 0 && (
+                <button
+                  onClick={() => setShowConfidenceWidget(!showConfidenceWidget)}
+                  className="border-l border-gray-700 pl-4 hover:bg-gray-800/50 px-3 py-2 rounded-lg transition-all group"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    <div className="text-2xl font-bold text-cyan-400">{Math.round(evolutionSummary.selfDiscoveryProgress * 100)}%</div>
+                  </div>
+                  <div className="text-xs text-gray-500 group-hover:text-gray-400">confidence</div>
+                </button>
+              )}
             </div>
             <div className="flex items-center gap-2 mt-2 justify-end">
               {saveStatus === 'saving' && (
@@ -951,6 +966,123 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           </div>
         </div>
       </div>
+
+      {/* Compact Confidence Evolution Widget */}
+      {showConfidenceWidget && evolutionSummary && confidenceEvolutions.length > 0 && (
+        <div className="mb-6 bg-gradient-to-br from-cyan-900/30 via-blue-900/20 to-cyan-900/30 rounded-xl border-2 border-cyan-500/40 p-5 animate-slide-in-right">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-cyan-100 flex items-center gap-2">
+              <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              Confidence Evolution
+            </h3>
+            <button
+              onClick={() => setShowConfidenceWidget(false)}
+              className="text-gray-400 hover:text-gray-300"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <div className="bg-gray-800/50 rounded-lg p-3 border border-green-500/30">
+              <div className="text-2xl font-bold text-green-400 mb-1">
+                {confidenceEvolutions.filter(e => e.trend === 'strengthening').length}
+              </div>
+              <div className="text-xs text-gray-400 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+                Trending Stronger
+              </div>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-3 border border-orange-500/30">
+              <div className="text-2xl font-bold text-orange-400 mb-1">
+                {confidenceEvolutions.filter(e => e.trend === 'weakening').length}
+              </div>
+              <div className="text-xs text-gray-400 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Needs Exploration
+              </div>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-3 border border-blue-500/30">
+              <div className="text-2xl font-bold text-blue-400 mb-1">
+                {evolutionSummary.validatedHunches}
+              </div>
+              <div className="text-xs text-gray-400 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Validated
+              </div>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-3 border border-cyan-500/30">
+              <div className="text-2xl font-bold text-cyan-400 mb-1">
+                {Math.round(evolutionSummary.selfDiscoveryProgress * 100)}%
+              </div>
+              <div className="text-xs text-gray-400">Overall Score</div>
+            </div>
+          </div>
+
+          {/* Trending Insights */}
+          <div className="space-y-2">
+            {confidenceEvolutions
+              .filter(e => e.trend === 'strengthening' || e.trend === 'weakening')
+              .slice(0, 3)
+              .map((evolution, idx) => (
+                <div
+                  key={idx}
+                  className={`p-3 rounded-lg border ${
+                    evolution.trend === 'strengthening'
+                      ? 'bg-green-900/20 border-green-700/30'
+                      : 'bg-orange-900/20 border-orange-700/30'
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    {evolution.trend === 'strengthening' ? (
+                      <svg className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-200 mb-1">{evolution.insightText}</p>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className={evolution.trend === 'strengthening' ? 'text-green-400' : 'text-orange-400'}>
+                          {Math.round(evolution.initialConfidence * 100)}% → {Math.round(evolution.currentConfidence * 100)}%
+                        </span>
+                        <span className="text-gray-500">•</span>
+                        <span className="text-gray-400">{evolution.confidenceHistory.length} updates</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          <button
+            onClick={() => {
+              setShowConfidenceWidget(false);
+              const evolutionSection = document.getElementById('confidence-evolution-full');
+              evolutionSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="mt-4 w-full py-2 text-sm text-cyan-300 hover:text-cyan-200 font-medium flex items-center justify-center gap-1 hover:bg-cyan-500/10 rounded-lg transition-all"
+          >
+            View Full Confidence Evolution
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* 8 Exploration Areas Progress */}
       <div className="mb-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-lg border border-blue-500/30 p-4">
@@ -1357,7 +1489,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       {/* Confidence Evolution Panel */}
       {showConfidenceEvolution && evolutionSummary && (
-        <div className="mb-6">
+        <div id="confidence-evolution-full" className="mb-6">
           <ConfidenceEvolutionPanel
             evolutions={confidenceEvolutions}
             patterns={confidencePatterns}
