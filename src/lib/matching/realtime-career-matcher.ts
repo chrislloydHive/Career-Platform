@@ -138,7 +138,7 @@ export class RealtimeCareerMatcher {
     else if (dataCompleteness < 0.7) confidenceMultiplier = 0.85;
     else if (dataCompleteness < 0.9) confidenceMultiplier = 0.95;
 
-    let finalScore = totalScore * confidenceMultiplier;
+    const finalScore = totalScore * confidenceMultiplier;
 
     const normalizedScore = this.normalizeScore(finalScore, career);
 

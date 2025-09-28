@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { ActionPlan } from '@/lib/action-plan/action-plan-generator';
+import type { ActionPlan as ActionPlanType } from '@/lib/action-plan/action-plan-generator';
 
 interface ActionPlanProps {
-  actionPlan: ActionPlan;
+  actionPlan: ActionPlanType;
   onRestartExploration: () => void;
 }
 

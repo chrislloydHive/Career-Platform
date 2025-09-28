@@ -73,7 +73,7 @@ export function generateActionPlan(profile: CareerProfile): ActionPlan {
 function generateCareerRecommendations(
   strengths: string[],
   preferences: string[],
-  hiddenInterests: any[]
+  hiddenInterests: { motivation: string; relatedAreas: string[] }[]
 ): ActionPlan['careersToResearch'] {
   const careerMap: Record<string, { reason: string; priority: 'high' | 'medium' | 'low' }> = {};
 

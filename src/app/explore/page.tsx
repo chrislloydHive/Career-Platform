@@ -394,9 +394,9 @@ export default function ExplorePage() {
                         <div key={index} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50 hover:border-purple-500/50 transition-colors">
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
-                              <div className="text-sm font-medium text-gray-200 mb-1">{insight.category || insight.insight}</div>
+                              <div className="text-sm font-medium text-gray-200 mb-1">{insight.insight}</div>
                               <div className="text-xs text-gray-400 mb-2">
-                                {insight.insight && insight.insight !== insight.category ? insight.insight : 'Pattern detected in your responses'}
+                                Pattern detected in your responses
                               </div>
                             </div>
                             <div className="flex flex-col items-end gap-1">
