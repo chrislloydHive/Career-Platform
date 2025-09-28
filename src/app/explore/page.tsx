@@ -4,13 +4,18 @@ import { useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
+import { CareerFitScore } from '@/lib/matching/realtime-career-matcher';
+
+type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
+  topCareers?: CareerFitScore[];
+};
 
 export default function ExplorePage() {
   const [showResults, setShowResults] = useState(false);
-  const [profile, setProfile] = useState<ReturnType<AdaptiveQuestioningEngine['exportProfile']> | null>(null);
+  const [profile, setProfile] = useState<ExportedProfile | null>(null);
   const [questionnaireKey, setQuestionnaireKey] = useState(0);
 
-  const handleComplete = (exportedProfile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => {
+  const handleComplete = (exportedProfile: ExportedProfile) => {
     setProfile(exportedProfile);
     setShowResults(true);
   };
@@ -57,6 +62,102 @@ export default function ExplorePage() {
               <div className="text-sm text-gray-400">Avg Confidence</div>
             </div>
           </div>
+
+          {/* Recommended Careers - Primary Focus */}
+          {profile.topCareers && profile.topCareers.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
+                  <svg className="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  Your Top Career Matches
+                </h2>
+                <span className="text-sm text-gray-400">Based on {Object.keys(profile.responses).length} responses</span>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                {profile.topCareers.map((career, index) => (
+                  <div key={index} className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg border-2 border-green-600/40 p-6 hover:border-green-500/60 transition-all">
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded">
+                            #{index + 1}
+                          </span>
+                          <h3 className="text-xl font-bold text-gray-100">{career.careerTitle}</h3>
+                        </div>
+                        {career.careerCategory && (
+                          <p className="text-sm text-gray-400 mb-3">{career.careerCategory}</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-green-400 mb-1">
+                          {Math.round(career.currentScore)}%
+                        </div>
+                        <div className="text-xs text-gray-500">Match Score</div>
+                      </div>
+                    </div>
+
+                    {/* Match Factors */}
+                    <div className="space-y-3 mb-4">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Why this fits you:</p>
+                      {career.matchFactors.slice(0, 3).map((factor, factorIdx) => (
+                        <div key={factorIdx} className="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50">
+                          <div className="flex items-start gap-2">
+                            <div className={`p-1 rounded ${
+                              factor.strength === 'strong' ? 'bg-green-500/20' :
+                              factor.strength === 'moderate' ? 'bg-yellow-500/20' :
+                              'bg-gray-500/20'
+                            }`}>
+                              {factor.strength === 'strong' && (
+                                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                              {factor.strength === 'moderate' && (
+                                <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                              {factor.strength === 'weak' && (
+                                <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-200 mb-1">{factor.factor}</p>
+                              {factor.basedOn.length > 0 && (
+                                <p className="text-xs text-gray-400 line-clamp-2">{factor.basedOn[0]}</p>
+                              )}
+                            </div>
+                            <span className={`text-xs font-semibold px-2 py-1 rounded ${
+                              factor.strength === 'strong' ? 'bg-green-500/10 text-green-400' :
+                              factor.strength === 'moderate' ? 'bg-yellow-500/10 text-yellow-400' :
+                              'bg-gray-500/10 text-gray-400'
+                            }`}>
+                              {factor.strength === 'strong' ? '★★★' : factor.strength === 'moderate' ? '★★' : '★'}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Action Button */}
+                    <a
+                      href={`/careers?id=${encodeURIComponent(career.careerTitle)}`}
+                      className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      Explore This Career
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Cross-Domain Insights - Featured Section */}
           {profile.synthesizedInsights.length > 0 && (

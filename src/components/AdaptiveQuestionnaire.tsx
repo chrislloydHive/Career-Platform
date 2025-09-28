@@ -21,8 +21,12 @@ import { FutureCareerPathVisualizer } from './FutureCareerPathVisualizer';
 import { CareerSuggestion } from '@/lib/ai/career-suggestions-ai';
 import { ExpandableInsightCard } from './ExpandableInsightCard';
 
+type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
+  topCareers?: CareerFitScore[];
+};
+
 interface AdaptiveQuestionnaireProps {
-  onComplete?: (profile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => void;
+  onComplete?: (profile: ExportedProfile) => void;
   onInsightDiscovered?: (insight: DiscoveredInsight) => void;
   userProfile?: UserProfile;
 }
@@ -568,6 +572,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       patterns: state.consistencyPatterns.length,
       motivations: state.hiddenMotivations.length,
       valueHierarchy: state.valueHierarchy,
+      topCareers: topCareers.length,
     });
 
     const profile = engine.exportProfile();
@@ -580,7 +585,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       topValues: profile.patterns.valueHierarchy?.topValues.length || 0,
     });
 
-    onComplete?.(profile);
+    onComplete?.({ ...profile, topCareers: topCareers.slice(0, 7) });
   };
 
 
@@ -1145,7 +1150,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
                 {latestPattern.type === 'contradiction' && (
                   <div className="mt-2 text-xs text-orange-100">
-                    This isn't necessarily bad - it might reveal contextual preferences!
+                    This isn&apos;t necessarily bad - it might reveal contextual preferences!
                   </div>
                 )}
 
@@ -1731,7 +1736,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                 <svg className="w-3.5 h-3.5 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Why we're asking this
+                Why we&apos;re asking this
               </summary>
               <p className="mt-2 text-xs text-gray-400 bg-blue-900/10 border border-blue-700/20 rounded-lg p-3 leading-relaxed">
                 {getWhyAsking(currentQuestion)}
@@ -1769,7 +1774,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                     { value: 'uncertain', label: 'Low', color: 'bg-orange-600' },
                     { value: 'somewhat-sure', label: 'Medium', color: 'bg-yellow-600' },
                     { value: 'certain', label: 'High', color: 'bg-green-600' },
-                  ].map((level, idx) => (
+                  ].map((level) => (
                     <button
                       key={level.value}
                       onClick={() => setConfidenceLevel(level.value as typeof confidenceLevel)}
@@ -2249,7 +2254,10 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               risingCareers={risingCareers}
               latestUpdate={latestUpdate}
               dataCompleteness={careerMatcher.getDataCompletenessPercentage()}
-              explorationProgress={explorationProgress}
+              explorationProgress={explorationProgress.map(p => ({
+                ...p,
+                label: getAreaLabel(p.area),
+              }))}
               gaps={gaps}
               totalResponses={Object.keys(engine.getState().responses).length}
             />
