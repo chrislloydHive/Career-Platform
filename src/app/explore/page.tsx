@@ -377,10 +377,23 @@ export default function ExplorePage() {
           {/* Actions */}
           <div className="mt-8 flex gap-4 justify-center">
             <button
-              onClick={() => {
-                setShowResults(false);
-                setProfile(null);
-                setQuestionnaireKey(prev => prev + 1);
+              onClick={async () => {
+                if (confirm('Are you sure you want to restart? This will clear all your responses and start fresh.')) {
+                  try {
+                    // Clear database state
+                    await fetch('/api/questionnaire', { method: 'DELETE' });
+                    // Reset local state
+                    setShowResults(false);
+                    setProfile(null);
+                    setQuestionnaireKey(prev => prev + 1);
+                  } catch (error) {
+                    console.error('Failed to clear questionnaire:', error);
+                    // Still reset even if delete fails
+                    setShowResults(false);
+                    setProfile(null);
+                    setQuestionnaireKey(prev => prev + 1);
+                  }
+                }
               }}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
