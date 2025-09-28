@@ -10,6 +10,7 @@ export default function ExplorePage() {
   const [showResults, setShowResults] = useState(false);
   const [profile, setProfile] = useState<ReturnType<AdaptiveQuestioningEngine['exportProfile']> | null>(null);
   const [recentInsight, setRecentInsight] = useState<DiscoveredInsight | null>(null);
+  const [questionnaireKey, setQuestionnaireKey] = useState(0);
 
   const handleComplete = (exportedProfile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => {
     setProfile(exportedProfile);
@@ -386,6 +387,7 @@ export default function ExplorePage() {
               onClick={() => {
                 setShowResults(false);
                 setProfile(null);
+                setQuestionnaireKey(prev => prev + 1);
               }}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
@@ -406,6 +408,7 @@ export default function ExplorePage() {
 
       <main>
         <AdaptiveQuestionnaire
+          key={questionnaireKey}
           onComplete={handleComplete}
           onInsightDiscovered={handleInsightDiscovered}
         />
