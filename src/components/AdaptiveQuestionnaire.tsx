@@ -708,10 +708,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       )}
 
       {/* AI Career Suggestion Notification */}
-      {showNewSuggestion && latestSuggestion && (
+      {/* {showNewSuggestion && latestSuggestion && (
         <div className="fixed top-20 right-4 left-4 sm:left-auto z-50 animate-slide-in-right">
           <div className="bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 rounded-xl shadow-2xl p-4 sm:p-5 max-w-md border-2 border-amber-400/50 relative overflow-hidden">
-            {/* Sparkle effect */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
               <div className="absolute top-2 right-2 w-2 h-2 bg-amber-300 rounded-full animate-ping" />
               <div className="absolute top-4 right-8 w-1 h-1 bg-amber-300 rounded-full animate-ping delay-100" />
@@ -751,7 +750,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Main Content */}

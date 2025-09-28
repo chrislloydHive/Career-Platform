@@ -56,7 +56,7 @@ export default function CareersPage() {
           </div>
         ) : (
           <>
-            <AiCareerSuggestionsPanel />
+            {/* <AiCareerSuggestionsPanel /> */}
             <CareerExplorer
               key={refreshKey}
               onCareerSelect={setSelectedCareer}
