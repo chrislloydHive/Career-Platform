@@ -102,7 +102,7 @@ export function ProfileSwitcher() {
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-100 mb-2">Clear All Data?</h3>
                   <p className="text-sm text-gray-400 mb-4">
-                    This will permanently delete all saved data for <span className="font-medium text-gray-200">{currentProfile.name}</span>, including:
+                    This will permanently delete all saved data for <span className="font-medium text-gray-200">{userName}</span>, including:
                   </p>
                   <ul className="text-sm text-gray-400 space-y-1 mb-4 ml-4">
                     <li>• Questionnaire responses</li>

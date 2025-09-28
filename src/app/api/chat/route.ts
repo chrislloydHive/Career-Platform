@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     const userProfile = await getUserProfile(session.user.id);
     const questionnaireData = await getQuestionnaireInsights(session.user.id);
-    const userContext = buildUserContextPrompt(userProfile, questionnaireData);
+    const userContext = userProfile ? buildUserContextPrompt(userProfile, questionnaireData || undefined) : '';
 
     await addInteraction(session.user.id, 'chat_query', text);
 

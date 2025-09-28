@@ -30,9 +30,9 @@ async function updateCareerSalaries() {
       await sql`
         UPDATE career_research
         SET
-          skills = ${enhancedCareer.requiredSkills?.map(s => s.skill) || []},
-          day_in_life = ${enhancedCareer.dailyTasks?.map(t => t.task) || []},
-          career_path = ${enhancedCareer.careerProgression?.map(cp => cp.title) || []},
+          skills = ${JSON.stringify(enhancedCareer.requiredSkills?.map(s => s.skill) || [])},
+          day_in_life = ${JSON.stringify(enhancedCareer.dailyTasks?.map(t => t.task) || [])},
+          career_path = ${JSON.stringify(enhancedCareer.careerProgression?.map(cp => cp.title) || [])},
           salary_range = ${salaryRange},
           salary_ranges = ${JSON.stringify(enhancedCareer.salaryRanges || [])},
           career_progression = ${JSON.stringify(enhancedCareer.careerProgression || [])}

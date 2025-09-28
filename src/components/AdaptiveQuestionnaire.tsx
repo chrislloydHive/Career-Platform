@@ -762,9 +762,11 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                             CROSS-DOMAIN
                           </span>
                         )}
-                        <span className="text-xs font-medium text-amber-400">
-                          {getAreaLabel(insight.area)}
-                        </span>
+                        {!isSynthesized && regularInsight?.area && (
+                          <span className="text-xs font-medium text-amber-400">
+                            {getAreaLabel(regularInsight.area)}
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm font-medium text-gray-100 leading-relaxed">
                         {isSynthesized ? synthInsight?.title : regularInsight?.insight}

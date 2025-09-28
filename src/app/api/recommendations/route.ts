@@ -19,7 +19,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
-    const userContext = buildUserContextPrompt(userProfile, questionnaireData);
+    const userContext = buildUserContextPrompt(userProfile, questionnaireData || undefined);
 
     const careersResult = await sql`
       SELECT * FROM career_research
@@ -27,7 +27,7 @@ export async function GET() {
       ORDER BY created_at DESC
     `;
 
-    const exploredCareers: JobCategory[] = careersResult.rows.map(row => ({
+    const exploredCareers = careersResult.rows.map(row => ({
       id: row.id,
       title: row.title,
       category: row.category,
@@ -69,7 +69,7 @@ export async function GET() {
       userContext,
       {
         searchedJobs,
-        exploredCareers,
+        exploredCareers: exploredCareers as unknown as JobCategory[],
         chatHistory,
         questionnaireCompletion,
       }

@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // Also update user profile with insights
     if (data.insights && data.insights.length > 0) {
-      const insightTexts = data.insights.map((i: any) => i.insight);
+      const insightTexts = data.insights.map((i: { insight: string }) => i.insight);
 
       await sql`
         INSERT INTO ai_insights (user_id, insight, confidence, source)

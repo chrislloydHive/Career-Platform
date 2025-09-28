@@ -7,7 +7,7 @@ import { CareerExplorer } from '@/components/CareerExplorer';
 import { CareerDetailModal } from '@/components/CareerDetailModal';
 import { CareerComparisonTool } from '@/components/CareerComparisonTool';
 import { CareerResearchModal } from '@/components/CareerResearchModal';
-import { JobCategory } from '@/types/career';
+import { JobCategory, CareerCategory } from '@/types/career';
 
 export default function CareersPage() {
   const [selectedCareer, setSelectedCareer] = useState<JobCategory | null>(null);
@@ -59,7 +59,7 @@ export default function CareersPage() {
             onCareerSelect={setSelectedCareer}
             onTriggerAIResearch={handleTriggerAIResearch}
             onToggleComparison={() => setShowComparison(!showComparison)}
-            filterCategory={filterCategory as any}
+            filterCategory={filterCategory as CareerCategory | 'all' | undefined}
           />
         )}
       </main>

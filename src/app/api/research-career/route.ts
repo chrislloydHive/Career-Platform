@@ -29,9 +29,11 @@ export async function POST(request: NextRequest) {
 
     const userProfile = await getUserProfile(session.user.id);
     const questionnaireData = await getQuestionnaireInsights(session.user.id);
-    const userContext = questionnaireData
-      ? buildUserContextPrompt(userProfile, questionnaireData)
-      : buildShortUserContext(userProfile);
+    const userContext = userProfile
+      ? (questionnaireData
+        ? buildUserContextPrompt(userProfile, questionnaireData || undefined)
+        : buildShortUserContext(userProfile))
+      : '';
 
     await addInteraction(session.user.id, 'career_research', jobTitle);
 
