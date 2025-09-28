@@ -18,10 +18,23 @@ export default function ExplorePage() {
   const [showResults, setShowResults] = useState(false);
   const [profile, setProfile] = useState<ExportedProfile | null>(null);
   const [questionnaireKey, setQuestionnaireKey] = useState(0);
+  const [expandedInsights, setExpandedInsights] = useState<Set<number>>(new Set());
 
   const handleComplete = (exportedProfile: ExportedProfile) => {
     setProfile(exportedProfile);
     setShowResults(true);
+  };
+
+  const toggleInsightExpansion = (index: number) => {
+    setExpandedInsights(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
   };
 
   const careerPaths = useMemo(() => {
@@ -113,18 +126,44 @@ export default function ExplorePage() {
                           <span className="text-xs font-medium text-gray-400">
                             {Math.round(insight.confidence * 100)}% confidence
                           </span>
-                          <span className="text-xs text-gray-300">
-                            {insight.type === 'cross-domain'
-                              ? 'Connections between different career areas'
-                              : insight.type === 'paradox'
-                              ? 'Contradictory preferences that reveal depth'
-                              : insight.type === 'nuanced-preference'
-                              ? 'Complex preferences beyond simple choices'
-                              : 'Additional behavioral patterns'}
-                          </span>
                         </div>
                         <h3 className="text-xl font-bold text-gray-100 mb-2">{insight.title}</h3>
                         <p className="text-gray-300 leading-relaxed">{insight.description}</p>
+
+                        {/* Expand/Collapse Button */}
+                        <button
+                          onClick={() => toggleInsightExpansion(index)}
+                          className="mt-3 flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                        >
+                          <span>
+                            {expandedInsights.has(index) ? 'Show less' : 'Learn more about this insight type'}
+                          </span>
+                          <svg
+                            className={`w-4 h-4 transition-transform ${expandedInsights.has(index) ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+
+                        {/* Collapsible Content */}
+                        {expandedInsights.has(index) && (
+                          <div className="mt-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                            <p className="text-sm text-gray-300 mb-2">
+                              <strong>What this means:</strong> {
+                                insight.type === 'cross-domain'
+                                  ? 'This insight reveals connections between different career areas in your responses, showing how your interests span multiple domains and suggesting hybrid career paths.'
+                                  : insight.type === 'paradox'
+                                  ? 'This insight identifies contradictory preferences in your responses, which often reveal the depth and complexity of your career interests rather than confusion.'
+                                  : insight.type === 'nuanced-preference'
+                                  ? 'This insight captures complex preferences that go beyond simple yes/no choices, reflecting the sophisticated way you think about career decisions.'
+                                  : 'This insight represents additional behavioral patterns detected in your responses that provide valuable context for your career exploration.'
+                              }
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap gap-2">
