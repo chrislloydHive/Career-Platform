@@ -186,21 +186,27 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         console.log('Save successful');
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Save failed with status:', response.status);
-        console.error('Error data:', errorData);
+        console.warn('Save failed with status:', response.status, '- Error:', errorData);
+        console.warn('This is expected if the database table does not exist or if not logged in. Questionnaire will continue working.');
 
         // Only show error status for non-auth errors to avoid cluttering UI
         if (response.status !== 401) {
           setSaveStatus('error');
+          // Auto-clear error after 3 seconds to not clutter UI
+          setTimeout(() => setSaveStatus('idle'), 3000);
+        } else {
+          // For auth errors, just go back to idle
+          setSaveStatus('idle');
         }
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.error('Save request was aborted (timeout or manual abort)');
+        console.warn('Save request was aborted (timeout)');
       } else {
-        console.error('Failed to save state - exception thrown:', error);
+        console.warn('Failed to save state:', error);
       }
-      setSaveStatus('error');
+      console.warn('Questionnaire will continue working without persistence.');
+      setSaveStatus('idle'); // Don't show error, just go back to idle
     }
   };
 
