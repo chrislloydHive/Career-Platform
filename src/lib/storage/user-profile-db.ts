@@ -213,7 +213,51 @@ export async function getQuestionnaireInsights(userId: string) {
   }
 }
 
-export function buildUserContextPrompt(profile: UserProfile, questionnaireData?: any): string {
+interface QuestionnaireInsight {
+  insight: string;
+  area: string;
+  confidence: number;
+}
+
+interface SynthesizedInsight {
+  title: string;
+  type: string;
+  description: string;
+  implications: string[];
+}
+
+interface NarrativeInsight {
+  title: string;
+  narrative: string;
+  themes: string[];
+}
+
+interface AuthenticPreference {
+  preference: string;
+}
+
+interface AuthenticityProfileData {
+  authenticityScore: number;
+  authenticPreferences?: AuthenticPreference[];
+  selfPerceptionGaps?: unknown[];
+}
+
+interface Gap {
+  gap: string;
+  area: string;
+  importance: string;
+}
+
+interface QuestionnaireData {
+  insights?: QuestionnaireInsight[];
+  synthesized_insights?: SynthesizedInsight[];
+  gaps?: Gap[];
+  authenticity_profile?: AuthenticityProfileData;
+  narrative_insights?: NarrativeInsight[];
+  completion_percentage?: number;
+}
+
+export function buildUserContextPrompt(profile: UserProfile, questionnaireData?: QuestionnaireData): string {
   let questionnaireSection = '';
 
   if (questionnaireData) {
@@ -228,10 +272,10 @@ export function buildUserContextPrompt(profile: UserProfile, questionnaireData?:
 ## SELF-DISCOVERY QUESTIONNAIRE INSIGHTS (${completionPercentage}% Complete)
 
 ### Discovered Patterns & Insights
-${insights.length > 0 ? insights.map((i: any) => `- ${i.insight} (${i.area}, ${Math.round(i.confidence * 100)}% confidence)`).join('\n') : '- No insights discovered yet'}
+${insights.length > 0 ? insights.map((i) => `- ${i.insight} (${i.area}, ${Math.round(i.confidence * 100)}% confidence)`).join('\n') : '- No insights discovered yet'}
 
 ### Cross-Domain Insights
-${synthesized.length > 0 ? synthesized.map((s: any) => `
+${synthesized.length > 0 ? synthesized.map((s) => `
 **${s.title}** (${s.type})
 ${s.description}
 Implications:
@@ -239,7 +283,7 @@ ${s.implications.map((imp: string) => `  - ${imp}`).join('\n')}
 `).join('\n') : '- No cross-domain insights yet'}
 
 ### Narrative Insights (User's Story)
-${narrativeInsights.length > 0 ? narrativeInsights.map((n: any) => `
+${narrativeInsights.length > 0 ? narrativeInsights.map((n) => `
 **${n.title}**
 ${n.narrative}
 Key themes: ${n.themes.join(', ')}
@@ -248,12 +292,12 @@ Key themes: ${n.themes.join(', ')}
 ### Authenticity Profile
 ${authenticityProfile ? `
 Authenticity Score: ${Math.round(authenticityProfile.authenticityScore * 100)}%
-Core Values: ${authenticityProfile.authenticPreferences?.map((p: any) => p.preference).join(', ') || 'N/A'}
+Core Values: ${authenticityProfile.authenticPreferences?.map((p) => p.preference).join(', ') || 'N/A'}
 Self-Perception Gaps: ${authenticityProfile.selfPerceptionGaps?.length || 0} identified
 ` : '- Not yet analyzed'}
 
 ### Knowledge Gaps to Explore
-${gaps.length > 0 ? gaps.map((g: any) => `- ${g.gap} (${g.area}, ${g.importance} priority)`).join('\n') : '- No gaps identified yet'}
+${gaps.length > 0 ? gaps.map((g) => `- ${g.gap} (${g.area}, ${g.importance} priority)`).join('\n') : '- No gaps identified yet'}
 
 `;
   }
