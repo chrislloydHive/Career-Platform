@@ -38,6 +38,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [showProgress, setShowProgress] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showInsightNotification, setShowInsightNotification] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
   const [latestInsightNotification, setLatestInsightNotification] = useState<DiscoveredInsight | null>(null);
   const [skippedQuestions, setSkippedQuestions] = useState<AdaptiveQuestion[]>([]);
   const [showSynthesized, setShowSynthesized] = useState(true);
@@ -209,6 +210,36 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       setResponse(3);
     }
   }, [currentQuestion, response]);
+
+  // Debug mode keyboard shortcut: Press Ctrl+Shift+D
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        setDebugMode(prev => !prev);
+        console.log('Debug mode:', !debugMode);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [debugMode]);
+
+  const quickSubmit = async () => {
+    if (!currentQuestion) return;
+
+    // Auto-select first option for multiple choice or scenario
+    if (currentQuestion.type === 'multiple-choice' || currentQuestion.type === 'scenario') {
+      if (currentQuestion.options && currentQuestion.options.length > 0) {
+        setResponse(currentQuestion.options[0].value);
+        setTimeout(() => handleSubmitResponse(), 100);
+      }
+    } else if (currentQuestion.type === 'scale') {
+      setResponse(3);
+      setTimeout(() => handleSubmitResponse(), 100);
+    } else if (currentQuestion.type === 'open-ended') {
+      setResponse('Debug test response');
+      setTimeout(() => handleSubmitResponse(), 100);
+    }
+  };
 
   const handleSubmitResponse = async () => {
     if (!currentQuestion || response === null || isSubmitting) {
@@ -535,6 +566,34 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-8">
+      {/* Debug Panel */}
+      {debugMode && (
+        <div className="fixed bottom-4 right-4 z-50 bg-yellow-600 text-black rounded-lg shadow-2xl p-4 max-w-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-sm">🛠️ DEBUG MODE</h3>
+            <button
+              onClick={() => setDebugMode(false)}
+              className="text-black hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="space-y-2 text-xs">
+            <p><strong>Question:</strong> {currentQuestion?.id}</p>
+            <p><strong>Type:</strong> {currentQuestion?.type}</p>
+            <p><strong>Response:</strong> {response !== null ? String(response) : 'none'}</p>
+            <p><strong>Responses:</strong> {Object.keys(engine.getState().responses).length}</p>
+            <p><strong>Insights:</strong> {insights.length}</p>
+            <button
+              onClick={quickSubmit}
+              className="w-full mt-2 px-3 py-2 bg-black text-yellow-400 rounded font-bold hover:bg-gray-800"
+            >
+              ⚡ Quick Submit (Auto-answer)
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Real-time Insight Notification - Celebratory */}
       {showInsightNotification && latestInsightNotification && (
         <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
