@@ -36,6 +36,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [synthesizedInsights, setSynthesizedInsights] = useState<SynthesizedInsight[]>([]);
   const [gaps, setGaps] = useState<IdentifiedGap[]>([]);
   const [showProgress, setShowProgress] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showInsightNotification, setShowInsightNotification] = useState(false);
   const [latestInsightNotification, setLatestInsightNotification] = useState<DiscoveredInsight | null>(null);
   const [skippedQuestions, setSkippedQuestions] = useState<AdaptiveQuestion[]>([]);
@@ -210,9 +211,21 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   }, [currentQuestion, response]);
 
   const handleSubmitResponse = async () => {
-    if (!currentQuestion || response === null) return;
+    if (!currentQuestion || response === null || isSubmitting) {
+      console.log('Cannot submit:', { currentQuestion: !!currentQuestion, response, isSubmitting });
+      return;
+    }
 
-    engine.recordResponse(currentQuestion.id, response, confidenceLevel);
+    console.log('Submitting response for question:', currentQuestion.id, 'value:', response);
+    setIsSubmitting(true);
+
+    try {
+      engine.recordResponse(currentQuestion.id, response, confidenceLevel);
+    } catch (error) {
+      console.error('Error recording response:', error);
+      setIsSubmitting(false);
+      return;
+    }
 
     const newInsights = engine.getInsights();
     const previousCount = insights.length;
@@ -273,14 +286,27 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       }
     }
 
-    if (currentQuestionIndex < currentQuestions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      resetResponse();
-    } else {
-      loadNextQuestions();
+    try {
+      if (currentQuestionIndex < currentQuestions.length - 1) {
+        console.log('Moving to next question in batch');
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        resetResponse();
+      } else {
+        console.log('Loading next question batch');
+        loadNextQuestions();
+      }
+    } catch (error) {
+      console.error('Error loading next question:', error);
     }
 
-    await saveState();
+    console.log('About to save state...');
+    try {
+      await saveState();
+    } catch (error) {
+      console.error('Error saving state:', error);
+    }
+    console.log('Response submission complete');
+    setIsSubmitting(false);
   };
 
   const updateCareerMatches = (currentInsights: DiscoveredInsight[]) => {
@@ -718,13 +744,25 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           <div className="flex gap-3">
             <button
               onClick={handleSubmitResponse}
-              disabled={response === null}
+              disabled={response === null || isSubmitting}
               className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-700 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
             >
-              Continue
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  Continue
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </>
+              )}
             </button>
             <button
               onClick={handleComeBackLater}
