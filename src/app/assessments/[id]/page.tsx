@@ -111,8 +111,35 @@ export default function AssessmentDetailPage() {
   }
 
   const profile = assessment.profile;
-  const careerPaths = profile.topCareers && profile.insights
-    ? generateCareerPaths(profile.topCareers, profile.insights, profile.analysis.strengths)
+
+  // Transform topCareers to CareerFitScore format for generateCareerPaths
+  const transformedCareers = profile.topCareers?.map((career) => ({
+    careerTitle: career.title,
+    careerCategory: 'General', // Default category since not stored
+    currentScore: career.match,
+    previousScore: career.match,
+    change: 0,
+    trend: 'stable' as const,
+    matchFactors: []
+  })) || [];
+
+  // Safely extract strengths as string array
+  const strengths = Array.isArray(profile.analysis?.strengths)
+    ? profile.analysis.strengths as string[]
+    : [];
+
+  // Transform insights to the expected format for generateCareerPaths
+  const transformedInsights = profile.insights?.map((insight) => ({
+    type: 'strength' as const,
+    area: 'work-style' as const,
+    insight: 'Saved insight from assessment',
+    basedOn: [],
+    confidence: insight.confidence || 0.5,
+    explanation: 'Saved from previous assessment'
+  })) || [];
+
+  const careerPaths = profile.topCareers && transformedInsights.length > 0 && strengths.length > 0
+    ? generateCareerPaths(transformedCareers, transformedInsights, strengths)
     : [];
 
   return (
@@ -174,13 +201,13 @@ export default function AssessmentDetailPage() {
           </div>
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
             <div className="text-3xl font-bold text-green-400 mb-1">
-              {profile.patterns.consistencyPatterns.length}
+              {Array.isArray((profile.patterns as Record<string, unknown>)?.consistencyPatterns) ? ((profile.patterns as Record<string, unknown>).consistencyPatterns as unknown[]).length : 0}
             </div>
             <div className="text-sm text-gray-400">Pattern Matches</div>
           </div>
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
             <div className="text-3xl font-bold text-orange-400 mb-1">
-              {profile.patterns.hiddenMotivations.length}
+              {Array.isArray((profile.patterns as Record<string, unknown>)?.hiddenMotivations) ? ((profile.patterns as Record<string, unknown>).hiddenMotivations as unknown[]).length : 0}
             </div>
             <div className="text-sm text-gray-400">Core Motivations</div>
           </div>
@@ -227,7 +254,7 @@ export default function AssessmentDetailPage() {
                           {insight.type.replace('-', ' ')}
                         </span>
                         <span className="text-xs font-medium text-gray-400">
-                          {Math.round(insight.confidence * 100)}% confidence
+                          {Math.round((insight.confidence as number || 0.5) * 100)}% confidence
                         </span>
                       </div>
                       <h3 className="text-xl font-bold text-gray-100 mb-2">{insight.title}</h3>
@@ -255,8 +282,8 @@ export default function AssessmentDetailPage() {
         {/* Skills Gap Analysis */}
         {profile.topCareers && profile.topCareers.length > 0 && (
           <SkillsGapAnalysis
-            topCareers={profile.topCareers}
-            userStrengths={profile.analysis.strengths || []}
+            topCareers={transformedCareers}
+            userStrengths={strengths}
             userExperience={[]}
           />
         )}
@@ -268,7 +295,22 @@ export default function AssessmentDetailPage() {
 
         {/* Action Plan */}
         <ActionPlan
-          actionPlan={generateActionPlan(profile)}
+          actionPlan={generateActionPlan({
+            ...profile,
+            motivationInsights: [],
+            strengthProfile: { validatedStrengths: [], preferredWorkStyle: '', strengthEvolution: [] },
+            hiddenInterestPredictions: [],
+            futureSelfProjection: { futureGoals: [], anticipatedChallenges: [], adaptabilityFactors: [] },
+            selfPerceptionGaps: [],
+            archaeologyInsights: [],
+            matchEvolution: [],
+            confidenceEvolutions: profile.confidenceEvolutions || [],
+            patterns: {
+              consistencyPatterns: (profile.patterns as Record<string, unknown>)?.consistencyPatterns as unknown[] || [],
+              hiddenMotivations: (profile.patterns as Record<string, unknown>)?.hiddenMotivations as unknown[] || [],
+              strengthEvolution: (profile.patterns as Record<string, unknown>)?.strengthEvolution as unknown[] || []
+            }
+          } as unknown)}
           onRestartExploration={async () => {
             if (confirm('This will start a new assessment. Continue?')) {
               window.location.href = '/explore';
