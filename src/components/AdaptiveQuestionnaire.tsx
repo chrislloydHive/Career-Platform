@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { AdaptiveQuestioningEngine, DiscoveredInsight, IdentifiedGap } from '@/lib/adaptive-questions/adaptive-engine';
 import { SynthesizedInsight } from '@/lib/adaptive-questions/insight-synthesis';
-import { AdaptiveQuestion, ExplorationArea } from '@/lib/adaptive-questions/question-banks';
+import { AdaptiveQuestion, ExplorationArea, getQuestionById } from '@/lib/adaptive-questions/question-banks';
 import { InteractiveInsightCards } from './InteractiveInsightCards';
 import { UserProfile } from '@/types/user-profile';
 import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/matching/realtime-career-matcher';
@@ -1392,20 +1392,157 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       {/* Gaps Identified */}
       {gaps.length > 0 && (
-        <div className="mt-6 bg-blue-900/20 rounded-lg border border-blue-700/50 p-6">
-          <h3 className="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            Areas to Explore
-          </h3>
-          <div className="space-y-2">
-            {gaps.map((gap, index) => (
-              <div key={index} className="text-sm text-gray-300 flex items-start gap-2">
-                <span className="text-blue-400 mt-0.5">•</span>
-                <span>{gap.gap}</span>
+        <div className="mt-6 bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-blue-900/30 rounded-xl border-2 border-blue-500/40 p-6 shadow-lg">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-xl font-bold text-gray-100 flex items-center gap-3">
+              <div className="p-2 bg-blue-500/20 rounded-lg">
+                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
               </div>
-            ))}
+              <span>Areas to Explore</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-semibold">
+                {gaps.length} {gaps.length === 1 ? 'opportunity' : 'opportunities'}
+              </span>
+            </h3>
+          </div>
+          <div className="space-y-4">
+            {gaps.map((gap, index) => {
+              const explorationProgress = engine.getExplorationProgress();
+              const areaProgress = explorationProgress.find(p => p.area === gap.area);
+              const confidencePercentage = areaProgress ? Math.min(100, (areaProgress.depth / areaProgress.totalQuestions) * 100) : 0;
+
+              // Calculate potential impact on career matching
+              const impactScore = gap.importance === 'high' ? 85 : gap.importance === 'medium' ? 60 : 35;
+
+              return (
+                <div
+                  key={index}
+                  className="bg-gray-800/60 rounded-lg border border-gray-700 hover:border-blue-500/50 transition-all p-5 group"
+                >
+                  {/* Header with importance and impact */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                        gap.importance === 'high' ? 'bg-red-500/20 text-red-300 border border-red-500/30' :
+                        gap.importance === 'medium' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
+                        'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                      }`}>
+                        {gap.importance} priority
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {getAreaLabel(gap.area)}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500">Potential Impact</div>
+                        <div className={`text-lg font-bold ${
+                          impactScore >= 80 ? 'text-green-400' :
+                          impactScore >= 50 ? 'text-yellow-400' :
+                          'text-blue-400'
+                        }`}>
+                          +{impactScore}%
+                        </div>
+                      </div>
+                      <div className="relative w-12 h-12">
+                        <svg className="transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#374151"
+                            strokeWidth="3"
+                          />
+                          <path
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#60A5FA"
+                            strokeWidth="3"
+                            strokeDasharray={`${confidencePercentage}, 100`}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-blue-400">
+                          {Math.round(confidencePercentage)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gap description */}
+                  <p className="text-base text-gray-200 mb-4 font-medium">{gap.gap}</p>
+
+                  {/* Suggested questions */}
+                  {gap.suggestedQuestions.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 mb-3">
+                        <svg className="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-sm font-semibold text-purple-300">Answer these to close the gap:</span>
+                      </div>
+                      <div className="space-y-2">
+                        {gap.suggestedQuestions.slice(0, 3).map((questionId, qIndex) => {
+                          const question = getQuestionById(questionId);
+                          if (!question) return null;
+
+                          return (
+                            <button
+                              key={qIndex}
+                              onClick={() => {
+                                // Check if already answered
+                                const state = engine.getState();
+                                if (state.responses[questionId]) {
+                                  alert('You\'ve already answered this question!');
+                                  return;
+                                }
+                                // Load this specific question
+                                setCurrentQuestions([question]);
+                                setCurrentQuestionIndex(0);
+                                resetResponse();
+                                // Scroll to question
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="w-full text-left p-3 bg-purple-900/20 hover:bg-purple-900/40 border border-purple-700/30 hover:border-purple-500/50 rounded-lg transition-all group/question"
+                            >
+                              <div className="flex items-start gap-3">
+                                <svg className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5 group-hover/question:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                                <div className="flex-1">
+                                  <p className="text-sm text-gray-200 group-hover/question:text-purple-200 transition-colors">{question.text}</p>
+                                  <div className="flex items-center gap-2 mt-1.5">
+                                    <span className="text-xs text-purple-400/60">{question.type}</span>
+                                    {engine.getState().responses[questionId] && (
+                                      <span className="text-xs text-green-400 flex items-center gap-1">
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        Answered
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {gap.suggestedQuestions.length > 3 && (
+                        <p className="text-xs text-gray-500 mt-2 ml-6">+{gap.suggestedQuestions.length - 3} more questions available</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Action hint */}
+                  <div className="mt-4 pt-3 border-t border-gray-700/50 flex items-center gap-2 text-xs text-gray-400">
+                    <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Click any question above to answer it now and improve your career matches</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
