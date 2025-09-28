@@ -2,12 +2,24 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { CareerFitScore, LiveCareerUpdate } from '@/lib/matching/realtime-career-matcher';
+import { ExplorationArea } from '@/lib/adaptive-questions/question-banks';
+import { IdentifiedGap } from '@/lib/adaptive-questions/adaptive-engine';
+
+interface ExplorationProgress {
+  area: ExplorationArea;
+  depth: number;
+  totalQuestions: number;
+  label: string;
+}
 
 interface LiveCareerMatchesPanelProps {
   topCareers: CareerFitScore[];
   risingCareers: CareerFitScore[];
   latestUpdate?: LiveCareerUpdate;
   dataCompleteness?: number;
+  explorationProgress?: ExplorationProgress[];
+  gaps?: IdentifiedGap[];
+  totalResponses?: number;
 }
 
 function AnimatedNumber({ value, duration = 600 }: { value: number; duration?: number }) {
@@ -52,11 +64,15 @@ export function LiveCareerMatchesPanel({
   risingCareers,
   latestUpdate,
   dataCompleteness = 0,
+  explorationProgress = [],
+  gaps = [],
+  totalResponses = 0,
 }: LiveCareerMatchesPanelProps) {
   const [animatingScores, setAnimatingScores] = useState<Set<string>>(new Set());
   const [previousScores, setPreviousScores] = useState<Map<string, number>>(new Map());
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [scoreChanges, setScoreChanges] = useState<Map<string, number>>(new Map());
+  const [showDataQualityDetail, setShowDataQualityDetail] = useState(false);
 
   useEffect(() => {
     if (latestUpdate) {
@@ -166,8 +182,16 @@ export function LiveCareerMatchesPanel({
             </div>
           </div>
           <p className="text-xs text-blue-100 mt-1 mb-2 hidden sm:block">Building your profile dynamically</p>
-          <div className="flex items-center justify-between text-xs pt-2 border-t border-white/10">
-            <span className="text-white/80">Data Quality</span>
+          <button
+            onClick={() => setShowDataQualityDetail(!showDataQualityDetail)}
+            className="w-full flex items-center justify-between text-xs pt-2 border-t border-white/10 hover:bg-white/5 -mx-4 sm:-mx-5 px-4 sm:px-5 py-2 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-white/80">Data Quality</span>
+              <svg className={`w-3 h-3 text-white/60 transition-transform ${showDataQualityDetail ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
             <div className="flex items-center gap-2">
               <div className="w-20 h-1.5 bg-white/20 rounded-full overflow-hidden">
                 <div
@@ -177,8 +201,148 @@ export function LiveCareerMatchesPanel({
               </div>
               <span className="text-white font-medium">{dataCompleteness}%</span>
             </div>
-          </div>
+          </button>
         </div>
+
+        {/* Enhanced Data Quality Breakdown */}
+        {showDataQualityDetail && (
+          <div className="px-4 sm:px-5 py-4 bg-gray-900/50 border-b border-gray-700/50">
+            <div className="space-y-4">
+              {/* Overall Progress */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-gray-300">Overall Progress</span>
+                  <span className="text-xs text-gray-400">{totalResponses} responses</span>
+                </div>
+                <div className="space-y-1.5 text-xs text-gray-400">
+                  {totalResponses < 10 && (
+                    <p className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      Answer <strong className="text-yellow-300">{Math.max(0, 10 - totalResponses)} more</strong> to see initial matches
+                    </p>
+                  )}
+                  {totalResponses >= 10 && totalResponses < 20 && (
+                    <p className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      Answer <strong className="text-blue-300">{Math.max(0, 20 - totalResponses)} more</strong> for better accuracy
+                    </p>
+                  )}
+                  {totalResponses >= 20 && totalResponses < 35 && (
+                    <p className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Good progress! <strong className="text-green-300">{Math.max(0, 35 - totalResponses)} more</strong> for high confidence
+                    </p>
+                  )}
+                  {totalResponses >= 35 && (
+                    <p className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-green-300 font-semibold">Excellent data coverage!</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Exploration Areas */}
+              {explorationProgress.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-300 mb-2">Exploration Areas</h4>
+                  <div className="space-y-2">
+                    {explorationProgress
+                      .sort((a, b) => {
+                        const aPercent = a.totalQuestions > 0 ? a.depth / a.totalQuestions : 0;
+                        const bPercent = b.totalQuestions > 0 ? b.depth / b.totalQuestions : 0;
+                        return aPercent - bPercent;
+                      })
+                      .slice(0, 4)
+                      .map((area) => {
+                        const percentage = area.totalQuestions > 0 ? Math.min(100, (area.depth / area.totalQuestions) * 100) : 0;
+                        const isLow = percentage < 30;
+                        const isMedium = percentage >= 30 && percentage < 70;
+
+                        return (
+                          <div key={area.area} className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className={`font-medium ${isLow ? 'text-orange-300' : isMedium ? 'text-blue-300' : 'text-green-300'}`}>
+                                {area.label}
+                              </span>
+                              <span className="text-gray-500">{area.depth}/{area.totalQuestions}</span>
+                            </div>
+                            <div className="h-1 bg-gray-700/50 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full transition-all duration-500 ${
+                                  isLow ? 'bg-gradient-to-r from-orange-500 to-red-500' :
+                                  isMedium ? 'bg-gradient-to-r from-blue-500 to-cyan-500' :
+                                  'bg-gradient-to-r from-green-500 to-emerald-500'
+                                }`}
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
+              {/* Priority Areas to Explore */}
+              {gaps.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-300 mb-2 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Priority Questions
+                  </h4>
+                  <div className="space-y-2">
+                    {gaps.slice(0, 2).map((gap, idx) => (
+                      <div key={idx} className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-2.5">
+                        <div className="flex items-start gap-2">
+                          <div className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex-shrink-0 ${
+                            gap.importance === 'high' ? 'bg-red-500/20 text-red-300' :
+                            gap.importance === 'medium' ? 'bg-orange-500/20 text-orange-300' :
+                            'bg-blue-500/20 text-blue-300'
+                          }`}>
+                            {gap.importance}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-300 leading-relaxed">{gap.gap}</p>
+                            <p className="text-[10px] text-gray-500 mt-1">Would improve {gap.suggestedQuestions.length} match factor{gap.suggestedQuestions.length !== 1 ? 's' : ''}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recommendation */}
+              <div className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border border-cyan-700/30 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <svg className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  <div className="text-xs text-gray-300 leading-relaxed">
+                    {explorationProgress.length > 0 && explorationProgress.some(a => a.depth === 0) ? (
+                      <span>Focus on <strong className="text-cyan-300">{explorationProgress.find(a => a.depth === 0)?.label}</strong> to unlock new career matches</span>
+                    ) : gaps.length > 0 ? (
+                      <span>Answer <strong className="text-cyan-300">{gaps[0].area.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</strong> questions for better matching accuracy</span>
+                    ) : (
+                      <span>Keep answering questions to refine your matches!</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="p-3 sm:p-4 lg:p-5 space-y-2 sm:space-y-3">
           {topCareers.length === 0 ? (

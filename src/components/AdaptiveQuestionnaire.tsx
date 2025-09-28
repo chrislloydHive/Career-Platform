@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { AdaptiveQuestioningEngine, DiscoveredInsight, IdentifiedGap } from '@/lib/adaptive-questions/adaptive-engine';
 import { SynthesizedInsight } from '@/lib/adaptive-questions/insight-synthesis';
 import { AdaptiveQuestion, ExplorationArea, getQuestionById } from '@/lib/adaptive-questions/question-banks';
+import { ConsistencyPattern, PreferenceIntensity, ValueHierarchy, Contradiction, HiddenMotivation } from '@/lib/adaptive-questions/pattern-recognition';
 import { InteractiveInsightCards } from './InteractiveInsightCards';
 import { UserProfile } from '@/types/user-profile';
 import { RealtimeCareerMatcher, LiveCareerUpdate, CareerFitScore } from '@/lib/matching/realtime-career-matcher';
@@ -69,6 +70,24 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [isSmartQuestion, setIsSmartQuestion] = useState(false);
   const [questionSource, setQuestionSource] = useState<'base' | 'followup' | 'gap'>('base');
   const [showConfidenceWidget, setShowConfidenceWidget] = useState(false);
+  const [showPatternHistory, setShowPatternHistory] = useState(false);
+
+  const [consistencyPatterns, setConsistencyPatterns] = useState<ConsistencyPattern[]>([]);
+  const [preferenceIntensities, setPreferenceIntensities] = useState<PreferenceIntensity[]>([]);
+  const [valueHierarchy, setValueHierarchy] = useState<ValueHierarchy | null>(null);
+  const [contradictions, setContradictions] = useState<Contradiction[]>([]);
+  const [hiddenMotivations, setHiddenMotivations] = useState<HiddenMotivation[]>([]);
+
+  const [showPatternNotification, setShowPatternNotification] = useState(false);
+  const [latestPattern, setLatestPattern] = useState<{
+    type: 'consistency' | 'preference' | 'value' | 'contradiction' | 'motivation';
+    data: ConsistencyPattern | PreferenceIntensity | ValueHierarchy | Contradiction | HiddenMotivation;
+  } | null>(null);
+  const [patternHistory, setPatternHistory] = useState<Array<{
+    type: 'consistency' | 'preference' | 'value' | 'contradiction' | 'motivation';
+    data: ConsistencyPattern | PreferenceIntensity | ValueHierarchy | Contradiction | HiddenMotivation;
+    timestamp: Date;
+  }>>([]);
 
   useEffect(() => {
     loadSavedState();
@@ -113,6 +132,14 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           }
           setNarrativeInsights(data.narrativeInsights || []);
           setConfidenceEvolutions(data.confidenceEvolutions || []);
+
+          // Load pattern data from the engine state
+          const engineState = engine.getState();
+          setConsistencyPatterns(engineState.consistencyPatterns);
+          setPreferenceIntensities(engineState.preferenceIntensities);
+          setValueHierarchy(engineState.valueHierarchy);
+          setContradictions(engineState.contradictions);
+          setHiddenMotivations(engineState.hiddenMotivations);
 
           const nextQuestions = engine.getNextQuestions(1);
           if (nextQuestions.length > 0) {
@@ -320,6 +347,57 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     setSynthesizedInsights(engine.getSynthesizedInsights());
     setGaps(engine.getGaps());
 
+    const responseCount = Object.keys(engine.getState().responses).length;
+    if (responseCount >= 3) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      setProcessingMessage('Detecting patterns...');
+
+      const patternAnalysis = engine.getPatternAnalysis();
+      const prevConsistency = consistencyPatterns.length;
+      const prevPreferences = preferenceIntensities.length;
+      const prevContradictions = contradictions.length;
+      const prevMotivations = hiddenMotivations.length;
+
+      setConsistencyPatterns(patternAnalysis.consistencyPatterns);
+      setPreferenceIntensities(patternAnalysis.preferenceIntensities);
+      setValueHierarchy(patternAnalysis.valueHierarchy);
+      setContradictions(patternAnalysis.contradictions);
+      setHiddenMotivations(patternAnalysis.hiddenMotivations);
+
+      if (patternAnalysis.consistencyPatterns.length > prevConsistency) {
+        const newPattern = patternAnalysis.consistencyPatterns[patternAnalysis.consistencyPatterns.length - 1];
+        setLatestPattern({ type: 'consistency', data: newPattern });
+        setPatternHistory(prev => [...prev, { type: 'consistency', data: newPattern, timestamp: new Date() }]);
+        setShowPatternNotification(true);
+        setTimeout(() => setShowPatternNotification(false), 6000);
+      } else if (patternAnalysis.preferenceIntensities.length > prevPreferences) {
+        const newPref = patternAnalysis.preferenceIntensities[patternAnalysis.preferenceIntensities.length - 1];
+        if (newPref.intensity === 'strong') {
+          setLatestPattern({ type: 'preference', data: newPref });
+          setPatternHistory(prev => [...prev, { type: 'preference', data: newPref, timestamp: new Date() }]);
+          setShowPatternNotification(true);
+          setTimeout(() => setShowPatternNotification(false), 6000);
+        }
+      } else if (patternAnalysis.contradictions.length > prevContradictions) {
+        const newContradiction = patternAnalysis.contradictions[patternAnalysis.contradictions.length - 1];
+        setLatestPattern({ type: 'contradiction', data: newContradiction });
+        setPatternHistory(prev => [...prev, { type: 'contradiction', data: newContradiction, timestamp: new Date() }]);
+        setShowPatternNotification(true);
+        setTimeout(() => setShowPatternNotification(false), 6000);
+      } else if (patternAnalysis.hiddenMotivations.length > prevMotivations) {
+        const newMotivation = patternAnalysis.hiddenMotivations[patternAnalysis.hiddenMotivations.length - 1];
+        setLatestPattern({ type: 'motivation', data: newMotivation });
+        setPatternHistory(prev => [...prev, { type: 'motivation', data: newMotivation, timestamp: new Date() }]);
+        setShowPatternNotification(true);
+        setTimeout(() => setShowPatternNotification(false), 6000);
+      } else if (patternAnalysis.valueHierarchy && !valueHierarchy && patternAnalysis.valueHierarchy.topValues.length > 0) {
+        setLatestPattern({ type: 'value', data: patternAnalysis.valueHierarchy });
+        setPatternHistory(prev => [...prev, { type: 'value', data: patternAnalysis.valueHierarchy!, timestamp: new Date() }]);
+        setShowPatternNotification(true);
+        setTimeout(() => setShowPatternNotification(false), 6000);
+      }
+    }
+
     if (newInsights.length >= 2 && userProfile) {
       const narrativeGen = new NarrativeInsightGenerator(
         userProfile,
@@ -364,7 +442,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     }
 
     // Generate AI career suggestions periodically
-    const responseCount = Object.keys(engine.getState().responses).length;
     if (responseCount >= 8 && (responseCount - 8) % 5 === 0) {
       generateAiSuggestions();
     }
@@ -482,10 +559,167 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   };
 
   const handleComplete = () => {
+    // Ensure all analysis is up to date before exporting
+    const state = engine.getState();
+    console.log('Exporting profile with:', {
+      responses: Object.keys(state.responses).length,
+      insights: state.discoveredInsights.length,
+      synthesizedInsights: state.synthesizedInsights.length,
+      patterns: state.consistencyPatterns.length,
+      motivations: state.hiddenMotivations.length,
+      valueHierarchy: state.valueHierarchy,
+    });
+
     const profile = engine.exportProfile();
+    console.log('Exported profile:', {
+      completion: profile.completion,
+      synthesizedInsights: profile.synthesizedInsights.length,
+      patterns: profile.patterns.consistencyPatterns.length,
+      motivations: profile.patterns.hiddenMotivations.length,
+      valueHierarchy: profile.patterns.valueHierarchy,
+      topValues: profile.patterns.valueHierarchy?.topValues.length || 0,
+    });
+
     onComplete?.(profile);
   };
 
+
+  const getContextualIntro = (question: AdaptiveQuestion): string | null => {
+    const responses = engine.getState().responses;
+    const recentResponses = Object.entries(responses).slice(-5);
+
+    // Check for related previous answers
+    for (const [questionId, response] of recentResponses) {
+      const prevQuestion = getQuestionById(questionId);
+      if (!prevQuestion) continue;
+
+      // Look for related topics within same area
+      if (question.area === prevQuestion.area) {
+        // Work style connections
+        if (question.text.toLowerCase().includes('routine') &&
+            prevQuestion.text.toLowerCase().includes('structure')) {
+          return `You mentioned your structure preferences — let's explore routine...`;
+        }
+        if (question.text.toLowerCase().includes('focus') &&
+            prevQuestion.text.toLowerCase().includes('day')) {
+          return `Building on how you structure your day...`;
+        }
+        if (question.text.toLowerCase().includes('energy') &&
+            prevQuestion.text.toLowerCase().includes('time')) {
+          return `Following up on your time preferences...`;
+        }
+
+        // People interaction connections
+        if (question.text.toLowerCase().includes('team') &&
+            (prevQuestion.text.toLowerCase().includes('help') ||
+             prevQuestion.text.toLowerCase().includes('colleague'))) {
+          return `You shared how you help colleagues — now about team dynamics...`;
+        }
+        if (question.text.toLowerCase().includes('conflict') &&
+            prevQuestion.text.toLowerCase().includes('team')) {
+          return `Continuing on team interactions...`;
+        }
+
+        // Problem solving connections
+        if (question.text.toLowerCase().includes('solution') &&
+            prevQuestion.text.toLowerCase().includes('problem')) {
+          return `Based on your problem-solving approach...`;
+        }
+
+        // Learning and growth connections
+        if (question.text.toLowerCase().includes('learn') &&
+            prevQuestion.text.toLowerCase().includes('skill')) {
+          return `You mentioned your skills — let's explore learning...`;
+        }
+        if (question.text.toLowerCase().includes('feedback') &&
+            prevQuestion.text.toLowerCase().includes('growth')) {
+          return `Following up on your growth preferences...`;
+        }
+
+        // Environment connections
+        if (question.text.toLowerCase().includes('environment') &&
+            prevQuestion.text.toLowerCase().includes('work')) {
+          return `Since you mentioned your work style...`;
+        }
+        if (question.text.toLowerCase().includes('space') &&
+            prevQuestion.text.toLowerCase().includes('setting')) {
+          return `Building on your setting preferences...`;
+        }
+
+        // Values connections
+        if (question.text.toLowerCase().includes('value') &&
+            prevQuestion.text.toLowerCase().includes('important')) {
+          return `You shared what's important to you...`;
+        }
+        if (question.text.toLowerCase().includes('impact') &&
+            prevQuestion.text.toLowerCase().includes('work')) {
+          return `Let's explore the impact side of your work...`;
+        }
+      }
+
+      // Cross-area connections
+      if (question.area !== prevQuestion.area) {
+        // Connect work style to people interaction
+        if (question.area === 'people-interaction' &&
+            prevQuestion.area === 'work-style' &&
+            response.response === 'flexible-flow') {
+          return `You prefer flexible work — let's see how that applies to working with others...`;
+        }
+        // Connect people interaction to work style
+        if (question.area === 'work-style' &&
+            prevQuestion.area === 'people-interaction' &&
+            String(response.response).includes('solo')) {
+          return `You mentioned preferring independent work — let's explore your work style...`;
+        }
+      }
+    }
+
+    // Check for follow-up questions - get specific reason if available
+    if (question.followUpConditions && question.followUpConditions.length > 0) {
+      // Try to find the most recent response that triggered this follow-up
+      const recentQuestionIds = recentResponses.map(([id]) => id);
+      for (const [prevQuestionId, response] of recentResponses.reverse()) {
+        const prevQuestion = getQuestionById(prevQuestionId);
+        if (!prevQuestion?.followUpConditions) continue;
+
+        for (const condition of prevQuestion.followUpConditions) {
+          if (condition.if(response.response) && condition.then.includes(question.id)) {
+            return `Based on your previous answer...`;
+          }
+        }
+      }
+      return `Based on your previous answer...`;
+    }
+
+    return null;
+  };
+
+  const getWhyAsking = (question: AdaptiveQuestion): string => {
+    const areaDescriptions: Record<ExplorationArea, string> = {
+      'work-style': 'Your work preferences reveal which environments you\'ll thrive in',
+      'people-interaction': 'Understanding how you work with others helps match you to the right team dynamics',
+      'problem-solving': 'Your problem-solving approach shows which types of challenges suit you best',
+      'creativity': 'Knowing your creative style helps identify roles where innovation matters',
+      'structure-flexibility': 'Your preference for structure vs. flexibility indicates compatible work environments',
+      'values': 'Understanding what drives you helps match careers aligned with your core values',
+      'environment': 'Your environmental preferences reveal where you\'ll feel most comfortable and productive',
+      'learning-growth': 'How you learn and grow shows which career paths offer the development you need',
+    };
+
+    // Check if it's a follow-up question
+    if (question.followUpConditions && question.followUpConditions.length > 0) {
+      return 'This helps us understand the nuances of your previous response';
+    }
+
+    // Check if we're filling a gap
+    const gaps = engine.getGaps();
+    const relatedGap = gaps.find(gap => gap.area === question.area);
+    if (relatedGap && relatedGap.suggestedQuestions.includes(question.id)) {
+      return `This fills a gap in our understanding of your ${getAreaLabel(question.area).toLowerCase()}`;
+    }
+
+    return areaDescriptions[question.area] || 'This helps build your career profile';
+  };
 
   const getAreaLabel = (area: ExplorationArea) => {
     return area.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -812,6 +1046,137 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )}
 
+      {/* Pattern Detection Notification */}
+      {showPatternNotification && latestPattern && (
+        <div className="fixed top-4 right-4 left-4 sm:left-auto z-50 animate-slide-in-right">
+          <div className={`rounded-xl shadow-2xl p-4 sm:p-5 max-w-md border-2 relative overflow-hidden ${
+            latestPattern.type === 'consistency' ? 'bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 border-purple-400/60' :
+            latestPattern.type === 'preference' ? 'bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800 border-indigo-400/60' :
+            latestPattern.type === 'value' ? 'bg-gradient-to-br from-pink-600 via-pink-700 to-pink-800 border-pink-400/60' :
+            latestPattern.type === 'contradiction' ? 'bg-gradient-to-br from-orange-600 via-orange-700 to-orange-800 border-orange-400/60' :
+            'bg-gradient-to-br from-cyan-600 via-cyan-700 to-cyan-800 border-cyan-400/60'
+          }`}>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer pointer-events-none" />
+
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+              <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-ping" />
+              <div className="absolute top-4 right-8 w-1.5 h-1.5 bg-white/80 rounded-full animate-ping" style={{ animationDelay: '100ms' }} />
+              <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-white/80 rounded-full animate-ping" style={{ animationDelay: '200ms' }} />
+            </div>
+
+            <div className="flex items-start gap-3 relative">
+              <div className={`p-2.5 rounded-xl animate-pulse-subtle ${
+                latestPattern.type === 'consistency' ? 'bg-purple-400/30' :
+                latestPattern.type === 'preference' ? 'bg-indigo-400/30' :
+                latestPattern.type === 'value' ? 'bg-pink-400/30' :
+                latestPattern.type === 'contradiction' ? 'bg-orange-400/30' :
+                'bg-cyan-400/30'
+              }`}>
+                {latestPattern.type === 'consistency' && (
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+                {latestPattern.type === 'preference' && (
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                )}
+                {latestPattern.type === 'value' && (
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                )}
+                {latestPattern.type === 'contradiction' && (
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                )}
+                {latestPattern.type === 'motivation' && (
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                )}
+              </div>
+
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-xs font-bold text-white/90 uppercase tracking-wider px-2 py-0.5 bg-white/20 rounded">
+                    {latestPattern.type === 'consistency' && '✓ Pattern Detected'}
+                    {latestPattern.type === 'preference' && '⚡ Strong Preference'}
+                    {latestPattern.type === 'value' && '★ Core Value'}
+                    {latestPattern.type === 'contradiction' && '⚠ Interesting Tension'}
+                    {latestPattern.type === 'motivation' && '💡 Hidden Driver'}
+                  </span>
+                </div>
+                <p className="text-base text-white font-semibold leading-snug mb-2">
+                  {latestPattern.type === 'consistency' && `${(latestPattern.data as ConsistencyPattern).theme.replace('-', ' ')} across ${getAreaLabel((latestPattern.data as ConsistencyPattern).area)}`}
+                  {latestPattern.type === 'preference' && (latestPattern.data as PreferenceIntensity).preference}
+                  {latestPattern.type === 'value' && `Top value: ${(latestPattern.data as ValueHierarchy).topValues[0]?.value}`}
+                  {latestPattern.type === 'contradiction' && (latestPattern.data as Contradiction).possibleReasons[0]}
+                  {latestPattern.type === 'motivation' && (latestPattern.data as HiddenMotivation).motivation}
+                </p>
+
+                {latestPattern.type === 'consistency' && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="flex-1 bg-white/20 rounded-full h-2.5 border border-white/20">
+                      <div
+                        className="bg-gradient-to-r from-purple-300 to-purple-400 h-full rounded-full transition-all duration-700 shadow-lg shadow-purple-400/50 animate-grow-width"
+                        style={{ width: `${(latestPattern.data as ConsistencyPattern).confidence * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-white/90 font-bold px-2 py-0.5 bg-white/20 rounded-full">
+                      {Math.round((latestPattern.data as ConsistencyPattern).confidence * 100)}%
+                    </span>
+                  </div>
+                )}
+
+                {latestPattern.type === 'preference' && (
+                  <div className="mt-2 text-xs text-white/80">
+                    <span className={`px-2 py-1 rounded-full font-semibold ${
+                      (latestPattern.data as PreferenceIntensity).intensity === 'strong' ? 'bg-indigo-400/30 text-white' :
+                      (latestPattern.data as PreferenceIntensity).intensity === 'moderate' ? 'bg-indigo-400/20 text-white/90' :
+                      'bg-indigo-400/10 text-white/70'
+                    }`}>
+                      {(latestPattern.data as PreferenceIntensity).intensity.toUpperCase()} INTENSITY
+                    </span>
+                  </div>
+                )}
+
+                {latestPattern.type === 'contradiction' && (
+                  <div className="mt-2 text-xs text-orange-100">
+                    This isn't necessarily bad - it might reveal contextual preferences!
+                  </div>
+                )}
+
+                {latestPattern.type === 'motivation' && (
+                  <div className="mt-2 text-xs text-cyan-100">
+                    {(latestPattern.data as HiddenMotivation).insight}
+                  </div>
+                )}
+
+                <div className="mt-3 flex items-center gap-2">
+                  <svg className="w-3.5 h-3.5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="text-xs text-white/80">
+                    Detected from {Object.keys(engine.getState().responses).length} responses
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPatternNotification(false)}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* AI Career Suggestion Notification */}
       {/* {showNewSuggestion && latestSuggestion && (
         <div className="fixed top-20 right-4 left-4 sm:left-auto z-50 animate-slide-in-right">
@@ -944,6 +1309,23 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                     <div className="text-2xl font-bold text-cyan-400">{Math.round(evolutionSummary.selfDiscoveryProgress * 100)}%</div>
                   </div>
                   <div className="text-xs text-gray-500 group-hover:text-gray-400">confidence</div>
+                </button>
+              )}
+              {patternHistory.length > 0 && (
+                <button
+                  onClick={() => setShowPatternHistory(!showPatternHistory)}
+                  className="border-l border-gray-700 pl-4 hover:bg-gray-800/50 px-3 py-2 rounded-lg transition-all group relative"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="text-2xl font-bold text-purple-400">{patternHistory.length}</div>
+                  </div>
+                  <div className="text-xs text-gray-500 group-hover:text-gray-400">patterns</div>
+                  {patternHistory.length > 0 && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full animate-pulse" />
+                  )}
                 </button>
               )}
             </div>
@@ -1084,6 +1466,138 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )}
 
+      {/* Pattern History Panel */}
+      {showPatternHistory && patternHistory.length > 0 && (
+        <div className="mb-6 bg-gradient-to-br from-purple-900/30 via-indigo-900/20 to-purple-900/30 rounded-xl border-2 border-purple-500/40 p-5 animate-slide-in-right">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-purple-100 flex items-center gap-2">
+              <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Pattern Recognition
+            </h3>
+            <button
+              onClick={() => setShowPatternHistory(false)}
+              className="text-gray-400 hover:text-gray-300"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <p className="text-sm text-gray-300 mb-4">
+            As you answer questions, the system detects patterns in your responses. These reveal consistent themes, strong preferences, and hidden motivations.
+          </p>
+
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {patternHistory.slice().reverse().map((item, idx) => (
+              <div
+                key={idx}
+                className={`p-4 rounded-lg border-l-4 ${
+                  item.type === 'consistency' ? 'bg-purple-900/20 border-purple-500' :
+                  item.type === 'preference' ? 'bg-indigo-900/20 border-indigo-500' :
+                  item.type === 'value' ? 'bg-pink-900/20 border-pink-500' :
+                  item.type === 'contradiction' ? 'bg-orange-900/20 border-orange-500' :
+                  'bg-cyan-900/20 border-cyan-500'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`p-2 rounded-lg ${
+                    item.type === 'consistency' ? 'bg-purple-500/20' :
+                    item.type === 'preference' ? 'bg-indigo-500/20' :
+                    item.type === 'value' ? 'bg-pink-500/20' :
+                    item.type === 'contradiction' ? 'bg-orange-500/20' :
+                    'bg-cyan-500/20'
+                  }`}>
+                    {item.type === 'consistency' && (
+                      <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                    {item.type === 'preference' && (
+                      <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    )}
+                    {item.type === 'value' && (
+                      <svg className="w-5 h-5 text-pink-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    )}
+                    {item.type === 'contradiction' && (
+                      <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    )}
+                    {item.type === 'motivation' && (
+                      <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-white/70 uppercase tracking-wider">
+                        {item.type === 'consistency' && 'Consistency Pattern'}
+                        {item.type === 'preference' && 'Strong Preference'}
+                        {item.type === 'value' && 'Core Value'}
+                        {item.type === 'contradiction' && 'Interesting Tension'}
+                        {item.type === 'motivation' && 'Hidden Motivation'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-gray-200 font-medium mb-2">
+                      {item.type === 'consistency' && `${(item.data as ConsistencyPattern).theme.replace('-', ' ')} pattern in ${getAreaLabel((item.data as ConsistencyPattern).area)}`}
+                      {item.type === 'preference' && (item.data as PreferenceIntensity).preference}
+                      {item.type === 'value' && `Core value: ${(item.data as ValueHierarchy).topValues[0]?.value}`}
+                      {item.type === 'contradiction' && (item.data as Contradiction).possibleReasons[0]}
+                      {item.type === 'motivation' && (item.data as HiddenMotivation).motivation}
+                    </p>
+
+                    {item.type === 'consistency' && (
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 bg-white/10 rounded-full h-1.5">
+                          <div
+                            className="bg-purple-400 h-full rounded-full"
+                            style={{ width: `${(item.data as ConsistencyPattern).confidence * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-purple-300 font-semibold">
+                          {Math.round((item.data as ConsistencyPattern).confidence * 100)}%
+                        </span>
+                      </div>
+                    )}
+
+                    {item.type === 'preference' && (
+                      <div className="text-xs">
+                        <span className={`px-2 py-0.5 rounded-full font-semibold ${
+                          (item.data as PreferenceIntensity).intensity === 'strong' ? 'bg-indigo-500/30 text-indigo-200' :
+                          (item.data as PreferenceIntensity).intensity === 'moderate' ? 'bg-indigo-500/20 text-indigo-300' :
+                          'bg-indigo-500/10 text-indigo-400'
+                        }`}>
+                          {(item.data as PreferenceIntensity).intensity.toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.type === 'motivation' && (
+                      <p className="text-xs text-cyan-200 italic">
+                        {(item.data as HiddenMotivation).insight}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* 8 Exploration Areas Progress */}
       <div className="mb-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-lg border border-blue-500/30 p-4">
         <div className="flex items-center justify-between mb-3">
@@ -1156,8 +1670,33 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs">
-                {currentQuestion.type}
+              <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs flex items-center gap-1.5">
+                {currentQuestion.type === 'scale' && (
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                )}
+                {currentQuestion.type === 'multiple-choice' && (
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                )}
+                {currentQuestion.type === 'scenario' && (
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                )}
+                {currentQuestion.type === 'open-ended' && (
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                )}
+                <span>
+                  {currentQuestion.type === 'scale' && 'Rate'}
+                  {currentQuestion.type === 'multiple-choice' && 'Choose one'}
+                  {currentQuestion.type === 'scenario' && 'Scenario'}
+                  {currentQuestion.type === 'open-ended' && 'Your thoughts'}
+                </span>
               </span>
               {currentQuestion.followUpConditions && currentQuestion.followUpConditions.length > 0 && (
                 <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-purple-900/30 text-purple-300 rounded-full text-xs flex items-center gap-1.5">
@@ -1176,9 +1715,28 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                 </span>
               )}
             </div>
+            {getContextualIntro(currentQuestion) && (
+              <div className="mb-3 flex items-center gap-2 text-sm text-blue-300/80 italic">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                {getContextualIntro(currentQuestion)}
+              </div>
+            )}
             <h2 className="text-lg sm:text-xl font-semibold text-gray-100 leading-relaxed">
               {currentQuestion.text}
             </h2>
+            <details className="mt-3 group">
+              <summary className="text-xs text-gray-500 hover:text-gray-400 cursor-pointer flex items-center gap-1.5 w-fit">
+                <svg className="w-3.5 h-3.5 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Why we're asking this
+              </summary>
+              <p className="mt-2 text-xs text-gray-400 bg-blue-900/10 border border-blue-700/20 rounded-lg p-3 leading-relaxed">
+                {getWhyAsking(currentQuestion)}
+              </p>
+            </details>
           </div>
         </div>
 
@@ -1327,15 +1885,18 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           </div>
 
           <div className="space-y-3">
-            {[...synthesizedInsights.slice(-2).reverse(), ...insights.slice(-3).reverse()].slice(0, 3).map((insight, index) => (
-              <ExpandableInsightCard
-                key={index}
-                insight={insight}
-                responses={engine.getState().responses}
-                topCareers={topCareers}
-                getAreaLabel={getAreaLabel}
-              />
-            ))}
+            {[...synthesizedInsights, ...insights]
+              .slice(-3)
+              .reverse()
+              .map((insight, index) => (
+                <ExpandableInsightCard
+                  key={index}
+                  insight={insight}
+                  responses={engine.getState().responses}
+                  topCareers={topCareers}
+                  getAreaLabel={getAreaLabel}
+                />
+              ))}
           </div>
 
           {(insights.length + synthesizedInsights.length) > 3 && (
@@ -1688,6 +2249,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               risingCareers={risingCareers}
               latestUpdate={latestUpdate}
               dataCompleteness={careerMatcher.getDataCompletenessPercentage()}
+              explorationProgress={explorationProgress}
+              gaps={gaps}
+              totalResponses={Object.keys(engine.getState().responses).length}
             />
           </div>
         )}
