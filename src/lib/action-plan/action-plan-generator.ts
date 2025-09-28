@@ -1,4 +1,9 @@
-import { CareerProfile } from '@/lib/storage/user-profile';
+import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
+import { CareerFitScore } from '@/lib/matching/realtime-career-matcher';
+
+type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
+  topCareers?: CareerFitScore[];
+};
 
 export interface ActionPlan {
   careersToResearch: {
@@ -41,7 +46,7 @@ export interface ActionPlan {
   }[];
 }
 
-export function generateActionPlan(profile: CareerProfile): ActionPlan {
+export function generateActionPlan(profile: ExportedProfile): ActionPlan {
   const strengths = profile.analysis.strengths || [];
   const preferences = profile.analysis.preferences || [];
   const hiddenInterests = profile.patterns?.hiddenMotivations || [];
@@ -251,7 +256,7 @@ function getKeyTitles(industry: string): string[] {
   return titles[industry] || ['Manager', 'Director', 'VP', 'C-Level'];
 }
 
-function generateJobSearchStrategies(profile: CareerProfile): ActionPlan['jobSearchStrategies'] {
+function generateJobSearchStrategies(profile: ExportedProfile): ActionPlan['jobSearchStrategies'] {
   return [
     {
       strategy: 'Targeted Application Strategy',
