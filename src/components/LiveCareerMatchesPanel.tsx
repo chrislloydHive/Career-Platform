@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CareerFitScore, LiveCareerUpdate } from '@/lib/matching/realtime-career-matcher';
 
 interface LiveCareerMatchesPanelProps {
@@ -8,6 +8,43 @@ interface LiveCareerMatchesPanelProps {
   risingCareers: CareerFitScore[];
   latestUpdate?: LiveCareerUpdate;
   dataCompleteness?: number;
+}
+
+function AnimatedNumber({ value, duration = 600 }: { value: number; duration?: number }) {
+  const [displayValue, setDisplayValue] = useState(value);
+  const frameRef = useRef<number>();
+  const startTimeRef = useRef<number>();
+  const startValueRef = useRef(value);
+
+  useEffect(() => {
+    startValueRef.current = displayValue;
+    startTimeRef.current = Date.now();
+
+    const animate = () => {
+      const now = Date.now();
+      const elapsed = now - (startTimeRef.current || now);
+      const progress = Math.min(elapsed / duration, 1);
+
+      const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+      const current = startValueRef.current + (value - startValueRef.current) * easeOutCubic;
+
+      setDisplayValue(current);
+
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
+    };
+  }, [value, duration]);
+
+  return <>{Math.round(displayValue)}</>;
 }
 
 export function LiveCareerMatchesPanel({
@@ -19,6 +56,7 @@ export function LiveCareerMatchesPanel({
   const [animatingScores, setAnimatingScores] = useState<Set<string>>(new Set());
   const [previousScores, setPreviousScores] = useState<Map<string, number>>(new Map());
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+  const [scoreChanges, setScoreChanges] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
     if (latestUpdate) {
@@ -31,24 +69,27 @@ export function LiveCareerMatchesPanel({
   useEffect(() => {
     const newAnimating = new Set<string>();
     const newPreviousScores = new Map(previousScores);
+    const newScoreChanges = new Map<string, number>();
 
     topCareers.forEach(career => {
       const prevScore = previousScores.get(career.careerTitle);
       if (prevScore !== undefined && prevScore !== career.currentScore) {
         newAnimating.add(career.careerTitle);
+        newScoreChanges.set(career.careerTitle, career.currentScore - prevScore);
         setTimeout(() => {
           setAnimatingScores(prev => {
             const next = new Set(prev);
             next.delete(career.careerTitle);
             return next;
           });
-        }, 800);
+        }, 1200);
       }
       newPreviousScores.set(career.careerTitle, career.currentScore);
     });
 
     setAnimatingScores(newAnimating);
     setPreviousScores(newPreviousScores);
+    setScoreChanges(newScoreChanges);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topCareers]);
 
@@ -150,28 +191,46 @@ export function LiveCareerMatchesPanel({
               <p className="text-xs sm:text-sm text-gray-400">Keep answering to see your matches!</p>
             </div>
           ) : (
-            topCareers.map((career, index) => (
+            topCareers.map((career, index) => {
+              const isAnimating = animatingScores.has(career.careerTitle);
+              const scoreChange = scoreChanges.get(career.careerTitle) || 0;
+              const isIncreasing = scoreChange > 0;
+              const isRapidlyRising = career.trend === 'rising' && scoreChange >= 8;
+
+              return (
               <div
                 key={career.careerTitle}
-                className={`group relative bg-gray-800/50 hover:bg-gray-800 rounded-lg p-3 sm:p-4 border border-gray-700 hover:border-blue-500/50 transition-all duration-300 ${
-                  animatingScores.has(career.careerTitle) ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
+                className={`group relative bg-gray-800/50 hover:bg-gray-800 rounded-lg p-3 sm:p-4 border transition-all duration-500 ${
+                  isAnimating
+                    ? isIncreasing
+                      ? 'border-green-400/60 ring-2 ring-green-400/30 shadow-lg shadow-green-400/20 animate-glow-green'
+                      : 'border-orange-400/60 ring-2 ring-orange-400/30 shadow-lg shadow-orange-400/20'
+                    : 'border-gray-700 hover:border-blue-500/50'
                 }`}
               >
-                <div className="flex items-start justify-between gap-3 mb-3">
+                {/* Animated background glow for rapidly rising careers */}
+                {isRapidlyRising && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/5 to-transparent animate-shimmer rounded-lg pointer-events-none" />
+                )}
+
+                <div className="flex items-start justify-between gap-3 mb-3 relative">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className={`text-xs font-bold ${getScoreColor(career.currentScore)}`}>
                         #{index + 1}
                       </span>
                       {getTrendIcon(career.trend)}
                       {career.trend === 'rising' && (
-                        <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-medium">
-                          Trending Up
+                        <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-medium flex items-center gap-1 animate-pulse-subtle">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                          </svg>
+                          {isRapidlyRising ? '🔥 Hot' : 'Trending'}
                         </span>
                       )}
                       {career.trend === 'new' && (
                         <span className="px-2 py-0.5 bg-cyan-500/20 text-cyan-400 rounded text-xs font-medium">
-                          New
+                          ✨ New
                         </span>
                       )}
                     </div>
@@ -182,13 +241,34 @@ export function LiveCareerMatchesPanel({
 
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-2">
+                      {/* Animated arrow indicator */}
+                      {isAnimating && Math.abs(scoreChange) >= 1 && (
+                        <div className={`animate-bounce ${isIncreasing ? 'text-green-400' : 'text-orange-400'}`}>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            {isIncreasing ? (
+                              <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                            ) : (
+                              <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            )}
+                          </svg>
+                        </div>
+                      )}
                       <span className={`text-2xl font-bold ${getScoreColor(career.currentScore)} transition-all ${
-                        animatingScores.has(career.careerTitle) ? 'scale-110' : 'scale-100'
+                        isAnimating ? 'scale-110' : 'scale-100'
                       }`}>
-                        {Math.round(career.currentScore)}%
+                        <AnimatedNumber value={career.currentScore} />%
                       </span>
                     </div>
-                    {getChangeIndicator(career.change)}
+                    {/* Enhanced change indicator */}
+                    {Math.abs(scoreChange) >= 0.5 && (
+                      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                        isIncreasing
+                          ? 'bg-green-500/20 text-green-300'
+                          : 'bg-orange-500/20 text-orange-300'
+                      }`}>
+                        {isIncreasing ? '↗' : '↘'} {isIncreasing ? '+' : ''}{Math.round(scoreChange)}%
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -238,7 +318,8 @@ export function LiveCareerMatchesPanel({
                   </div>
                 )}
               </div>
-            ))
+              );
+            })
           )}
         </div>
 
@@ -252,11 +333,20 @@ export function LiveCareerMatchesPanel({
             </div>
             <div className="space-y-2">
               {risingCareers.map(career => (
-                <div key={career.careerTitle} className="flex items-center justify-between text-xs">
-                  <span className="text-gray-300 truncate">{career.careerTitle}</span>
+                <div key={career.careerTitle} className="flex items-center justify-between text-xs bg-gray-800/30 rounded-lg p-2 hover:bg-gray-800/50 transition-colors">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <svg className="w-3.5 h-3.5 text-green-400 flex-shrink-0 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-gray-200 truncate font-medium">{career.careerTitle}</span>
+                  </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-green-400 font-bold">+{Math.round(career.change)}%</span>
-                    <span className="text-gray-400">{Math.round(career.currentScore)}%</span>
+                    <span className="text-green-400 font-bold px-2 py-0.5 bg-green-500/10 rounded-full">
+                      +<AnimatedNumber value={career.change} />%
+                    </span>
+                    <span className="text-gray-300 font-semibold">
+                      <AnimatedNumber value={career.currentScore} />%
+                    </span>
                   </div>
                 </div>
               ))}
