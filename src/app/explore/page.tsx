@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
@@ -178,12 +179,12 @@ export default function ExplorePage() {
                 </div>
               )}
             </div>
-            <a
+            <Link
               href="/assessments"
               className="text-gray-400 hover:text-gray-300 text-sm transition-colors"
             >
               View Saved Assessments →
-            </a>
+            </Link>
           </div>
 
           {/* Summary Stats */}

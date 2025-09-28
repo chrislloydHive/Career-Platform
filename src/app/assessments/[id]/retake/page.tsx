@@ -4,18 +4,19 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
+import Link from 'next/link';
 
 type SavedProfile = {
-  responses: any;
-  insights: any[];
-  synthesizedInsights: any[];
-  gaps: any[];
-  authenticityProfile: any;
-  narrativeInsights: any[];
-  confidenceEvolutions: any[];
-  patterns: any;
-  analysis: any;
-  topCareers: any[];
+  responses: Record<string, unknown>;
+  insights: unknown[];
+  synthesizedInsights: unknown[];
+  gaps: unknown[];
+  authenticityProfile: Record<string, unknown>;
+  narrativeInsights: unknown[];
+  confidenceEvolutions: unknown[];
+  patterns: Record<string, unknown>;
+  analysis: Record<string, unknown>;
+  topCareers: unknown[];
   completion: number;
 };
 
@@ -137,12 +138,12 @@ export default function RetakeAssessmentPage() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-16">
             <div className="text-red-400 mb-4">{error || 'Assessment not found'}</div>
-            <a
+            <Link
               href="/assessments"
               className="text-blue-400 hover:text-blue-300 transition-colors"
             >
               ← Back to Assessments
-            </a>
+            </Link>
           </div>
         </main>
       </div>

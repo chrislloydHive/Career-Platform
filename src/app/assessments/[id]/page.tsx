@@ -8,18 +8,19 @@ import { generateCareerPaths } from '@/lib/career-paths/career-path-generator';
 import { ActionPlan } from '@/components/ActionPlan';
 import { generateActionPlan } from '@/lib/action-plan/action-plan-generator';
 import { SkillsGapAnalysis } from '@/components/SkillsGapAnalysis';
+import Link from 'next/link';
 
 type SavedProfile = {
-  responses: any;
-  insights: any[];
-  synthesizedInsights: any[];
-  gaps: any[];
-  authenticityProfile: any;
-  narrativeInsights: any[];
-  confidenceEvolutions: any[];
-  patterns: any;
-  analysis: any;
-  topCareers: any[];
+  responses: Record<string, unknown>;
+  insights: Array<{ confidence: number; [key: string]: unknown }>;
+  synthesizedInsights: Array<{ type: string; title: string; description: string; implications: string[]; [key: string]: unknown }>;
+  gaps: unknown[];
+  authenticityProfile: Record<string, unknown>;
+  narrativeInsights: unknown[];
+  confidenceEvolutions: unknown[];
+  patterns: Record<string, unknown>;
+  analysis: { strengths?: string[]; [key: string]: unknown };
+  topCareers: Array<{ title: string; match: number; [key: string]: unknown }>;
   completion: number;
 };
 
@@ -37,7 +38,6 @@ export default function AssessmentDetailPage() {
   const [assessment, setAssessment] = useState<SavedAssessment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedInsights, setExpandedInsights] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (params.id) {
@@ -61,17 +61,6 @@ export default function AssessmentDetailPage() {
     }
   };
 
-  const toggleInsightExpansion = (index: number) => {
-    setExpandedInsights(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(index)) {
-        newSet.delete(index);
-      } else {
-        newSet.add(index);
-      }
-      return newSet;
-    });
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -109,12 +98,12 @@ export default function AssessmentDetailPage() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-16">
             <div className="text-red-400 mb-4">{error || 'Assessment not found'}</div>
-            <a
+            <Link
               href="/assessments"
               className="text-blue-400 hover:text-blue-300 transition-colors"
             >
               ← Back to Assessments
-            </a>
+            </Link>
           </div>
         </main>
       </div>
@@ -157,12 +146,12 @@ export default function AssessmentDetailPage() {
               </svg>
               Retake Assessment
             </a>
-            <a
+            <Link
               href="/assessments"
               className="text-gray-400 hover:text-gray-300 transition-colors px-3 py-2"
             >
               ← All Assessments
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -197,7 +186,7 @@ export default function AssessmentDetailPage() {
           </div>
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
             <div className="text-3xl font-bold text-yellow-400 mb-1">
-              {Math.round((profile.insights.reduce((sum: number, i: any) => sum + i.confidence, 0) / profile.insights.length) * 100) || 0}%
+              {Math.round((profile.insights.reduce((sum: number, i) => sum + i.confidence, 0) / profile.insights.length) * 100) || 0}%
             </div>
             <div className="text-sm text-gray-400">Avg Confidence</div>
           </div>
@@ -221,7 +210,7 @@ export default function AssessmentDetailPage() {
               Cross-Domain Insights
             </h2>
             <div className="grid grid-cols-1 gap-4">
-              {profile.synthesizedInsights.map((insight: any, index: number) => (
+              {profile.synthesizedInsights.map((insight, index: number) => (
                 <div key={index} className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-lg border-2 border-blue-600/60 p-6">
                   <div className="space-y-4">
                     <div>
