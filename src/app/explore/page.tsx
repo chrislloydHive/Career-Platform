@@ -150,8 +150,8 @@ export default function ExplorePage() {
 
                         {/* Collapsible Content */}
                         {expandedInsights.has(index) && (
-                          <div className="mt-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                            <p className="text-sm text-gray-300 mb-2">
+                          <div className="mt-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 space-y-4">
+                            <p className="text-sm text-gray-300">
                               <strong>What this means:</strong> {
                                 insight.type === 'cross-domain'
                                   ? 'This insight reveals connections between different career areas in your responses, showing how your interests span multiple domains and suggesting hybrid career paths.'
@@ -162,28 +162,31 @@ export default function ExplorePage() {
                                   : 'This insight represents additional behavioral patterns detected in your responses that provide valuable context for your career exploration.'
                               }
                             </p>
+
+                            <div>
+                              <h4 className="text-sm font-semibold text-blue-400 mb-2">Source Areas:</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {insight.sourceAreas.map((area, i) => (
+                                  <span key={i} className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded text-xs font-medium">
+                                    {area.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="bg-gray-900/50 rounded-lg p-4 border border-green-700/30">
+                              <h4 className="text-sm font-semibold text-green-400 mb-2">Career Implications:</h4>
+                              <ul className="space-y-1.5">
+                                {insight.implications.map((implication, i) => (
+                                  <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
+                                    <span className="text-green-400 mt-0.5">→</span>
+                                    <span>{implication}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                           </div>
                         )}
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        {insight.sourceAreas.map((area, i) => (
-                          <span key={i} className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded text-xs font-medium">
-                            {area.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="bg-gray-900/50 rounded-lg p-4 border border-green-700/30">
-                        <h4 className="text-sm font-semibold text-green-400 mb-2">Career Implications:</h4>
-                        <ul className="space-y-1.5">
-                          {insight.implications.map((implication, i) => (
-                            <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
-                              <span className="text-green-400 mt-0.5">→</span>
-                              <span>{implication}</span>
-                            </li>
-                          ))}
-                        </ul>
                       </div>
                     </div>
                   </div>
