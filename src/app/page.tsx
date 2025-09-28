@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SearchCriteria, ScoredJob } from '@/types';
 import { Navigation } from '@/components/Navigation';
 import { EnhancedSearchForm } from '@/components/EnhancedSearchForm';
@@ -10,7 +10,7 @@ import { SearchProgress } from '@/components/SearchProgress';
 import { ToastContainer, Toast, createToast } from '@/components/Toast';
 import { ExportDialog } from '@/components/ExportDialog';
 import { getUserFriendlyError, retryWithBackoff } from '@/lib/feedback/error-handler';
-import { saveSearchToHistory } from '@/lib/storage/search-history';
+import { saveSearchToHistory, saveLastSearch, getLastSearch } from '@/lib/storage/search-history';
 
 export default function Home() {
   const [jobs, setJobs] = useState<ScoredJob[]>([]);
@@ -24,6 +24,17 @@ export default function Home() {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState<SearchCriteria | null>(null);
   const [retryAttempt, setRetryAttempt] = useState(0);
+  const [initialValues, setInitialValues] = useState<Partial<SearchCriteria> | undefined>(undefined);
+
+  useEffect(() => {
+    const lastSearch = getLastSearch();
+    if (lastSearch) {
+      setInitialValues(lastSearch.criteria);
+      setJobs(lastSearch.jobs);
+      setJobsFound(lastSearch.jobs.length);
+      setSearchCriteria(lastSearch.criteria);
+    }
+  }, []);
 
   const addToast = (toast: Toast) => {
     setToasts(prev => [...prev, toast]);
@@ -93,6 +104,8 @@ export default function Home() {
         result.jobs.length,
         result.metadata.averageScore
       );
+
+      saveLastSearch(criteria, result.jobs);
 
       if (result.warnings && result.warnings.length > 0) {
         result.warnings.forEach((warning: string) => {
@@ -214,6 +227,7 @@ export default function Home() {
               isLoading={isSearching}
               error={error}
               onClearError={() => setError(null)}
+              initialValues={initialValues}
             />
 
             {jobs.length === 0 && (

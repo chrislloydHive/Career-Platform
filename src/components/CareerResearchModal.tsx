@@ -62,12 +62,15 @@ export function CareerResearchModal({ isOpen, onClose, onSaveCareer, initialJobT
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save career');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Save career failed:', response.status, errorData);
+        throw new Error(errorData.details || errorData.error || 'Failed to save career');
       }
 
       onSaveCareer(generatedCareer);
       handleClose();
     } catch (err) {
+      console.error('Error in handleSave:', err);
       setError(err instanceof Error ? err.message : 'Failed to save career');
     }
   };

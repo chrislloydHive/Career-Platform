@@ -57,7 +57,12 @@ export async function POST(request: NextRequest) {
       ? `$${career.salaryRanges[0].min.toLocaleString()} - $${career.salaryRanges[0].max.toLocaleString()}`
       : '';
 
-    await sql`
+    const skillsArray = career.requiredSkills?.map(s => s.skill) || [];
+    const alternativeTitlesArray = career.alternativeTitles || [];
+    const relatedRolesArray = career.relatedRoles || [];
+    const keywordsArray = career.keywords || [];
+
+    const result = await sql`
       INSERT INTO career_research (
         id, user_id, title, description, category, salary_range, education_required,
         skills, work_life_balance, job_security, growth_potential, match_score,
@@ -73,28 +78,28 @@ export async function POST(request: NextRequest) {
         ${career.category || 'business'},
         ${salaryRange},
         ${career.education?.minimumDegree || ''},
-        ${JSON.stringify(career.requiredSkills?.map(s => s.skill) || [])},
+        ${skillsArray},
         ${0},
         ${0},
         ${0},
         ${0},
-        ${JSON.stringify([])},
-        ${JSON.stringify([])},
-        ${JSON.stringify(career.dailyTasks?.map(t => t.task) || [])},
-        ${JSON.stringify(career.careerProgression?.map(cp => cp.title) || [])},
-        ${JSON.stringify([])},
+        ${[]},
+        ${[]},
+        ${career.dailyTasks?.map(t => t.task) || []},
+        ${career.careerProgression?.map(cp => cp.title) || []},
+        ${[]},
         ${JSON.stringify({})},
         ${JSON.stringify(career.salaryRanges || [])},
         ${JSON.stringify(career.careerProgression || [])},
         ${'overview'},
-        ${JSON.stringify(career.alternativeTitles || [])},
+        ${alternativeTitlesArray},
         ${JSON.stringify(career.dailyTasks || [])},
         ${JSON.stringify(career.industryInsights || [])},
         ${JSON.stringify(career.workEnvironment || {})},
         ${JSON.stringify(career.jobOutlook || {})},
         ${JSON.stringify(career.education || {})},
-        ${JSON.stringify(career.relatedRoles || [])},
-        ${JSON.stringify(career.keywords || [])}
+        ${relatedRolesArray},
+        ${keywordsArray}
       )
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
@@ -125,8 +130,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error saving career:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to save career' },
+      { error: 'Failed to save career', details: errorMessage },
       { status: 500 }
     );
   }

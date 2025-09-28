@@ -63,7 +63,7 @@ export function EnhancedSearchForm({
   initialValues,
 }: EnhancedSearchFormProps) {
   const [query, setQuery] = useState(initialValues?.query || '');
-  const [location, setLocation] = useState(initialValues?.location || 'Seattle, WA');
+  const [location, setLocation] = useState(initialValues?.location || '');
   const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
   const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
   const [selectedSources, setSelectedSources] = useState<JobSource[]>(

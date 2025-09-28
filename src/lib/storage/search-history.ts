@@ -1,4 +1,4 @@
-import { SearchCriteria } from '@/types';
+import { SearchCriteria, ScoredJob } from '@/types';
 
 export interface SearchHistoryItem {
   id: string;
@@ -8,7 +8,14 @@ export interface SearchHistoryItem {
   averageScore?: number;
 }
 
+export interface LastSearchState {
+  criteria: SearchCriteria;
+  jobs: ScoredJob[];
+  timestamp: Date;
+}
+
 const STORAGE_KEY = 'job_search_history';
+const LAST_SEARCH_KEY = 'last_job_search';
 const MAX_HISTORY_ITEMS = 20;
 
 export function saveSearchToHistory(
@@ -98,4 +105,41 @@ export function formatSearchSummary(item: SearchHistoryItem): string {
 export function getRecentSearches(limit: number = 5): SearchHistoryItem[] {
   const history = getSearchHistory();
   return history.slice(0, limit);
+}
+
+export function saveLastSearch(criteria: SearchCriteria, jobs: ScoredJob[]): void {
+  try {
+    const lastSearch: LastSearchState = {
+      criteria,
+      jobs,
+      timestamp: new Date(),
+    };
+    localStorage.setItem(LAST_SEARCH_KEY, JSON.stringify(lastSearch));
+  } catch (error) {
+    console.error('Failed to save last search:', error);
+  }
+}
+
+export function getLastSearch(): LastSearchState | null {
+  try {
+    const stored = localStorage.getItem(LAST_SEARCH_KEY);
+    if (!stored) return null;
+
+    const lastSearch = JSON.parse(stored) as LastSearchState;
+    return {
+      ...lastSearch,
+      timestamp: new Date(lastSearch.timestamp),
+    };
+  } catch (error) {
+    console.error('Failed to load last search:', error);
+    return null;
+  }
+}
+
+export function clearLastSearch(): void {
+  try {
+    localStorage.removeItem(LAST_SEARCH_KEY);
+  } catch (error) {
+    console.error('Failed to clear last search:', error);
+  }
 }
