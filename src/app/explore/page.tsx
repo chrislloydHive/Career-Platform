@@ -5,6 +5,7 @@ import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
 import { CareerFitScore } from '@/lib/matching/realtime-career-matcher';
+import { enrichStrength, enrichPreference, enrichHiddenInterest } from '@/lib/insights/insight-enrichment';
 
 type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
   topCareers?: CareerFitScore[];
@@ -226,14 +227,44 @@ export default function ExplorePage() {
                 <h2 className="text-xl font-bold text-blue-400 mb-4">
                   Your Strengths
                 </h2>
-                <ul className="space-y-3">
-                  {profile.analysis.strengths.map((strength, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="text-blue-400 mt-1">✓</span>
-                      <span className="text-gray-300">{strength}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-4">
+                  {profile.analysis.strengths.map((strength, index) => {
+                    const enriched = enrichStrength(strength);
+                    return (
+                      <div key={index} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                        <div className="flex items-start gap-3 mb-3">
+                          <span className="text-blue-400 mt-1">✓</span>
+                          <span className="text-gray-300 font-medium">{strength}</span>
+                        </div>
+
+                        <div className="ml-7 space-y-3">
+                          <div>
+                            <p className="text-xs font-semibold text-green-400 uppercase tracking-wide mb-1.5">This means you&apos;d thrive in roles like:</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {enriched.roles.map((role, roleIdx) => (
+                                <span key={roleIdx} className="px-2 py-1 bg-green-900/30 text-green-300 rounded text-xs">
+                                  {role}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-blue-400 uppercase tracking-wide mb-1.5">Next steps:</p>
+                            <ul className="space-y-1">
+                              {enriched.nextSteps.map((step, stepIdx) => (
+                                <li key={stepIdx} className="text-xs text-gray-400 flex items-start gap-1.5">
+                                  <span className="text-blue-400 mt-0.5">→</span>
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
@@ -243,14 +274,44 @@ export default function ExplorePage() {
                 <h2 className="text-xl font-bold text-blue-400 mb-4">
                   Work Preferences
                 </h2>
-                <ul className="space-y-3">
-                  {profile.analysis.preferences.map((pref, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="text-blue-400 mt-1">→</span>
-                      <span className="text-gray-300">{pref}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-4">
+                  {profile.analysis.preferences.map((pref, index) => {
+                    const enriched = enrichPreference(pref);
+                    return (
+                      <div key={index} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50">
+                        <div className="flex items-start gap-3 mb-3">
+                          <span className="text-blue-400 mt-1">→</span>
+                          <span className="text-gray-300 font-medium">{pref}</span>
+                        </div>
+
+                        <div className="ml-7 space-y-3">
+                          <div>
+                            <p className="text-xs font-semibold text-green-400 uppercase tracking-wide mb-1.5">This means you&apos;d thrive in roles like:</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {enriched.roles.map((role, roleIdx) => (
+                                <span key={roleIdx} className="px-2 py-1 bg-green-900/30 text-green-300 rounded text-xs">
+                                  {role}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-blue-400 uppercase tracking-wide mb-1.5">Next steps:</p>
+                            <ul className="space-y-1">
+                              {enriched.nextSteps.map((step, stepIdx) => (
+                                <li key={stepIdx} className="text-xs text-gray-400 flex items-start gap-1.5">
+                                  <span className="text-blue-400 mt-0.5">→</span>
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
@@ -260,14 +321,44 @@ export default function ExplorePage() {
                 <h2 className="text-xl font-bold text-green-400 mb-4">
                   Hidden Interests
                 </h2>
-                <ul className="space-y-3">
-                  {profile.analysis.hiddenInterests.map((interest, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="text-green-400 mt-1">•</span>
-                      <span className="text-gray-300">{interest}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-4">
+                  {profile.analysis.hiddenInterests.map((interest, index) => {
+                    const enriched = enrichHiddenInterest(interest);
+                    return (
+                      <div key={index} className="bg-gray-900/50 rounded-lg p-4 border border-green-700/30">
+                        <div className="flex items-start gap-3 mb-3">
+                          <span className="text-green-400 mt-1">•</span>
+                          <span className="text-gray-300 font-medium">{interest}</span>
+                        </div>
+
+                        <div className="ml-7 space-y-3">
+                          <div>
+                            <p className="text-xs font-semibold text-green-400 uppercase tracking-wide mb-1.5">This means you&apos;d thrive in roles like:</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {enriched.roles.map((role, roleIdx) => (
+                                <span key={roleIdx} className="px-2 py-1 bg-green-900/30 text-green-300 rounded text-xs">
+                                  {role}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-blue-400 uppercase tracking-wide mb-1.5">Next steps:</p>
+                            <ul className="space-y-1">
+                              {enriched.nextSteps.map((step, stepIdx) => (
+                                <li key={stepIdx} className="text-xs text-gray-400 flex items-start gap-1.5">
+                                  <span className="text-blue-400 mt-0.5">→</span>
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
