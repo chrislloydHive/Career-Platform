@@ -4,9 +4,10 @@ import { auth } from '@/lib/auth/config';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -14,7 +15,7 @@ export async function GET(
 
     const result = await sql`
       SELECT * FROM assessment_results
-      WHERE id = ${params.id} AND user_id = ${session.user.id}
+      WHERE id = ${id} AND user_id = ${session.user.id}
     `;
 
     if (result.rows.length === 0) {
@@ -56,9 +57,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -66,7 +68,7 @@ export async function DELETE(
 
     const result = await sql`
       DELETE FROM assessment_results
-      WHERE id = ${params.id} AND user_id = ${session.user.id}
+      WHERE id = ${id} AND user_id = ${session.user.id}
       RETURNING id
     `;
 
