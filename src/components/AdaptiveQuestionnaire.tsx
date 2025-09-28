@@ -288,7 +288,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       setLatestInsightNotification(latest);
       setShowInsightNotification(true);
-      setTimeout(() => setShowInsightNotification(false), 5000);
+      setTimeout(() => setShowInsightNotification(false), 4000);
     }
 
     setInsights(newInsights);
@@ -673,44 +673,60 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       {/* Real-time Insight Notification - Celebratory */}
       {showInsightNotification && latestInsightNotification && (
         <div className="fixed top-4 right-4 left-4 sm:left-auto z-50 animate-slide-in-right">
-          <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-xl shadow-2xl p-4 sm:p-5 max-w-md border-2 border-blue-400/50 relative overflow-hidden">
-            {/* Sparkle effect */}
+          <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-xl shadow-2xl p-4 sm:p-5 max-w-md border-2 border-green-400/60 relative overflow-hidden">
+            {/* Animated gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/10 to-transparent animate-shimmer pointer-events-none" />
+
+            {/* Enhanced sparkle effect with green */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-              <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-ping" />
-              <div className="absolute top-4 right-8 w-1 h-1 bg-white rounded-full animate-ping delay-100" />
-              <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-white rounded-full animate-ping delay-200" />
+              <div className="absolute top-2 right-2 w-2 h-2 bg-green-300 rounded-full animate-ping" />
+              <div className="absolute top-4 right-8 w-1.5 h-1.5 bg-green-400 rounded-full animate-ping" style={{ animationDelay: '100ms' }} />
+              <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-green-300 rounded-full animate-ping" style={{ animationDelay: '200ms' }} />
+              <div className="absolute top-6 right-6 w-1 h-1 bg-white rounded-full animate-ping" style={{ animationDelay: '300ms' }} />
+              <div className="absolute top-5 right-16 w-1 h-1 bg-green-200 rounded-full animate-ping" style={{ animationDelay: '400ms' }} />
             </div>
 
             <div className="flex items-start gap-3 relative">
-              <div className="p-2.5 bg-white/30 rounded-xl">
+              <div className="p-2.5 bg-gradient-to-br from-green-400/30 to-blue-400/30 rounded-xl animate-pulse-subtle">
                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xs font-bold text-white uppercase tracking-wider">New Insight!</span>
-                  <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs font-semibold text-white">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">✨ New Insight Discovered!</span>
+                  <span className="px-2 py-0.5 bg-green-400/30 rounded-full text-xs font-semibold text-green-100 border border-green-300/30">
                     #{insights.length + synthesizedInsights.length}
                   </span>
                 </div>
-                <p className="text-base text-white font-semibold leading-snug">{latestInsightNotification.insight}</p>
+                <p className="text-base text-white font-semibold leading-snug mb-2">{latestInsightNotification.insight}</p>
+
+                {/* Confidence bar with green accent */}
                 <div className="mt-3 flex items-center gap-2">
-                  <div className="flex-1 bg-white/30 rounded-full h-2">
+                  <div className="flex-1 bg-white/20 rounded-full h-2.5 border border-green-300/20">
                     <div
-                      className="bg-white h-2 rounded-full transition-all duration-500"
+                      className="bg-gradient-to-r from-green-400 to-green-300 h-full rounded-full transition-all duration-700 shadow-lg shadow-green-400/50 animate-grow-width"
                       style={{ width: `${latestInsightNotification.confidence * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs text-white font-bold">{Math.round(latestInsightNotification.confidence * 100)}%</span>
+                  <span className="text-xs text-green-200 font-bold px-2 py-0.5 bg-green-400/20 rounded-full">
+                    {Math.round(latestInsightNotification.confidence * 100)}%
+                  </span>
                 </div>
-                <div className="mt-2 text-xs text-white/80">
-                  {getAreaLabel(latestInsightNotification.area)}
+
+                {/* Triggered by info */}
+                <div className="mt-3 flex items-center gap-2">
+                  <svg className="w-3.5 h-3.5 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="text-xs text-green-100/90">
+                    Triggered by your response • {getAreaLabel(latestInsightNotification.area)}
+                  </span>
                 </div>
               </div>
               <button
                 onClick={() => setShowInsightNotification(false)}
-                className="text-white/70 hover:text-white transition-colors"
+                className="text-white/60 hover:text-white transition-colors"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
