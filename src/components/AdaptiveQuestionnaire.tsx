@@ -64,6 +64,10 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isLoading, setIsLoading] = useState(true);
   const [userCareers, setUserCareers] = useState<JobCategory[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingMessage, setProcessingMessage] = useState('');
+  const [isSmartQuestion, setIsSmartQuestion] = useState(false);
+  const [questionSource, setQuestionSource] = useState<'base' | 'followup' | 'gap'>('base');
 
   useEffect(() => {
     loadSavedState();
@@ -271,17 +275,25 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
     console.log('Submitting response for question:', currentQuestion.id, 'value:', response);
     setIsSubmitting(true);
+    setIsProcessing(true);
+    setProcessingMessage('Analyzing your response...');
 
     try {
       engine.recordResponse(currentQuestion.id, response, confidenceLevel);
+      await new Promise(resolve => setTimeout(resolve, 300));
+      setProcessingMessage('Detecting patterns...');
     } catch (error) {
       console.error('Error recording response:', error);
       setIsSubmitting(false);
+      setIsProcessing(false);
       return;
     }
 
     const newInsights = engine.getInsights();
     const previousCount = insights.length;
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setProcessingMessage('Connecting insights...');
 
     if (newInsights.length > previousCount) {
       const latest = newInsights[newInsights.length - 1];
@@ -365,6 +377,8 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       console.error('Error saving state:', error);
     }
     console.log('Response submission complete');
+    await new Promise(resolve => setTimeout(resolve, 200));
+    setIsProcessing(false);
     setIsSubmitting(false);
   };
 
@@ -890,6 +904,15 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               </div>
               <div className="border-l border-gray-700 pl-4">
                 <div className="flex items-center gap-2 mb-1">
+                  <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                  </svg>
+                  <div className="text-2xl font-bold text-purple-400">{Object.keys(engine.getState().responses).length}</div>
+                </div>
+                <div className="text-xs text-gray-500">intelligence gathered</div>
+              </div>
+              <div className="border-l border-gray-700 pl-4">
+                <div className="flex items-center gap-2 mb-1">
                   <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
@@ -951,7 +974,36 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       </div>
 
       {/* Question Card */}
-      <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-4 sm:p-6 lg:p-8 mb-6">
+      <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-4 sm:p-6 lg:p-8 mb-6 relative">
+        {/* Processing Overlay */}
+        {isProcessing && (
+          <div className="absolute inset-0 bg-gray-900/95 rounded-lg z-10 flex flex-col items-center justify-center backdrop-blur-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <svg className="animate-spin h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <div>
+                <div className="text-lg font-semibold text-blue-300">{processingMessage}</div>
+                <div className="text-xs text-gray-400 mt-1">AI engine working...</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 mt-4 px-6 py-3 bg-gray-800/60 rounded-lg border border-blue-500/30">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-gray-300">Pattern detection</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                <span className="text-xs text-gray-300">Insight synthesis</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                <span className="text-xs text-gray-300">Career matching</span>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mb-4 sm:mb-6">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <div className="h-5 sm:h-6 w-1 bg-blue-500 rounded-full"></div>
@@ -960,10 +1012,26 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             </span>
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs">
                 {currentQuestion.type}
               </span>
+              {currentQuestion.followUpConditions && currentQuestion.followUpConditions.length > 0 && (
+                <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-purple-900/30 text-purple-300 rounded-full text-xs flex items-center gap-1.5">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
+                  </svg>
+                  Smart Question
+                </span>
+              )}
+              {Object.keys(engine.getState().responses).length > 0 && Object.keys(engine.getState().responses).length % 5 === 0 && (
+                <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-green-900/30 text-green-300 rounded-full text-xs flex items-center gap-1.5 animate-pulse-subtle">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Milestone Reached
+                </span>
+              )}
             </div>
             <h2 className="text-lg sm:text-xl font-semibold text-gray-100 leading-relaxed">
               {currentQuestion.text}
@@ -1070,8 +1138,34 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       {/* Latest Insights - Compact Preview Above the Fold */}
       {(insights.length > 0 || synthesizedInsights.length > 0) && (
-        <div className="mb-6 bg-gradient-to-br from-blue-900/20 via-blue-800/10 to-blue-900/20 rounded-xl border-2 border-blue-500/30 p-5">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-6 bg-gradient-to-br from-blue-900/20 via-blue-800/10 to-blue-900/20 rounded-xl border-2 border-blue-500/30 p-5 relative overflow-hidden">
+          {/* Animated connection lines background */}
+          <div className="absolute inset-0 opacity-20 pointer-events-none">
+            <svg className="w-full h-full" viewBox="0 0 400 200">
+              <line x1="50" y1="30" x2="200" y2="100" stroke="url(#connection-gradient)" strokeWidth="1.5" strokeDasharray="4,4">
+                <animate attributeName="stroke-dashoffset" from="0" to="8" dur="1s" repeatCount="indefinite" />
+              </line>
+              <line x1="150" y1="30" x2="200" y2="100" stroke="url(#connection-gradient)" strokeWidth="1.5" strokeDasharray="4,4">
+                <animate attributeName="stroke-dashoffset" from="0" to="8" dur="1.2s" repeatCount="indefinite" />
+              </line>
+              <line x1="250" y1="30" x2="200" y2="100" stroke="url(#connection-gradient)" strokeWidth="1.5" strokeDasharray="4,4">
+                <animate attributeName="stroke-dashoffset" from="0" to="8" dur="0.9s" repeatCount="indefinite" />
+              </line>
+              <circle cx="50" cy="30" r="3" fill="#60A5FA" opacity="0.6" />
+              <circle cx="150" cy="30" r="3" fill="#60A5FA" opacity="0.6" />
+              <circle cx="250" cy="30" r="3" fill="#60A5FA" opacity="0.6" />
+              <circle cx="200" cy="100" r="5" fill="#F59E0B" opacity="0.8">
+                <animate attributeName="r" values="5;6;5" dur="2s" repeatCount="indefinite" />
+              </circle>
+              <defs>
+                <linearGradient id="connection-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.6" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div className="flex items-center justify-between mb-4 relative z-10">
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -1080,6 +1174,12 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full text-xs font-semibold">
                 {insights.length + synthesizedInsights.length} total
               </span>
+              <div className="flex items-center gap-1.5 ml-2 text-xs text-gray-400">
+                <svg className="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Generated from your responses</span>
+              </div>
             </div>
           </div>
 
