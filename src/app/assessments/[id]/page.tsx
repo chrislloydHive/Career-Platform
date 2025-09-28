@@ -295,30 +295,7 @@ export default function AssessmentDetailPage() {
 
         {/* Action Plan */}
         <ActionPlan
-          actionPlan={generateActionPlan({
-            responses: {},
-            insights: transformedInsights,
-            synthesizedInsights: profile.synthesizedInsights as unknown[],
-            gaps: profile.gaps as unknown[],
-            authenticityProfile: profile.authenticityProfile as Record<string, unknown>,
-            narrativeInsights: profile.narrativeInsights as unknown[],
-            confidenceEvolutions: profile.confidenceEvolutions as unknown[],
-            patterns: {
-              consistencyPatterns: (profile.patterns as Record<string, unknown>)?.consistencyPatterns as unknown[] || [],
-              hiddenMotivations: (profile.patterns as Record<string, unknown>)?.hiddenMotivations as unknown[] || [],
-              strengthEvolution: (profile.patterns as Record<string, unknown>)?.strengthEvolution as unknown[] || []
-            },
-            analysis: profile.analysis as Record<string, unknown>,
-            topCareers: transformedCareers,
-            completion: profile.completion,
-            motivationInsights: [],
-            strengthProfile: { validatedStrengths: [], preferredWorkStyle: '', strengthEvolution: [] },
-            hiddenInterestPredictions: [],
-            futureSelfProjection: { futureGoals: [], anticipatedChallenges: [], adaptabilityFactors: [] },
-            selfPerceptionGaps: [],
-            archaeologyInsights: [],
-            matchEvolution: []
-          } as unknown)}
+          actionPlan={generateActionPlan(profile as never)}
           onRestartExploration={async () => {
             if (confirm('This will start a new assessment. Continue?')) {
               window.location.href = '/explore';
