@@ -93,6 +93,27 @@ export default function ExplorePage() {
                 </svg>
                 Cross-Domain Insights
               </h2>
+              <div className="mb-6 bg-gray-800/50 rounded-lg border border-gray-700/50 p-4">
+                <p className="text-gray-300 text-sm mb-3">These insights reveal complex patterns by connecting your responses across different areas:</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-1 bg-blue-600 text-white rounded text-xs font-medium">Cross Domain</span>
+                    <span className="text-gray-400">Connections between different career areas</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-1 bg-purple-600 text-white rounded text-xs font-medium">Paradox</span>
+                    <span className="text-gray-400">Contradictory preferences that reveal depth</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-1 bg-green-600 text-white rounded text-xs font-medium">Nuanced</span>
+                    <span className="text-gray-400">Complex preferences beyond simple choices</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-1 bg-orange-600 text-white rounded text-xs font-medium">Other</span>
+                    <span className="text-gray-400">Additional behavioral patterns</span>
+                  </div>
+                </div>
+              </div>
               <div className="grid grid-cols-1 gap-4">
                 {profile.synthesizedInsights.map((insight, index) => (
                   <div key={index} className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-lg border-2 border-blue-600/60 p-6">
@@ -107,7 +128,15 @@ export default function ExplorePage() {
                               : insight.type === 'nuanced-preference'
                               ? 'bg-green-600 text-white'
                               : 'bg-orange-600 text-white'
-                          }`}>
+                          }`} title={
+                            insight.type === 'cross-domain'
+                              ? 'Connections between different career areas'
+                              : insight.type === 'paradox'
+                              ? 'Contradictory preferences that reveal depth'
+                              : insight.type === 'nuanced-preference'
+                              ? 'Complex preferences beyond simple choices'
+                              : 'Additional behavioral patterns'
+                          }>
                             {insight.type.replace('-', ' ')}
                           </span>
                           <span className="text-xs font-medium text-gray-400">
