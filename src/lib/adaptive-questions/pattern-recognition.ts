@@ -159,22 +159,22 @@ export class PatternRecognitionEngine {
     const allResponses = Object.values(this.responses);
 
     const impactValue = this.assessValue('impact', allResponses);
-    if (impactValue.priority > 0) values.push(impactValue);
+    values.push(impactValue);
 
     const autonomyValue = this.assessValue('autonomy', allResponses);
-    if (autonomyValue.priority > 0) values.push(autonomyValue);
+    values.push(autonomyValue);
 
     const growthValue = this.assessValue('growth', allResponses);
-    if (growthValue.priority > 0) values.push(growthValue);
+    values.push(growthValue);
 
     const stabilityValue = this.assessValue('stability', allResponses);
-    if (stabilityValue.priority > 0) values.push(stabilityValue);
+    values.push(stabilityValue);
 
     const creativityValue = this.assessValue('creativity', allResponses);
-    if (creativityValue.priority > 0) values.push(creativityValue);
+    values.push(creativityValue);
 
     const collaborationValue = this.assessValue('collaboration', allResponses);
-    if (collaborationValue.priority > 0) values.push(collaborationValue);
+    values.push(collaborationValue);
 
     if (autonomyValue.priority > 7 && collaborationValue.priority > 7) {
       conflicts.push({

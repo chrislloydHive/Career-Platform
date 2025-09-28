@@ -76,7 +76,7 @@ export default function ExplorePage() {
                 </h2>
                 <span className="text-sm text-gray-400">Based on {Object.keys(profile.responses).length} responses</span>
               </div>
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {profile.topCareers.map((career, index) => (
                   <div key={index} className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg border-2 border-green-600/40 p-6 hover:border-green-500/60 transition-all">
                     <div className="flex items-start justify-between gap-4 mb-4">
