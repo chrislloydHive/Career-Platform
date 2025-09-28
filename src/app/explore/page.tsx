@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
@@ -9,6 +10,9 @@ import { CareerPathVisualization } from '@/components/CareerPathVisualization';
 import { generateCareerPaths } from '@/lib/career-paths/career-path-generator';
 import { ActionPlan } from '@/components/ActionPlan';
 import { generateActionPlan } from '@/lib/action-plan/action-plan-generator';
+import { SkillsGapAnalysis } from '@/components/SkillsGapAnalysis';
+import { SaveAssessmentDialog } from '@/components/SaveAssessmentDialog';
+import { ExitWarningDialog } from '@/components/ExitWarningDialog';
 
 type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
   topCareers?: CareerFitScore[];
@@ -19,10 +23,18 @@ export default function ExplorePage() {
   const [profile, setProfile] = useState<ExportedProfile | null>(null);
   const [questionnaireKey, setQuestionnaireKey] = useState(0);
   const [expandedInsights, setExpandedInsights] = useState<Set<number>>(new Set());
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [hasUnsavedResults, setHasUnsavedResults] = useState(false);
+  const [showExitWarning, setShowExitWarning] = useState(false);
+
+  const router = useRouter();
 
   const handleComplete = (exportedProfile: ExportedProfile) => {
     setProfile(exportedProfile);
     setShowResults(true);
+    setHasUnsavedResults(true);
   };
 
   const toggleInsightExpansion = (index: number) => {
@@ -46,6 +58,85 @@ export default function ExplorePage() {
     );
   }, [profile]);
 
+  // Warning effect for unsaved results
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedResults && showResults) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved assessment results. Are you sure you want to leave without saving?';
+        return e.returnValue;
+      }
+    };
+
+    const handlePopState = () => {
+      if (hasUnsavedResults && showResults) {
+        setShowExitWarning(true);
+        return false;
+      }
+    };
+
+    if (hasUnsavedResults && showResults) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [hasUnsavedResults, showResults]);
+
+  const handleSaveAssessment = async (title: string, description: string) => {
+    if (!profile) return;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/assessment-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          profile
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save assessment');
+      }
+
+      setSaveMessage('Assessment saved successfully!');
+      setShowSaveDialog(false);
+      setHasUnsavedResults(false); // Mark as saved
+
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error) {
+      console.error('Error saving assessment:', error);
+      setSaveMessage('Failed to save assessment. Please try again.');
+      setTimeout(() => setSaveMessage(null), 3000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleExitSave = () => {
+    setShowExitWarning(false);
+    setShowSaveDialog(true);
+  };
+
+  const handleExitLeave = () => {
+    setHasUnsavedResults(false);
+    setShowExitWarning(false);
+    // Allow the navigation to proceed
+    window.history.back();
+  };
+
+  const handleExitCancel = () => {
+    setShowExitWarning(false);
+  };
+
   if (showResults && profile) {
     return (
       <div className="min-h-screen bg-gray-950">
@@ -55,6 +146,46 @@ export default function ExplorePage() {
         />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Save Assessment Actions */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowSaveDialog(true)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  hasUnsavedResults
+                    ? 'bg-yellow-600 hover:bg-yellow-500 text-white ring-2 ring-yellow-400/50 animate-pulse'
+                    : 'bg-blue-600 hover:bg-blue-500 text-white'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                {hasUnsavedResults ? 'Save Assessment (Unsaved!)' : 'Save Assessment'}
+              </button>
+              {hasUnsavedResults && !saveMessage && (
+                <div className="px-3 py-1 rounded-lg text-sm bg-yellow-900/50 text-yellow-400 border border-yellow-700/50 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                  Unsaved results - remember to save!
+                </div>
+              )}
+              {saveMessage && (
+                <div className={`px-3 py-1 rounded-lg text-sm ${
+                  saveMessage.includes('success')
+                    ? 'bg-green-900/50 text-green-400 border border-green-700/50'
+                    : 'bg-red-900/50 text-red-400 border border-red-700/50'
+                }`}>
+                  {saveMessage}
+                </div>
+              )}
+            </div>
+            <a
+              href="/assessments"
+              className="text-gray-400 hover:text-gray-300 text-sm transition-colors"
+            >
+              View Saved Assessments →
+            </a>
+          </div>
+
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
@@ -195,10 +326,10 @@ export default function ExplorePage() {
             </div>
           )}
 
-          {/* 3. Core Values and Hidden Interests Grid */}
+          {/* 3. Core Values and Hidden Interests - Full Width Stacked */}
           {profile.patterns && (
             <div className="mb-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-6">
                 {/* Core Values */}
                 {profile.patterns.valueHierarchy && profile.patterns.valueHierarchy.topValues.length > 0 && (
                   <div className="bg-gradient-to-br from-blue-900/30 to-green-900/20 rounded-lg border border-blue-700/50 p-5">
@@ -569,6 +700,15 @@ export default function ExplorePage() {
             </div>
           )}
 
+          {/* Skills Gap Analysis */}
+          {profile.topCareers && profile.topCareers.length > 0 && (
+            <SkillsGapAnalysis
+              topCareers={profile.topCareers}
+              userStrengths={profile.analysis.strengths || []}
+              userExperience={[]} // Could be enhanced to include experience data
+            />
+          )}
+
           {/* 8. Your Career Roadmap */}
           {careerPaths.length > 0 && (
             <CareerPathVisualization trajectories={careerPaths} />
@@ -593,17 +733,35 @@ export default function ExplorePage() {
                   setShowResults(false);
                   setProfile(null);
                   setQuestionnaireKey(prev => prev + 1);
+                  setHasUnsavedResults(false);
                 } catch (error) {
                   console.error('Failed to clear questionnaire:', error);
                   // Still reset even if delete fails
                   setShowResults(false);
                   setProfile(null);
                   setQuestionnaireKey(prev => prev + 1);
+                  setHasUnsavedResults(false);
                 }
               }
             }}
           />
         </main>
+
+        {/* Save Assessment Dialog */}
+        <SaveAssessmentDialog
+          isOpen={showSaveDialog}
+          onClose={() => setShowSaveDialog(false)}
+          onSave={handleSaveAssessment}
+          isSaving={isSaving}
+        />
+
+        {/* Exit Warning Dialog */}
+        <ExitWarningDialog
+          isOpen={showExitWarning}
+          onSave={handleExitSave}
+          onLeave={handleExitLeave}
+          onCancel={handleExitCancel}
+        />
       </div>
     );
   }

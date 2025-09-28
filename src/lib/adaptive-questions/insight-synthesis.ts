@@ -63,9 +63,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['creativity', 'work-style', 'people-interaction'],
           basedOn: [...creativityResponses.map(r => r.questionId), ...workStyleResponses.map(r => r.questionId)],
           implications: [
-            'Seek roles with strong team collaboration in planning phases',
-            'Ensure you have ownership over project execution',
-            'Look for environments that balance team input with individual accountability'
+            'Excel as Product Manager leading cross-functional planning with autonomous execution',
+            'Thrive in UX Design roles with collaborative research but independent design creation',
+            'Consider Software Architect positions balancing team input with technical ownership',
+            'Look for Strategy Consultant roles with team brainstorming and client delivery ownership',
+            'Avoid micromanaged environments or purely collaborative roles without individual ownership',
+            'Seek companies with "collaboration in planning, ownership in execution" cultures'
           ]
         });
       }
@@ -82,9 +85,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['creativity', 'people-interaction', 'work-style'],
           basedOn: [...creativityResponses.map(r => r.questionId), ...peopleResponses.map(r => r.questionId)],
           implications: [
-            'Request time blocks for individual creative work',
-            'Engage teams during implementation and refinement phases',
-            'Communicate your creative process needs to collaborators'
+            'Ideal for Creative Director roles with solo ideation and team execution phases',
+            'Excel in Research & Development positions with independent exploration and collaborative testing',
+            'Consider Content Strategy roles with individual content creation and team distribution',
+            'Thrive as Lead Designer with solo conceptual work and team implementation',
+            'Look for hybrid remote arrangements allowing focused creative time',
+            'Seek agencies or studios that respect the creative process and provide maker time'
           ]
         });
       }
@@ -113,9 +119,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['structure-flexibility', 'problem-solving'],
           basedOn: [...structureResponses.map(r => r.questionId), ...problemSolvingResponses.map(r => r.questionId)],
           implications: [
-            'Seek roles with established methodologies but innovation expectations',
-            'You may excel in process improvement and optimization',
-            'Consider positions that blend operational excellence with creative problem-solving'
+            'Perfect for Process Innovation Manager roles at established companies',
+            'Excel as Solutions Engineer combining systematic approach with creative problem-solving',
+            'Thrive in Management Consulting with proven frameworks applied to unique challenges',
+            'Consider Operations roles at tech companies balancing efficiency with experimentation',
+            'Look for "innovation within guidelines" environments like Google, Microsoft, or IBM',
+            'Avoid both chaotic startups and rigid bureaucracies - seek structured innovation cultures'
           ]
         });
       }
@@ -163,9 +172,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['creativity', 'structure-flexibility', 'problem-solving'],
           basedOn: [...creativityResponses.map(r => r.questionId), ...structureResponses.map(r => r.questionId)],
           implications: [
-            'You may excel in innovation-focused roles requiring implementation',
-            'Consider product development, creative operations, or innovation management',
-            'This skill set is particularly valuable in startup or high-growth environments'
+            'Ideal for Chief Technology Officer roles balancing vision with execution discipline',
+            'Excel as Product Development Lead turning creative concepts into market reality',
+            'Perfect for Innovation Manager positions at corporations launching new initiatives',
+            'Consider Creative Operations Director roles systematizing creative processes',
+            'Thrive in companies like Apple, Tesla, or design-driven startups that value both creativity and execution',
+            'Look for roles requiring both "zero-to-one" thinking and "one-to-scale" implementation'
           ]
         });
       }
@@ -194,9 +206,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['people-interaction', 'work-style', 'values'],
           basedOn: [...peopleResponses.map(r => r.questionId), ...workStyleResponses.map(r => r.questionId)],
           implications: [
-            'Seek leadership roles emphasizing coaching and development',
-            'You may excel in team lead or manager positions focused on growth',
-            'Consider cultures valuing collaborative leadership over command-and-control'
+            'Perfect for Engineering Manager roles focused on team growth and technical enablement',
+            'Excel as People Manager in consulting firms developing talent while delivering client value',
+            'Ideal for Department Head positions at companies prioritizing employee development',
+            'Consider Head of Operations roles optimizing systems to empower team performance',
+            'Thrive at companies like Atlassian, Buffer, or GitLab with servant leadership cultures',
+            'Look for "manager as coach" environments rather than traditional hierarchical structures'
           ]
         });
       }
@@ -213,9 +228,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['people-interaction', 'values'],
           basedOn: [...peopleResponses.map(r => r.questionId), ...valueResponses.map(r => r.questionId)],
           implications: [
-            'You may excel in roles requiring difficult conversations',
-            'Consider positions in HR, management, or client relations',
-            'This skill is valuable for conflict resolution and feedback-rich cultures'
+            'Perfect for Customer Success Manager roles requiring honest but empathetic client feedback',
+            'Excel as HR Business Partner delivering difficult messages while maintaining relationships',
+            'Ideal for Technical Program Manager roles navigating stakeholder conflicts with diplomacy',
+            'Consider Account Management positions balancing client advocacy with company interests',
+            'Thrive in Sales Engineering roles providing honest technical assessments while building trust',
+            'Look for companies with "radical candor" cultures like Netflix, Bridgewater, or Ray Dalio-inspired environments'
           ]
         });
       }
@@ -244,9 +262,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['environment', 'values', 'work-style'],
           basedOn: [...environmentResponses.map(r => r.questionId), ...valueResponses.map(r => r.questionId)],
           implications: [
-            'Look for established companies with innovation initiatives',
-            'Avoid both rigid bureaucracies and chaotic startups',
-            'Seek roles with variety in a stable organizational context'
+            'Perfect for Innovation roles at Fortune 500 companies with R&D budgets and stable infrastructure',
+            'Excel in Product Manager positions at established tech companies launching new features',
+            'Ideal for Strategy roles at mature startups (Series B+) with proven business models',
+            'Consider Business Development positions at companies expanding into new markets',
+            'Thrive at companies like Google, Amazon, or Microsoft with "startup within big company" cultures',
+            'Avoid both early-stage startups (too chaotic) and traditional corporations (too rigid)'
           ]
         });
       }
@@ -263,9 +284,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['environment', 'values', 'work-style'],
           basedOn: [...environmentResponses.map(r => r.questionId), ...valueResponses.map(r => r.questionId)],
           implications: [
-            'Advocate for "focus time" blocks in collaborative environments',
-            'Consider hybrid work arrangements for balance',
-            'Look for teams with strong async communication practices'
+            'Perfect for Senior Individual Contributor roles in collaborative but respectful environments',
+            'Excel as Technical Lead with design collaboration but focused implementation time',
+            'Ideal for Research roles requiring both team input and deep individual analysis',
+            'Consider remote-first companies like GitLab, Automattic, or Buffer with async-first cultures',
+            'Thrive in consulting firms with "heads down" project work balanced with client collaboration',
+            'Look for companies with "no meeting days" or protected focus time policies'
           ]
         });
       }
@@ -294,9 +318,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['problem-solving', 'creativity'],
           basedOn: [...problemSolvingResponses.map(r => r.questionId), ...creativityResponses.map(r => r.questionId)],
           implications: [
-            'You may excel in strategy, product innovation, or design thinking roles',
-            'Consider positions requiring both creativity and business acumen',
-            'This combination is valuable in consulting and innovation teams'
+            'Perfect for Product Strategy roles requiring both creative vision and analytical validation',
+            'Excel as Design Researcher combining creative methodology with systematic data analysis',
+            'Ideal for Management Consultant positions blending innovative solutions with logical frameworks',
+            'Consider Business Intelligence roles turning creative questions into analytical insights',
+            'Thrive at companies like McKinsey, IDEO, or Palantir that value both creativity and rigor',
+            'Look for "analytical creative" roles in strategy consulting, product development, or innovation labs'
           ]
         });
       }
@@ -313,9 +340,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['problem-solving', 'learning-growth'],
           basedOn: [...problemSolvingResponses.map(r => r.questionId), ...learningResponses.map(r => r.questionId)],
           implications: [
-            'You likely develop strong expertise over time',
-            'Consider roles valuing both quick decisions and deep knowledge',
-            'This approach works well in consulting, advisory, or expert positions'
+            'Perfect for Principal Engineer roles making rapid technical decisions based on deep expertise',
+            'Excel as Subject Matter Expert in consulting firms providing quick but well-informed recommendations',
+            'Ideal for Senior Analyst positions requiring both rapid market analysis and deep sector knowledge',
+            'Consider Advisory roles where expertise enables confident, intuitive guidance',
+            'Thrive in environments valuing "experienced gut instinct" over extensive deliberation',
+            'Look for senior IC roles at companies like Stripe, Airbnb, or top consulting firms that respect expertise-driven decisions'
           ]
         });
       }
@@ -344,9 +374,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['work-style', 'people-interaction', 'values'],
           basedOn: [...workStyleResponses.map(r => r.questionId), ...valueResponses.map(r => r.questionId)],
           implications: [
-            'Seek remote-friendly roles with strong team culture',
-            'Look for teams that respect boundaries but foster connection',
-            'Consider roles with project ownership but collaborative touchpoints'
+            'Perfect for Senior Developer roles in remote-first companies with strong async culture',
+            'Excel as Independent Consultant with regular client touchpoints but autonomous delivery',
+            'Ideal for Technical Writer roles requiring solo deep work with collaborative review cycles',
+            'Consider Product Marketing Manager positions with independent campaign development and team coordination',
+            'Thrive at companies like Zapier, GitHub, or Basecamp that value both autonomy and connection',
+            'Look for hybrid arrangements with "office days" focused on collaboration and "home days" for focused work'
           ]
         });
       }
@@ -363,9 +396,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['work-style', 'people-interaction'],
           basedOn: [...workStyleResponses.map(r => r.questionId), ...peopleResponses.map(r => r.questionId)],
           implications: [
-            'You may excel in team lead or project management roles',
-            'Look for cultures with clear individual accountability within teams',
-            'Avoid environments where team work obscures individual contributions'
+            'Perfect for Scrum Master roles balancing team facilitation with personal delivery ownership',
+            'Excel as Technical Team Lead with both collaborative planning and individual code contributions',
+            'Ideal for Project Manager positions where you own outcomes while enabling team success',
+            'Consider Product Owner roles requiring both stakeholder collaboration and personal backlog accountability',
+            'Thrive in environments with clear OKRs and individual performance metrics within team goals',
+            'Look for companies that celebrate both team wins and individual contributions equally'
           ]
         });
       }
@@ -394,9 +430,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['learning-growth', 'problem-solving', 'work-style'],
           basedOn: [...learningResponses.map(r => r.questionId), ...problemSolvingResponses.map(r => r.questionId)],
           implications: [
-            'Seek roles with challenging projects and learning opportunities',
-            'You may struggle with pure training or classroom environments',
-            'Look for apprenticeship-style growth and mentorship opportunities'
+            'Perfect for Solutions Engineer roles learning new technologies through real client implementations',
+            'Excel in Implementation Consultant positions where each project teaches new industry applications',
+            'Ideal for Growth Marketing roles experimenting with new channels through live campaign testing',
+            'Consider Field Engineer positions where technical learning happens through hands-on problem solving',
+            'Thrive at companies like Palantir, Stripe, or consulting firms where learning happens through doing',
+            'Avoid training-heavy companies or roles with extensive classroom onboarding without immediate application'
           ]
         });
       }
@@ -413,9 +452,12 @@ export class InsightSynthesisEngine {
           sourceAreas: ['learning-growth', 'work-style', 'problem-solving'],
           basedOn: [...learningResponses.map(r => r.questionId), ...workStyleResponses.map(r => r.questionId)],
           implications: [
-            'You may excel in consulting or strategic implementation roles',
-            'Consider positions requiring framework development and rapid deployment',
-            'This approach works well in scaling organizations'
+            'Perfect for Principal Consultant roles developing methodologies and rapidly implementing them across clients',
+            'Excel as Head of Strategy at scaling startups requiring both framework thinking and execution speed',
+            'Ideal for Technical Architect positions designing systems with theoretical rigor and rapid prototyping',
+            'Consider Chief of Staff roles requiring strategic framework development with fast tactical execution',
+            'Thrive at companies like Bain, BCG, or high-growth SaaS companies balancing strategy with speed',
+            'Look for "think fast, move fast" cultures that value both depth and velocity'
           ]
         });
       }
@@ -472,10 +514,14 @@ export class InsightSynthesisEngine {
         sourceAreas: ['values', 'work-style'],
         basedOn: ['cd-1', 'cd-2'],
         implications: [
-          'Prioritize roles with clear KPIs and defined success metrics',
-          'During interviews, assess how clearly the role and expectations are defined',
-          'Avoid ambiguous startup environments where expectations shift rapidly',
-          'You\'ll thrive in roles with regular feedback and performance clarity'
+          'This makes you ideal for project management roles where clear expectations drive team performance',
+          'Consider companies with structured onboarding and defined success metrics',
+          'Excel in consulting firms with established methodologies and client deliverables',
+          'Thrive in enterprise software roles with clear user requirements and acceptance criteria',
+          'Seek operations roles where processes and outcomes are well-defined',
+          'Avoid early-stage startups where role boundaries and success metrics are fluid',
+          'Look for managers who provide regular feedback and clear goal-setting',
+          'Consider roles like Business Analyst, Program Manager, or Implementation Specialist'
         ]
       });
     }
@@ -492,10 +538,13 @@ export class InsightSynthesisEngine {
         sourceAreas: ['values', 'people-interaction'],
         basedOn: ['cd-autonomy'],
         implications: [
-          'Seek managers with coaching rather than controlling styles',
-          'Look for cultures that emphasize trust and empowerment',
-          'Red flag: micromanagement or approval-heavy processes',
-          'You need to demonstrate competence to earn autonomy'
+          'Excel in Senior IC roles at companies like Netflix, Spotify, or Shopify with high-trust cultures',
+          'Perfect for Principal roles where expertise earns you decision-making authority',
+          'Ideal for remote-first companies that hire for outcomes rather than oversight',
+          'Consider consulting firms where client results demonstrate your competence and earn autonomy',
+          'Avoid micromanagement-heavy industries like traditional finance or highly regulated sectors',
+          'Look for managers who ask "What do you need from me?" rather than "What did you do today?"',
+          'Thrive in environments where trust is given based on track record, not hierarchy'
         ]
       });
     }
@@ -518,11 +567,13 @@ export class InsightSynthesisEngine {
         sourceAreas: ['values', 'problem-solving', 'learning-growth'],
         basedOn: ['ci-role-models', 'pe-2'],
         implications: [
-          'You need intellectually challenging work to feel fulfilled',
-          'Routine execution without problem-solving will drain you',
-          'Prioritize roles with novel challenges over repetitive tasks',
-          'Consider positions that evolve with increasing complexity',
-          'High compensation won\'t compensate for lack of intellectual engagement'
+          'Perfect for Principal Engineer roles at companies like Google, Facebook, or Stripe tackling complex technical challenges',
+          'Excel as Management Consultant solving unique strategic problems for different industries',
+          'Ideal for Research Scientist positions at AI labs, pharmaceutical companies, or tech R&D divisions',
+          'Consider Founding Engineer roles at startups where every problem is novel and undefined',
+          'Thrive in roles like Data Scientist, Solutions Architect, or Technical Product Manager with evolving complexity',
+          'Avoid operational roles, routine maintenance work, or highly standardized processes regardless of pay',
+          'Look for companies known for hard technical problems: SpaceX, Palantir, DeepMind, or top-tier consulting firms'
         ]
       });
     }
@@ -536,11 +587,13 @@ export class InsightSynthesisEngine {
         sourceAreas: ['values', 'people-interaction'],
         basedOn: ['ci-role-models'],
         implications: [
-          'Prioritize roles with direct human impact',
-          'Avoid pure strategy or backend roles without visible beneficiaries',
-          'You need to see and hear from the people you help',
-          'Consider customer-facing, teaching, or healthcare-adjacent roles',
-          'Metrics alone won\'t fulfill you - you need stories and faces'
+          'Perfect for Customer Success roles where you directly solve user problems and receive thank-you messages',
+          'Excel as Product Manager for user-facing features where you can see immediate impact on real people',
+          'Ideal for roles in education technology, healthcare, or social impact companies with visible beneficiaries',
+          'Consider Developer Relations positions helping other developers succeed with direct community feedback',
+          'Thrive in customer-facing roles at companies like Zoom, Slack, or educational platforms where users express gratitude',
+          'Avoid backend infrastructure, internal tooling, or pure data analysis roles without user connection',
+          'Look for companies that share user success stories and celebrate impact on individuals, not just business metrics'
         ]
       });
     }
@@ -554,11 +607,13 @@ export class InsightSynthesisEngine {
         sourceAreas: ['creativity', 'work-style'],
         basedOn: ['ci-role-models'],
         implications: [
-          'You need to create tangible outputs: code, designs, content, products',
-          'Avoid pure consulting roles without implementation',
-          'Look for maker cultures that value building',
-          'Your portfolio/body of work matters deeply to your fulfillment',
-          'Consider roles where you own creation from concept to completion'
+          'Perfect for Full-Stack Developer roles where you build complete features users can interact with',
+          'Excel as Product Designer creating interfaces and experiences people use daily',
+          'Ideal for Content Creator roles at companies like Medium, Substack, or creative agencies',
+          'Consider Founding roles where you build products, companies, or teams from zero to launch',
+          'Thrive at maker-friendly companies like GitHub, Figma, or Notion that celebrate creative output',
+          'Avoid pure strategy consulting, business analysis, or advisory roles without tangible deliverables',
+          'Look for roles where you can point to something and say "I built that" - your portfolio matters more than your title'
         ]
       });
     }
@@ -582,12 +637,13 @@ export class InsightSynthesisEngine {
         sourceAreas: ['work-style', 'environment', 'people-interaction'],
         basedOn: ['ep-2', 'ep-1'],
         implications: [
-          'You NEED roles with substantial independent work time',
-          'Excessive meetings will impact your work quality and health',
-          'Remote work with async communication may suit you better',
-          'Build in recharge time between social obligations',
-          'This is non-negotiable - don\'t accept roles that violate this',
-          'Look for cultures that respect focus time and limit meetings'
+          'Perfect for Senior IC roles at companies like Basecamp, Buffer, or GitLab with async-first, low-meeting cultures',
+          'Excel in Technical Writing, Software Development, or Research roles requiring deep focused work',
+          'Ideal for remote positions with companies that measure output, not hours or meeting attendance',
+          'Consider consulting where client work is project-based with natural recharge periods between engagements',
+          'Thrive at companies with "No Meeting Fridays" or "Focus Time" policies like Shopify or Atlassian',
+          'Absolutely avoid sales, customer success, or client-facing roles requiring constant social interaction',
+          'This is neurological, not a preference - prioritize this over salary, title, or other benefits'
         ]
       });
     }
@@ -601,11 +657,13 @@ export class InsightSynthesisEngine {
         sourceAreas: ['work-style', 'creativity', 'values'],
         basedOn: ['ep-2'],
         implications: [
-          'Highly regulated industries may slowly deplete you',
-          'Seek roles with decision-making authority and judgment calls',
-          'Avoid process-heavy environments with approval bottlenecks',
-          'Look for "how" flexibility even if "what" is defined',
-          'Startups or innovative teams may provide needed freedom'
+          'Perfect for Senior roles at fast-moving startups like Stripe, Figma, or Notion where you own decisions',
+          'Excel in Product roles with outcome ownership but methodology freedom',
+          'Ideal for Consulting positions where you design solutions rather than follow prescribed processes',
+          'Consider Creative roles at agencies or design studios with creative freedom within client briefs',
+          'Thrive at companies known for autonomy like Netflix, Spotify, or GitLab with "context not control" cultures',
+          'Avoid traditional banking, government, or heavily regulated industries with rigid approval processes',
+          'Look for "how" flexibility even if "what" outcomes are defined - entrepreneurial environments energize you'
         ]
       });
     }
@@ -621,11 +679,13 @@ export class InsightSynthesisEngine {
           sourceAreas: ['creativity', 'work-style', 'values'],
           basedOn: ['ep-3'],
           implications: [
-            'Prioritize roles where you create vs. manage or optimize',
-            'Greenfield projects will energize you more than maintenance',
-            'Consider maker roles: engineering, design, content creation',
-            'Avoid pure operations or optimization roles',
-            'You need creative outlets even in analytical roles'
+            'Perfect for Founding Engineer roles building new products from scratch rather than maintaining legacy systems',
+            'Excel in Product Design positions creating new user experiences rather than optimizing existing ones',
+            'Ideal for Content Strategy roles developing original campaigns rather than managing existing content',
+            'Consider Innovation Manager positions launching new initiatives rather than optimizing current operations',
+            'Thrive at companies like Tesla, SpaceX, or cutting-edge startups focused on creation over optimization',
+            'Avoid pure DevOps, maintenance engineering, or operational efficiency roles that lack creative expression',
+            'Even in analytical roles, seek positions where you create new models, insights, or frameworks rather than run reports'
           ]
         });
       }
