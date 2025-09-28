@@ -17,6 +17,7 @@ import { ConfidenceEvolutionEngine, InsightEvolution, ConfidencePattern, Evoluti
 import { ConfidenceEvolutionPanel } from './ConfidenceEvolutionPanel';
 import { FutureSelfProjection } from '@/lib/future-modeling/future-self-projector';
 import { FutureCareerPathVisualizer } from './FutureCareerPathVisualizer';
+import { CareerSuggestion } from '@/lib/ai/career-suggestions-ai';
 
 interface AdaptiveQuestionnaireProps {
   onComplete?: (profile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => void;
@@ -48,6 +49,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [latestUpdate, setLatestUpdate] = useState<LiveCareerUpdate | undefined>();
   const [showCareerMatches, setShowCareerMatches] = useState(false);
   const [authenticityProfile, setAuthenticityProfile] = useState<AuthenticityProfile | null>(null);
+  const [aiSuggestions, setAiSuggestions] = useState<CareerSuggestion[]>([]);
+  const [showNewSuggestion, setShowNewSuggestion] = useState(false);
+  const [latestSuggestion, setLatestSuggestion] = useState<CareerSuggestion | null>(null);
   const [showAuthenticityInsights, setShowAuthenticityInsights] = useState(false);
   const [narrativeInsights, setNarrativeInsights] = useState<NarrativeInsight[]>([]);
   const [confidenceEvolutions, setConfidenceEvolutions] = useState<InsightEvolution[]>([]);
@@ -334,6 +338,12 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       }
     }
 
+    // Generate AI career suggestions periodically
+    const responseCount = Object.keys(engine.getState().responses).length;
+    if (responseCount >= 8 && (responseCount - 8) % 5 === 0) {
+      generateAiSuggestions();
+    }
+
     try {
       if (currentQuestionIndex < currentQuestions.length - 1) {
         console.log('Moving to next question in batch');
@@ -355,6 +365,41 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     }
     console.log('Response submission complete');
     setIsSubmitting(false);
+  };
+
+  const generateAiSuggestions = async () => {
+    try {
+      const responses = engine.getState().responses;
+      const currentInsights = insights;
+      const currentMatches = topCareers.map(c => ({
+        careerTitle: c.careerTitle,
+        currentScore: c.currentScore,
+      }));
+      const responseCount = Object.keys(responses).length;
+
+      const response = await fetch('/api/career-suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          responses,
+          insights: currentInsights,
+          currentMatches,
+          responseCount,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.suggestions && data.suggestions.length > 0) {
+          setAiSuggestions(prev => [...prev, ...data.suggestions]);
+          setLatestSuggestion(data.suggestions[0]);
+          setShowNewSuggestion(true);
+          setTimeout(() => setShowNewSuggestion(false), 15000);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to generate AI suggestions:', error);
+    }
   };
 
   const updateCareerMatches = (currentInsights: DiscoveredInsight[]) => {
@@ -662,17 +707,85 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )}
 
+      {/* AI Career Suggestion Notification */}
+      {showNewSuggestion && latestSuggestion && (
+        <div className="fixed top-20 right-4 left-4 sm:left-auto z-50 animate-slide-in-right">
+          <div className="bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 rounded-xl shadow-2xl p-4 sm:p-5 max-w-md border-2 border-amber-400/50 relative overflow-hidden">
+            {/* Sparkle effect */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+              <div className="absolute top-2 right-2 w-2 h-2 bg-amber-300 rounded-full animate-ping" />
+              <div className="absolute top-4 right-8 w-1 h-1 bg-amber-300 rounded-full animate-ping delay-100" />
+              <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-amber-300 rounded-full animate-ping delay-200" />
+            </div>
+
+            <div className="flex items-start gap-3 relative">
+              <div className="p-2.5 bg-white/30 rounded-xl">
+                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">AI Discovery!</span>
+                  <span className="px-2 py-0.5 bg-amber-200/30 rounded-full text-xs font-semibold text-amber-100">
+                    {latestSuggestion.category}
+                  </span>
+                </div>
+                <p className="text-base text-white font-bold leading-snug mb-2">{latestSuggestion.title}</p>
+                <p className="text-sm text-white/90 leading-relaxed mb-2">{latestSuggestion.discoveryReason}</p>
+                <div className="flex items-center gap-2 text-xs text-white/80">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>{latestSuggestion.matchScore}% potential match</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowNewSuggestion(false)}
+                className="text-white/70 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Main Content */}
         <div className="flex-1 max-w-full lg:max-w-4xl">
       {/* Header with Adaptive Intelligence Indicator */}
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-100 mb-1">Adaptive Career Exploration</h1>
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span>AI adapting questions</span>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-100 mb-1">Adaptive Career Exploration</h1>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span>AI adapting questions</span>
+                </div>
+              </div>
+              <button
+                onClick={async () => {
+                  if (confirm('Are you sure you want to reset the assessment? This will clear all your answers and start over.')) {
+                    try {
+                      await fetch('/api/questionnaire', { method: 'DELETE' });
+                      window.location.reload();
+                    } catch (error) {
+                      console.error('Failed to reset:', error);
+                    }
+                  }
+                }}
+                className="px-3 py-1.5 bg-gray-700 text-gray-300 hover:bg-gray-600 rounded-lg text-xs font-medium transition-colors flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Reset
+              </button>
             </div>
           </div>
           <div className="text-left sm:text-right">

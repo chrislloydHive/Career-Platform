@@ -210,6 +210,7 @@ export class AdaptiveQuestioningEngine {
     }
 
     const dynamicQuestions = this.getDynamicQuestions();
+    this.generatedQuestionsCache.push(...dynamicQuestions);
     dynamicQuestions.forEach(q => candidates.push({ question: q, priority: 90, reason: 'Personalized from career interests' }));
 
     const archaeologyQuestions = this.getArchaeologyQuestions();
@@ -303,6 +304,12 @@ export class AdaptiveQuestioningEngine {
   }
 
   private getDynamicQuestions(): AdaptiveQuestion[] {
+    const responseCount = Object.keys(this.state.responses).length;
+
+    if (responseCount < 5) {
+      return [];
+    }
+
     const interactions = InteractionTracker.getRecentInteractions(50);
 
     if (interactions.length < 2) {

@@ -71,7 +71,7 @@ export class DynamicQuestionGenerator {
 
         if (commonThemes.includes('education') || commonThemes.includes('teaching')) {
           return {
-            id: `dynamic-teaching-${Date.now()}`,
+            id: 'dynamic-teaching-preference',
             area: 'people-interaction',
             type: 'multiple-choice',
             text: `You've shown interest in roles involving teaching and education (like ${roles.slice(0, 2).join(' and ')}). Do you prefer explaining complex topics to individuals or groups?`,
@@ -103,7 +103,7 @@ export class DynamicQuestionGenerator {
 
         if (commonThemes.includes('management') || commonThemes.includes('leadership')) {
           return {
-            id: `dynamic-leadership-${Date.now()}`,
+            id: 'dynamic-leadership-preference',
             area: 'people-interaction',
             type: 'multiple-choice',
             text: `You've explored leadership roles like ${roles[0]}. What aspect of leading people energizes you most?`,
@@ -172,7 +172,7 @@ export class DynamicQuestionGenerator {
 
         if (hasAnalytical && hasCreative) {
           return {
-            id: `dynamic-skill-blend-${Date.now()}`,
+            id: 'dynamic-skill-blend-preference',
             area: 'problem-solving',
             type: 'multiple-choice',
             text: `The roles you're interested in require both analytical and creative skills. Which describes your ideal project workflow?`,
@@ -232,7 +232,7 @@ export class DynamicQuestionGenerator {
         if (!topIndustry) return null;
 
         return {
-          id: `dynamic-industry-${Date.now()}`,
+          id: `dynamic-industry-${topIndustry.toLowerCase().replace(/\s+/g, '-')}`,
           area: 'values',
           type: 'multiple-choice',
           text: `You've been exploring roles in ${topIndustry}. What draws you to this industry specifically?`,
@@ -278,7 +278,7 @@ export class DynamicQuestionGenerator {
       },
       generate: (context) => {
         return {
-          id: `dynamic-environment-${Date.now()}`,
+          id: 'dynamic-environment-preference',
           area: 'environment',
           type: 'scenario',
           text: `Based on your career conversations, how important is work location flexibility to you?`,
@@ -321,7 +321,7 @@ export class DynamicQuestionGenerator {
       },
       generate: (context) => {
         return {
-          id: `dynamic-team-size-${Date.now()}`,
+          id: 'dynamic-team-size-preference',
           area: 'work-style',
           type: 'multiple-choice',
           text: `Thinking about the companies you've explored, what team size appeals to you most?`,
@@ -365,7 +365,7 @@ export class DynamicQuestionGenerator {
       },
       generate: (context) => {
         return {
-          id: `dynamic-impact-${Date.now()}`,
+          id: 'dynamic-impact-preference',
           area: 'values',
           type: 'multiple-choice',
           text: `Looking at the roles you're considering, what kind of impact do you want your work to have?`,
@@ -407,7 +407,7 @@ export class DynamicQuestionGenerator {
       },
       generate: (context) => {
         return {
-          id: `dynamic-communication-${Date.now()}`,
+          id: 'dynamic-communication-preference',
           area: 'people-interaction',
           type: 'scenario',
           text: `In the roles you're exploring, which communication format would you find most energizing?`,
@@ -453,7 +453,7 @@ export class DynamicQuestionGenerator {
       },
       generate: (context) => {
         return {
-          id: `dynamic-growth-${Date.now()}`,
+          id: 'dynamic-growth-preference',
           area: 'learning-growth',
           type: 'multiple-choice',
           text: `When you think about your career path, what type of growth matters most to you?`,
@@ -496,7 +496,7 @@ export class DynamicQuestionGenerator {
       },
       generate: (context) => {
         return {
-          id: `dynamic-company-stage-${Date.now()}`,
+          id: 'dynamic-company-stage-preference',
           area: 'environment',
           type: 'multiple-choice',
           text: `Based on your job searches, what company stage appeals to you most?`,
@@ -550,7 +550,7 @@ export class DynamicQuestionGenerator {
 
         if (hasDiverse) {
           return {
-            id: `dynamic-responsibility-${Date.now()}`,
+            id: 'dynamic-responsibility-preference',
             area: 'work-style',
             type: 'multiple-choice',
             text: `You're considering roles across different functions. Do you prefer focused expertise or diverse responsibilities?`,
