@@ -4,22 +4,15 @@ import { useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
-import { DiscoveredInsight } from '@/lib/adaptive-questions/adaptive-engine';
 
 export default function ExplorePage() {
   const [showResults, setShowResults] = useState(false);
   const [profile, setProfile] = useState<ReturnType<AdaptiveQuestioningEngine['exportProfile']> | null>(null);
-  const [recentInsight, setRecentInsight] = useState<DiscoveredInsight | null>(null);
   const [questionnaireKey, setQuestionnaireKey] = useState(0);
 
   const handleComplete = (exportedProfile: ReturnType<AdaptiveQuestioningEngine['exportProfile']>) => {
     setProfile(exportedProfile);
     setShowResults(true);
-  };
-
-  const handleInsightDiscovered = (insight: DiscoveredInsight) => {
-    setRecentInsight(insight);
-    setTimeout(() => setRecentInsight(null), 5000);
   };
 
   if (showResults && profile) {
@@ -410,42 +403,9 @@ export default function ExplorePage() {
         <AdaptiveQuestionnaire
           key={questionnaireKey}
           onComplete={handleComplete}
-          onInsightDiscovered={handleInsightDiscovered}
         />
       </main>
 
-      {/* Insight Toast */}
-      {recentInsight && (
-        <div className="fixed bottom-6 right-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg p-4 shadow-xl max-w-md animate-slide-up">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <div className="font-semibold mb-1">New Insight Discovered!</div>
-              <p className="text-sm opacity-90">{recentInsight.insight}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

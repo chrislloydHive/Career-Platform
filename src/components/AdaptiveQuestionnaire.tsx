@@ -160,6 +160,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         gapsCount: gaps.length,
         narrativeCount: narrativeInsights.length,
         completionPercentage,
+        payloadSize: JSON.stringify(payload).length,
       });
 
       const controller = new AbortController();
@@ -187,7 +188,11 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         console.error('Save failed with status:', response.status);
         console.error('Error data:', errorData);
-        setSaveStatus('error');
+
+        // Only show error status for non-auth errors to avoid cluttering UI
+        if (response.status !== 401) {
+          setSaveStatus('error');
+        }
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
