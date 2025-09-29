@@ -9,6 +9,18 @@ interface EnhancedJobListProps {
   isLoading?: boolean;
   onSaveJob?: (job: ScoredJob) => void;
   savedJobIds?: string[];
+  searchCriteria?: {
+    jobTypes?: string[];
+    keywords?: string[];
+  };
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
+  hasMoreResults?: boolean;
+  searchMetadata?: {
+    totalJobsFound?: number;
+    uniqueJobs?: number;
+    duplicatesRemoved?: number;
+  };
 }
 
 type SortOption = 'score' | 'date' | 'salary' | 'title' | 'company';
@@ -19,21 +31,30 @@ export function EnhancedJobList({
   isLoading = false,
   onSaveJob,
   savedJobIds = [],
+  searchCriteria,
+  onLoadMore,
+  isLoadingMore = false,
+  hasMoreResults = false,
+  searchMetadata,
 }: EnhancedJobListProps) {
   const [sortBy, setSortBy] = useState<SortOption>('score');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [filterSource, setFilterSource] = useState<JobSource | 'all'>('all');
   const [scoreRange, setScoreRange] = useState<[number, number]>([0, 100]);
-  const [salaryRange, setSalaryRange] = useState<[number, number]>([0, 500000]);
-  const [locationFilter, setLocationFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(() => {
+    // Auto-open filters on first visit to help discovery
+    const hasSeenFilters = localStorage.getItem('job_filters_seen');
+    if (!hasSeenFilters) {
+      localStorage.setItem('job_filters_seen', 'true');
+      return true;
+    }
+    return false;
+  });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
-  const uniqueLocations = useMemo(() => {
-    const locations = new Set(jobs.map(job => job.location));
-    return Array.from(locations).sort();
-  }, [jobs]);
+
+
 
   const filteredAndSortedJobs = useMemo(() => {
     let filtered = [...jobs];
@@ -46,16 +67,7 @@ export function EnhancedJobList({
       job.score >= scoreRange[0] && job.score <= scoreRange[1]
     );
 
-    if (locationFilter && locationFilter !== 'all') {
-      filtered = filtered.filter(job =>
-        job.location.toLowerCase().includes(locationFilter.toLowerCase())
-      );
-    }
 
-    filtered = filtered.filter(job => {
-      const salary = job.salary?.min || job.salary?.max || 0;
-      return salary >= salaryRange[0] && salary <= salaryRange[1];
-    });
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
@@ -66,6 +78,34 @@ export function EnhancedJobList({
       );
     }
 
+
+    // Job type filter (from search criteria)
+    if (searchCriteria?.jobTypes && searchCriteria.jobTypes.length > 0) {
+      filtered = filtered.filter(job => {
+        const text = `${job.title} ${job.description}`.toLowerCase();
+        return searchCriteria.jobTypes!.some(type => {
+          switch (type) {
+            case 'full-time':
+              return text.includes('full-time') || text.includes('full time') || text.includes('fulltime');
+            case 'part-time':
+              return text.includes('part-time') || text.includes('part time') || text.includes('parttime');
+            case 'contract':
+              return text.includes('contract') || text.includes('contractor') || text.includes('freelance');
+            case 'temporary':
+              return text.includes('temporary') || text.includes('temp') || text.includes('interim');
+            case 'internship':
+              return text.includes('internship') || text.includes('intern') || text.includes('trainee');
+            default:
+              return false;
+          }
+        });
+      });
+    }
+
+
+
+
+
     filtered.sort((a, b) => {
       let comparison = 0;
 
@@ -74,7 +114,7 @@ export function EnhancedJobList({
           comparison = a.score - b.score;
           break;
         case 'date':
-          comparison = a.postedDate.getTime() - b.postedDate.getTime();
+          comparison = new Date(a.postedDate).getTime() - new Date(b.postedDate).getTime();
           break;
         case 'salary': {
           const aSalary = a.salary?.max || a.salary?.min || 0;
@@ -94,7 +134,7 @@ export function EnhancedJobList({
     });
 
     return filtered;
-  }, [jobs, sortBy, sortDirection, filterSource, scoreRange, locationFilter, salaryRange, searchTerm]);
+  }, [jobs, sortBy, sortDirection, filterSource, scoreRange, searchTerm, searchCriteria]);
 
   const handleSortChange = (newSortBy: SortOption) => {
     if (sortBy === newSortBy) {
@@ -155,11 +195,10 @@ export function EnhancedJobList({
     URL.revokeObjectURL(url);
   };
 
+
   const resetFilters = () => {
     setFilterSource('all');
     setScoreRange([0, 100]);
-    setSalaryRange([0, 500000]);
-    setLocationFilter('');
     setSearchTerm('');
   };
 
@@ -208,17 +247,31 @@ export function EnhancedJobList({
             {stats.filtered !== stats.total && (
               <span className="text-sm text-gray-400">of {stats.total}</span>
             )}
+            {searchMetadata?.totalJobsFound && (
+              <span className="text-sm text-gray-500">({searchMetadata.totalJobsFound} total found)</span>
+            )}
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-3 py-2 text-sm text-gray-300 border border-gray-600 rounded-lg hover:bg-gray-800 flex items-center gap-2"
+              className={`px-3 py-2 text-sm border rounded-lg flex items-center gap-2 transition-colors ${
+                showFilters
+                  ? 'text-gray-300 border-gray-600 hover:bg-gray-800'
+                  : 'bg-green-600 text-white border-green-600'
+              }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
-              Filters {showFilters ? '▲' : '▼'}
+              <span className="font-medium">Post-Search Filters</span>
+              {/* Active filters count for remaining filters */}
+              {(filterSource !== 'all' || scoreRange[0] !== 0 || scoreRange[1] !== 100 || searchTerm) && (
+                <span className="text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded-full">
+                  {[filterSource !== 'all', scoreRange[0] !== 0 || scoreRange[1] !== 100, searchTerm].filter(Boolean).length}
+                </span>
+              )}
+              {showFilters ? '▲' : '▼'}
             </button>
 
             <div className="flex items-center gap-1 border border-gray-600 rounded-lg p-1">
@@ -242,7 +295,7 @@ export function EnhancedJobList({
 
             <button
               onClick={exportToCSV}
-              className="px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+              className="px-3 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -261,44 +314,22 @@ export function EnhancedJobList({
           </div>
         </div>
 
+
         {showFilters && (
           <div className="border-t border-gray-700 pt-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">Search</label>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Title, company, description..."
-                  className="w-full px-3 py-2 text-sm bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">Source</label>
+                <label className="block text-xs font-medium text-gray-300 mb-1">Job Source</label>
                 <select
                   value={filterSource}
                   onChange={(e) => setFilterSource(e.target.value as JobSource | 'all')}
                   className="w-full px-3 py-2 text-sm bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="all">All Sources</option>
-                  <option value="linkedin">LinkedIn</option>
                   <option value="indeed">Indeed</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">Location</label>
-                <select
-                  value={locationFilter}
-                  onChange={(e) => setLocationFilter(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">All Locations</option>
-                  {uniqueLocations.map(loc => (
-                    <option key={loc} value={loc}>{loc}</option>
-                  ))}
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="glassdoor">Glassdoor</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
 
@@ -327,39 +358,24 @@ export function EnhancedJobList({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">
-                  Salary Range: ${(salaryRange[0] / 1000).toFixed(0)}k - ${(salaryRange[1] / 1000).toFixed(0)}k
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="range"
-                    min="0"
-                    max="500000"
-                    step="10000"
-                    value={salaryRange[0]}
-                    onChange={(e) => setSalaryRange([parseInt(e.target.value), salaryRange[1]])}
-                    className="flex-1"
-                  />
-                  <input
-                    type="range"
-                    min="0"
-                    max="500000"
-                    step="10000"
-                    value={salaryRange[1]}
-                    onChange={(e) => setSalaryRange([salaryRange[0], parseInt(e.target.value)])}
-                    className="flex-1"
-                  />
-                </div>
+                <label className="block text-xs font-medium text-gray-300 mb-1">Search Within Results</label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search within results..."
+                  className="w-full px-3 py-2 text-sm bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
+            </div>
 
-              <div className="flex items-end">
-                <button
-                  onClick={resetFilters}
-                  className="w-full px-3 py-2 text-sm bg-gray-800 text-gray-300 border border-gray-600 rounded-lg hover:bg-gray-700"
-                >
-                  Reset Filters
-                </button>
-              </div>
+            <div className="flex items-end">
+              <button
+                onClick={resetFilters}
+                className="w-full px-3 py-2 text-sm bg-gray-800 text-gray-300 border border-gray-600 rounded-lg hover:bg-gray-700"
+              >
+                Reset Filters
+              </button>
             </div>
           </div>
         )}
@@ -436,6 +452,34 @@ export function EnhancedJobList({
           </div>
         ))}
       </div>
+
+      {/* Load More Button */}
+      {!isLoading && filteredAndSortedJobs.length > 0 && hasMoreResults && onLoadMore && (
+        <div className="mt-8 text-center">
+          <button
+            onClick={onLoadMore}
+            disabled={isLoadingMore}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors flex items-center gap-2 mx-auto"
+          >
+            {isLoadingMore ? (
+              <>
+                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Loading More...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Load More Results
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

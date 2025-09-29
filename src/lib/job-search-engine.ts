@@ -48,7 +48,15 @@ export class JobSearchEngine {
 
   async search(config: SearchEngineConfig): Promise<SearchEngineResult> {
     const startTime = Date.now();
-    const sourcesToScrape = config.sources || ['google_jobs'];
+    const requestedSources = config.sources || ['google_jobs'];
+    const supportedSources = Array.from(this.scrapers.keys());
+    const sourcesToScrape = requestedSources.filter(source => supportedSources.includes(source));
+    const unsupportedSources = requestedSources.filter(source => !supportedSources.includes(source));
+
+    // If no supported sources were requested, use default google_jobs
+    if (sourcesToScrape.length === 0 && requestedSources.length > 0) {
+      sourcesToScrape.push('google_jobs');
+    }
     const enableDedup = config.enableDeduplication !== false;
     const timeoutMs = config.timeoutMs || this.timeoutMs;
 
@@ -66,6 +74,17 @@ export class JobSearchEngine {
     const successfulSources: JobSource[] = [];
     const failedSources: JobSource[] = [];
     let partialResults = false;
+
+    // Add errors for unsupported sources
+    unsupportedSources.forEach(source => {
+      allErrors.push({
+        source,
+        message: `${source} scraper not implemented yet`,
+        timestamp: new Date(),
+      });
+      failedSources.push(source);
+      partialResults = true;
+    });
 
     results.forEach((result, index) => {
       const source = sourcesToScrape[index];
@@ -129,7 +148,7 @@ export class JobSearchEngine {
     const scraper = this.scrapers.get(source);
 
     if (!scraper) {
-      throw new Error(`Scraper for source "${source}" not found`);
+      throw new Error(`Scraper for source "${source}" not implemented yet`);
     }
 
     this.updateProgress(source, 'running', 0, 0);

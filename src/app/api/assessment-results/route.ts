@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import { auth } from '@/lib/auth/config';
 import { getUserProfile, buildUserContextPrompt, getQuestionnaireInsights } from '@/lib/storage/user-profile-db';
-import { careerRecommendationsAI, CareerRecommendation } from '@/lib/ai/career-recommendations-ai';
+import { careerRecommendationsAI, CareerRecommendationsResponse } from '@/lib/ai/career-recommendations-ai';
 import { JobCategory } from '@/types/career';
 
 export async function GET() {
@@ -59,7 +59,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let careerRecommendations: CareerRecommendation[] = [];
+    let careerRecommendationsResponse: CareerRecommendationsResponse = {
+      topRecommendations: [],
+      alternativePaths: []
+    };
     try {
       const userProfile = await getUserProfile(session.user.id);
       const questionnaireData = await getQuestionnaireInsights(session.user.id);
@@ -111,7 +114,7 @@ export async function POST(request: NextRequest) {
 
         const questionnaireCompletion = questionnaireData?.completion_percentage || 0;
 
-        careerRecommendations = await careerRecommendationsAI.generateRecommendations(
+        careerRecommendationsResponse = await careerRecommendationsAI.generateRecommendations(
           userContext,
           {
             searchedJobs,
@@ -157,7 +160,7 @@ export async function POST(request: NextRequest) {
         ${JSON.stringify(profile.analysis || {})}::jsonb,
         ${JSON.stringify(profile.topCareers || [])}::jsonb,
         ${profile.completion || 0},
-        ${JSON.stringify(careerRecommendations)}::jsonb
+        ${JSON.stringify(careerRecommendationsResponse)}::jsonb
       )
       RETURNING id
     `;

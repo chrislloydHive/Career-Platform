@@ -1,13 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { CareerExplorer } from '@/components/CareerExplorer';
 import { CareerDetailModal } from '@/components/CareerDetailModal';
 import { CareerComparisonTool } from '@/components/CareerComparisonTool';
 import { CareerResearchModal } from '@/components/CareerResearchModal';
-import { AiCareerSuggestionsPanel } from '@/components/AiCareerSuggestionsPanel';
 import { JobCategory, CareerCategory } from '@/types/career';
 
 export default function CareersPage() {

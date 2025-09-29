@@ -15,6 +15,12 @@ export interface SearchCriteria {
   excludeKeywords?: string[];
   postedWithinDays?: number;
   maxResults?: number;
+  // Advanced filters
+  experienceLevel?: 'all' | 'entry' | 'mid' | 'senior' | 'executive';
+  industry?: string;
+  employmentType?: 'all' | 'full-time' | 'part-time' | 'contract' | 'temporary' | 'internship';
+  freshnessFilter?: 'all' | 'today' | 'week' | 'month' | 'quarter';
+  additionalKeywords?: string;
 }
 
 export interface ScraperConfig {

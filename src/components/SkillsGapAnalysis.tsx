@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { CareerFitScore } from '@/lib/matching/realtime-career-matcher';
+import { ProgressTrackingService } from '@/lib/progress-tracking/progress-service';
+import { ProgressTracker } from './ProgressTracker';
 
 interface SkillsGapAnalysisProps {
   topCareers: CareerFitScore[];
@@ -227,7 +229,8 @@ const isSkillTransferable = (userStrength: string, requiredSkill: string): boole
 
 export function SkillsGapAnalysis({ topCareers, userStrengths }: SkillsGapAnalysisProps) {
   const [selectedCareerIndex, setSelectedCareerIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState<'overview' | 'transferable' | 'develop' | 'resources'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'transferable' | 'develop' | 'resources' | 'progress'>('overview');
+  const [service] = useState(() => ProgressTrackingService.getInstance());
 
   if (!topCareers || topCareers.length === 0) return null;
 
@@ -328,11 +331,12 @@ export function SkillsGapAnalysis({ topCareers, userStrengths }: SkillsGapAnalys
           { key: 'overview', label: 'Overview', icon: '📊' },
           { key: 'transferable', label: 'Transferable Skills', icon: '✅' },
           { key: 'develop', label: 'Skills to Develop', icon: '📈' },
-          { key: 'resources', label: 'Learning Resources', icon: '📚' }
+          { key: 'resources', label: 'Learning Resources', icon: '📚' },
+          { key: 'progress', label: 'Track Progress', icon: '🎯' }
         ].map(tab => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key as 'overview' | 'transferable' | 'develop' | 'resources')}
+            onClick={() => setActiveTab(tab.key as 'overview' | 'transferable' | 'develop' | 'resources' | 'progress')}
             className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all ${
               activeTab === tab.key
                 ? 'bg-purple-600 text-white'
@@ -556,7 +560,96 @@ export function SkillsGapAnalysis({ topCareers, userStrengths }: SkillsGapAnalys
             </div>
           </div>
         )}
+
+        {activeTab === 'progress' && (
+          <div>
+            <h3 className="text-xl font-bold text-gray-100 mb-4">Track Your Progress</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Import skills from your analysis to start tracking progress and building your development roadmap.
+            </p>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <button
+                onClick={() => importSkillsToProgress()}
+                className="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span className="font-semibold">Import Skills to Progress</span>
+                </div>
+                <p className="text-sm text-blue-100">
+                  Add the skills identified in this analysis to your progress tracker
+                </p>
+              </button>
+
+              <button
+                onClick={() => window.open('/careers/timeline', '_blank')}
+                className="p-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <span className="font-semibold">View Progress Dashboard</span>
+                </div>
+                <p className="text-sm text-green-100">
+                  Open the full progress tracking interface
+                </p>
+              </button>
+            </div>
+
+            {/* Progress Tracker Preview */}
+            <div className="border border-gray-700 rounded-lg p-1">
+              <ProgressTracker
+                initialCareerPath={selectedCareer.careerTitle}
+                showFullInterface={false}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
+
+  function importSkillsToProgress() {
+    // Set target career path
+    service.updatePreferences({ targetCareerPath: selectedCareer.careerTitle });
+
+    // Import skills to acquire as progress items
+    analysis.skillsToAcquire.forEach(skill => {
+      // Check if skill already exists
+      const existingSkills = service.getState().skills;
+      const skillExists = existingSkills.some(s => s.skillName === skill.name);
+
+      if (!skillExists) {
+        service.addSkill({
+          skillName: skill.name,
+          category: skill.category,
+          currentLevel: 'none',
+          targetLevel: skill.proficiencyLevel,
+          importance: skill.importance,
+          timeToAcquire: skill.timeToAcquire
+        });
+
+        // Add recommended courses
+        skill.resources.forEach(resource => {
+          service.addCourseToSkill(skill.name, {
+            title: resource.name,
+            provider: resource.provider,
+            type: resource.type,
+            duration: resource.duration,
+            cost: resource.cost,
+            url: resource.url,
+            skillArea: skill.name,
+            priority: skill.importance
+          });
+        });
+      }
+    });
+
+    alert(`Successfully imported ${analysis.skillsToAcquire.length} skills to your progress tracker!`);
+  }
 }

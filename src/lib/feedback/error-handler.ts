@@ -7,6 +7,27 @@ export interface UserFriendlyError {
   severity: 'error' | 'warning' | 'info';
 }
 
+function extractSourceNames(message: string): string {
+  const supportedSources = ['linkedin', 'indeed', 'google jobs'];
+  const foundSources = supportedSources.filter(source =>
+    message.toLowerCase().includes(source)
+  );
+
+  if (foundSources.length === 0) {
+    return 'some sources';
+  }
+
+  if (foundSources.length === 1) {
+    return foundSources[0];
+  }
+
+  if (foundSources.length === 2) {
+    return `${foundSources[0]} and ${foundSources[1]}`;
+  }
+
+  return `${foundSources.slice(0, -1).join(', ')}, and ${foundSources[foundSources.length - 1]}`;
+}
+
 export function getUserFriendlyError(error: unknown): UserFriendlyError {
   if (typeof error === 'object' && error !== null) {
     const err = error as Record<string, unknown>;
@@ -72,6 +93,54 @@ export function getUserFriendlyError(error: unknown): UserFriendlyError {
           ],
           canRetry: false,
           severity: 'error',
+        };
+      }
+
+      if (message.includes('not implemented') || message.includes('scraper not found')) {
+        const sources = extractSourceNames(message);
+        return {
+          title: 'Source Not Available',
+          message: `${sources} ${sources.includes(',') ? 'are' : 'is'} not yet supported. Only Google Jobs, LinkedIn, and Indeed are currently available.`,
+          actionable: true,
+          suggestions: [
+            'Use Google Jobs, LinkedIn, or Indeed sources',
+            'Uncheck unsupported sources in your search',
+            'Check back later as we add more sources',
+          ],
+          canRetry: false,
+          severity: 'warning',
+        };
+      }
+
+      if (message.includes('failed to retrieve') || message.includes('all sources')) {
+        return {
+          title: 'Search Sources Failed',
+          message: 'Unable to retrieve jobs from the selected sources.',
+          actionable: true,
+          suggestions: [
+            'Try selecting only Google Jobs or LinkedIn',
+            'Check if the job sites are accessible',
+            'Wait a few minutes and try again',
+            'Reduce the number of selected sources',
+          ],
+          canRetry: true,
+          severity: 'error',
+        };
+      }
+
+      if (message.includes('partial results') || message.includes('some sources failed')) {
+        const failedSources = extractSourceNames(message);
+        return {
+          title: 'Partial Results',
+          message: `Some sources failed: ${failedSources}. You may have fewer results than expected.`,
+          actionable: true,
+          suggestions: [
+            'Results from working sources are still shown',
+            'Try the search again to retry failed sources',
+            'Remove failed sources from your search',
+          ],
+          canRetry: true,
+          severity: 'warning',
         };
       }
 

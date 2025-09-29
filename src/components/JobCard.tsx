@@ -67,7 +67,7 @@ export function JobCard({ job, rank }: JobCardProps) {
 
   return (
     <div className="bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-700">
-      <div className="flex justify-between items-start mb-3">
+      <div className="flex justify-between items-start mb-3 pr-12">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             {rank && (
@@ -79,7 +79,7 @@ export function JobCard({ job, rank }: JobCardProps) {
           </div>
           <p className="text-lg text-gray-300">{job.company}</p>
         </div>
-        <div className={`px-3 py-1 rounded-full border-2 ${getScoreColor(job.score)}`}>
+        <div className={`px-3 py-1 rounded-full border-2 ${getScoreColor(job.score)} ml-2`}>
           <span className="text-sm font-bold">{job.score.toFixed(0)}</span>
         </div>
       </div>

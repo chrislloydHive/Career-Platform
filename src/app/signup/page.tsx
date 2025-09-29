@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 
 const INSPIRING_QUOTES = [
@@ -91,8 +90,11 @@ export default function SignupPage() {
         return;
       }
 
-      alert('Account created successfully! Please log in.');
-      router.push('/login');
+      // Store user info for immediate login
+      localStorage.setItem('currentUser', JSON.stringify({ email, name }));
+
+      // Redirect to onboarding
+      router.push('/onboarding');
     } catch (err) {
       console.error('Signup error:', err);
       setError('Signup failed: ' + (err instanceof Error ? err.message : 'Unknown error'));

@@ -16,9 +16,10 @@ interface CompanyJob {
 
 interface CompanyJobScraperProps {
   onJobsFound?: (jobs: CompanyJob[]) => void;
+  onClose?: () => void;
 }
 
-export function CompanyJobScraper({ onJobsFound }: CompanyJobScraperProps) {
+export function CompanyJobScraper({ onJobsFound, onClose }: CompanyJobScraperProps) {
   const [mode, setMode] = useState<'single' | 'category' | 'multiple'>('single');
   const [companyUrl, setCompanyUrl] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -30,8 +31,7 @@ export function CompanyJobScraper({ onJobsFound }: CompanyJobScraperProps) {
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState('');
 
-  const handleScrape = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleScrape = async () => {
     setIsScraping(true);
     setError(null);
     setJobs([]);
@@ -124,19 +124,32 @@ export function CompanyJobScraper({ onJobsFound }: CompanyJobScraperProps) {
 
   return (
     <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-100 mb-2 flex items-center gap-2">
-          <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-          </svg>
-          Scrape Company Career Pages
-        </h3>
-        <p className="text-sm text-gray-400">
-          Search single companies, categories, or multiple companies at once
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-100 mb-2 flex items-center gap-2">
+            <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 919-9" />
+            </svg>
+            Scrape Company Career Pages
+          </h3>
+          <p className="text-sm text-gray-400">
+            Search single companies, categories, or multiple companies at once
+          </p>
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1 text-gray-400 hover:text-gray-300 hover:bg-gray-700 rounded transition-colors"
+            title="Close"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
 
-      <form onSubmit={handleScrape} className="space-y-4">
+      <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Search Mode
@@ -297,7 +310,8 @@ export function CompanyJobScraper({ onJobsFound }: CompanyJobScraperProps) {
         )}
 
         <button
-          type="submit"
+          type="button"
+          onClick={handleScrape}
           disabled={isScraping}
           className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
         >
@@ -318,7 +332,7 @@ export function CompanyJobScraper({ onJobsFound }: CompanyJobScraperProps) {
             </>
           )}
         </button>
-      </form>
+      </div>
 
       {jobs.length > 0 && (
         <div className="pt-4 border-t border-gray-700">

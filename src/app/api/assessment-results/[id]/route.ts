@@ -23,6 +23,23 @@ export async function GET(
     }
 
     const assessment = result.rows[0];
+
+    // Handle backward compatibility for career recommendations format
+    let careerRecommendations = assessment.career_recommendations;
+    if (Array.isArray(careerRecommendations)) {
+      // Old format: array of recommendations - convert to new format
+      careerRecommendations = {
+        topRecommendations: careerRecommendations,
+        alternativePaths: []
+      };
+    } else if (!careerRecommendations) {
+      // No recommendations - set default structure
+      careerRecommendations = {
+        topRecommendations: [],
+        alternativePaths: []
+      };
+    }
+
     return NextResponse.json({
       success: true,
       assessment: {
@@ -42,7 +59,7 @@ export async function GET(
           topCareers: assessment.top_careers,
           completion: assessment.completion_percentage
         },
-        careerRecommendations: assessment.career_recommendations,
+        careerRecommendations,
         savedAt: assessment.saved_at,
         createdAt: assessment.created_at
       }

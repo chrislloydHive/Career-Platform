@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/config';
 import { getUserProfile, buildUserContextPrompt, getQuestionnaireInsights } from '@/lib/storage/user-profile-db';
 import { careerRecommendationsAI } from '@/lib/ai/career-recommendations-ai';

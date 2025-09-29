@@ -53,6 +53,10 @@ const SALARY_RANGES = [
   { min: 60000, max: 80000, label: '60k-80k' },
   { min: 80000, max: 100000, label: '80k-100k' },
   { min: 100000, max: 120000, label: '100k-120k' },
+  { min: 120000, max: 150000, label: '120k-150k' },
+  { min: 150000, max: 200000, label: '150k-200k' },
+  { min: 200000, max: 300000, label: '200k-300k' },
+  { min: 300000, max: 999999, label: '300k+' },
 ];
 
 export function EnhancedSearchForm({
@@ -82,6 +86,14 @@ export function EnhancedSearchForm({
   const [customMaxSalary, setCustomMaxSalary] = useState('');
   const [useCustomSalary, setUseCustomSalary] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  // Advanced filters
+  const [experienceLevel, setExperienceLevel] = useState(initialValues?.experienceLevel || 'all');
+  const [industry, setIndustry] = useState(initialValues?.industry || 'all');
+  const [employmentType, setEmploymentType] = useState(initialValues?.employmentType || 'all');
+  const [freshnessFilter, setFreshnessFilter] = useState(initialValues?.freshnessFilter || 'all');
+  const [additionalKeywords, setAdditionalKeywords] = useState(initialValues?.additionalKeywords || '');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const queryInputRef = useRef<HTMLInputElement>(null);
   const locationInputRef = useRef<HTMLInputElement>(null);
@@ -164,6 +176,12 @@ export function EnhancedSearchForm({
         currency: 'USD',
       } : undefined,
       keywords: keywords ? keywords.split(',').map(k => k.trim()).filter(Boolean) : undefined,
+      // Advanced filters
+      experienceLevel: experienceLevel !== 'all' ? experienceLevel : undefined,
+      industry: industry !== 'all' ? industry : undefined,
+      employmentType: employmentType !== 'all' ? employmentType : undefined,
+      freshnessFilter: freshnessFilter !== 'all' ? freshnessFilter : undefined,
+      additionalKeywords: additionalKeywords.trim() || undefined,
     };
 
     onSearch(criteria);
@@ -177,13 +195,6 @@ export function EnhancedSearchForm({
     );
   };
 
-  const toggleJobType = (type: JobType) => {
-    setSelectedJobTypes(prev =>
-      prev.includes(type)
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
-    );
-  };
 
   const handleReset = () => {
     setQuery('');
@@ -196,6 +207,12 @@ export function EnhancedSearchForm({
     setCustomMaxSalary('');
     setUseCustomSalary(false);
     setValidationErrors([]);
+    // Reset advanced filters
+    setExperienceLevel('all');
+    setIndustry('all');
+    setEmploymentType('all');
+    setFreshnessFilter('all');
+    setAdditionalKeywords('');
   };
 
   return (
@@ -377,78 +394,227 @@ export function EnhancedSearchForm({
           </div>
         </div>
 
+        {/* Advanced Filters Section */}
         <div>
-          <label className="block text-sm font-semibold text-gray-300 mb-3">
-            Job Sources <span className="text-red-500">*</span>
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            {(['google_jobs', 'linkedin', 'indeed', 'company_scraper'] as JobSource[]).map(source => (
+          <div className="flex items-center justify-between mb-3">
+            <label className="block text-sm font-semibold text-gray-300">
+              Advanced Filters
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
+              disabled={isLoading}
+            >
+              {showAdvancedFilters ? 'Hide' : 'Show'} Filters
+              <svg
+                className={`w-4 h-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+
+          {showAdvancedFilters && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
+              {/* Experience Level */}
+              <div>
+                <label className="block text-xs font-medium text-gray-300 mb-1">Experience Level</label>
+                <select
+                  value={experienceLevel}
+                  onChange={(e) => setExperienceLevel(e.target.value as 'all' | 'entry' | 'mid' | 'senior' | 'executive')}
+                  className="w-full px-3 py-2 text-sm bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-800"
+                  disabled={isLoading}
+                >
+                  <option value="all">All Levels</option>
+                  <option value="entry">Entry Level</option>
+                  <option value="mid">Mid Level</option>
+                  <option value="senior">Senior Level</option>
+                  <option value="executive">Executive</option>
+                </select>
+              </div>
+
+              {/* Industry */}
+              <div>
+                <label className="block text-xs font-medium text-gray-300 mb-1">Industry</label>
+                <select
+                  value={industry}
+                  onChange={(e) => setIndustry(e.target.value)}
+                  className="w-full px-3 py-2 text-sm bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-800"
+                  disabled={isLoading}
+                >
+                  <option value="all">All Industries</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Finance">Finance & Banking</option>
+                  <option value="Healthcare">Healthcare & Life Sciences</option>
+                  <option value="Education">Education & Training</option>
+                  <option value="Retail">Retail & E-commerce</option>
+                  <option value="Manufacturing">Manufacturing & Industrial</option>
+                  <option value="Consulting">Consulting & Professional Services</option>
+                  <option value="Media">Media & Entertainment</option>
+                  <option value="Real Estate">Real Estate & Construction</option>
+                  <option value="Non-profit">Non-profit & Government</option>
+                  <option value="Energy">Energy & Utilities</option>
+                  <option value="Transportation">Transportation & Logistics</option>
+                  <option value="Telecommunications">Telecommunications</option>
+                  <option value="Insurance">Insurance</option>
+                  <option value="Automotive">Automotive</option>
+                  <option value="Aerospace">Aerospace & Defense</option>
+                  <option value="Legal">Legal Services</option>
+                  <option value="Marketing">Marketing & Advertising</option>
+                  <option value="Food">Food & Beverage</option>
+                  <option value="Travel">Travel & Hospitality</option>
+                  <option value="Sports">Sports & Recreation</option>
+                  <option value="Agriculture">Agriculture & Farming</option>
+                  <option value="Mining">Mining & Natural Resources</option>
+                  <option value="Pharmaceuticals">Pharmaceuticals & Biotech</option>
+                  <option value="Fashion">Fashion & Apparel</option>
+                  <option value="Gaming">Gaming & Entertainment Tech</option>
+                  <option value="Cybersecurity">Cybersecurity</option>
+                  <option value="Environmental">Environmental & Sustainability</option>
+                  <option value="Research">Research & Development</option>
+                </select>
+              </div>
+
+              {/* Employment Type */}
+              <div>
+                <label className="block text-xs font-medium text-gray-300 mb-1">Employment Type</label>
+                <select
+                  value={employmentType}
+                  onChange={(e) => setEmploymentType(e.target.value as 'all' | 'full-time' | 'part-time' | 'contract' | 'temporary' | 'internship')}
+                  className="w-full px-3 py-2 text-sm bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-800"
+                  disabled={isLoading}
+                >
+                  <option value="all">All Types</option>
+                  <option value="full-time">Full Time</option>
+                  <option value="part-time">Part Time</option>
+                  <option value="contract">Contract</option>
+                  <option value="temporary">Temporary</option>
+                  <option value="internship">Internship</option>
+                </select>
+              </div>
+
+              {/* Job Freshness */}
+              <div>
+                <label className="block text-xs font-medium text-gray-300 mb-1">Posted Within</label>
+                <select
+                  value={freshnessFilter}
+                  onChange={(e) => setFreshnessFilter(e.target.value as 'all' | 'today' | 'week' | 'month' | 'quarter')}
+                  className="w-full px-3 py-2 text-sm bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-800"
+                  disabled={isLoading}
+                >
+                  <option value="all">Any Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="quarter">Last 3 Months</option>
+                </select>
+              </div>
+
+              {/* Additional Keywords */}
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">Additional Keywords</label>
+                <input
+                  type="text"
+                  value={additionalKeywords}
+                  onChange={(e) => setAdditionalKeywords(e.target.value)}
+                  placeholder="e.g. remote, python, startup"
+                  className="w-full px-3 py-2 text-sm bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-800"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {selectedSources.includes('company_scraper') && (
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <CompanyJobScraper onClose={() => toggleSource('company_scraper')} />
+          </div>
+        )}
+
+
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-gray-300 mb-2">
+          Job Sources <span className="text-red-500">*</span>
+        </label>
+        <div className="grid grid-cols-2 gap-1 max-h-32 overflow-y-auto border border-gray-600 rounded-lg p-2 bg-gray-800">
+          {([
+            'google_jobs',
+            'linkedin',
+            'indeed',
+            'company_scraper',
+            'glassdoor',
+            'monster',
+            'ziprecruiter',
+            'careerbuilder',
+            'dice',
+            'stackoverflow',
+            'angellist',
+            'remoteok',
+            'weworkremotely',
+            'flexjobs',
+            'upwork',
+            'freelancer',
+            'toptal',
+            'hired',
+            'vettery',
+            'wellfound',
+            'crunchbase',
+            'builtin',
+            'techstars',
+            'ycombinator'
+          ] as JobSource[]).map(source => {
+            const sourceLabels: Record<string, string> = {
+              google_jobs: 'Google Jobs',
+              linkedin: 'LinkedIn',
+              indeed: 'Indeed',
+              company_scraper: 'Company Sites',
+              glassdoor: 'Glassdoor',
+              monster: 'Monster',
+              ziprecruiter: 'ZipRecruiter',
+              careerbuilder: 'CareerBuilder',
+              dice: 'Dice',
+              stackoverflow: 'Stack Overflow',
+              angellist: 'AngelList',
+              remoteok: 'Remote OK',
+              weworkremotely: 'We Work Remotely',
+              flexjobs: 'FlexJobs',
+              upwork: 'Upwork',
+              freelancer: 'Freelancer',
+              toptal: 'Toptal',
+              hired: 'Hired',
+              vettery: 'Vettery',
+              wellfound: 'Wellfound',
+              crunchbase: 'Crunchbase',
+              builtin: 'Built In',
+              techstars: 'Techstars',
+              ycombinator: 'Y Combinator'
+            };
+
+            return (
               <label
                 key={source}
-                className={`flex items-center justify-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                  selectedSources.includes(source)
-                    ? 'border-blue-600 bg-blue-900/50'
-                    : 'border-gray-600 hover:border-blue-400'
-                } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`flex items-center gap-1 p-1 rounded cursor-pointer transition-all hover:bg-gray-700 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <input
                   type="checkbox"
                   checked={selectedSources.includes(source)}
                   onChange={() => toggleSource(source)}
-                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-3 h-3 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   disabled={isLoading}
                 />
-                <span className="text-sm font-medium text-gray-300 capitalize">
-                  {source === 'google_jobs' ? 'Google Jobs' : source === 'company_scraper' ? 'Company Sites' : source}
+                <span className="text-xs text-gray-300">
+                  {sourceLabels[source] || source}
                 </span>
               </label>
-            ))}
-          </div>
-        </div>
-
-        {selectedSources.includes('company_scraper') && (
-          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-            <CompanyJobScraper />
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-300 mb-3">
-            Job Type
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {(['full-time', 'part-time', 'contract', 'temporary', 'internship'] as JobType[]).map(type => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => toggleJobType(type)}
-                disabled={isLoading}
-                className={`px-4 py-2 text-sm rounded-full border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                  selectedJobTypes.includes(type)
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-gray-800 text-gray-300 border-gray-600 hover:border-blue-500'
-                }`}
-              >
-                {type.replace('-', ' ')}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="keywords" className="block text-sm font-semibold text-gray-300 mb-2">
-            Additional Keywords
-          </label>
-          <input
-            id="keywords"
-            type="text"
-            value={keywords}
-            onChange={(e) => setKeywords(e.target.value)}
-            placeholder="e.g. React, TypeScript, Remote"
-            className="w-full px-4 py-3 bg-gray-800 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-800 disabled:cursor-not-allowed"
-            disabled={isLoading}
-          />
-          <p className="mt-1 text-xs text-gray-400">Separate multiple keywords with commas</p>
+            );
+          })}
         </div>
       </div>
 

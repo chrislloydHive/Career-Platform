@@ -5,11 +5,14 @@ import { useParams } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { CareerPathVisualization } from '@/components/CareerPathVisualization';
 import { generateCareerPaths } from '@/lib/career-paths/career-path-generator';
-import { ActionPlan } from '@/components/ActionPlan';
-import { generateActionPlan } from '@/lib/action-plan/action-plan-generator';
+import { InteractiveCareerPath } from '@/components/InteractiveCareerPath';
+import { InteractiveCareerGenerator } from '@/lib/career-paths/interactive-career-generator';
+import { EnhancedCareerTimeline } from '@/components/EnhancedCareerTimeline';
+import { EnhancedActionPlan } from '@/components/EnhancedActionPlan';
 import { SkillsGapAnalysis } from '@/components/SkillsGapAnalysis';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { usePersonalizedInsights } from '@/hooks/usePersonalizedInsights';
 
 type SavedProfile = {
   responses: Record<string, unknown>;
@@ -25,6 +28,18 @@ type SavedProfile = {
   completion: number;
 };
 
+interface BackgroundConnection {
+  aspect: string;
+  connection: string;
+  transferableValue: string;
+}
+
+interface IndustryApplication {
+  industry: string;
+  application: string;
+  specificExample: string;
+}
+
 interface CareerRecommendation {
   jobTitle: string;
   category: string;
@@ -34,7 +49,23 @@ interface CareerRecommendation {
     explanation: string;
     confidence: number;
   }>;
+  backgroundConnections?: BackgroundConnection[];
+  industryApplications?: IndustryApplication[];
   newInsight?: string;
+}
+
+interface AlternativePath {
+  jobTitle: string;
+  category: string;
+  matchScore: number;
+  appealReason: string;
+  personalityAspect: string;
+  industryApplications?: IndustryApplication[];
+}
+
+interface CareerRecommendationsResponse {
+  topRecommendations: CareerRecommendation[];
+  alternativePaths: AlternativePath[];
 }
 
 interface SavedAssessment {
@@ -42,7 +73,7 @@ interface SavedAssessment {
   title: string;
   description: string;
   profile: SavedProfile;
-  careerRecommendations: CareerRecommendation[];
+  careerRecommendations: CareerRecommendationsResponse;
   savedAt: string;
   createdAt: string;
 }
@@ -57,6 +88,14 @@ export default function AssessmentDetailPage() {
     recommendations: false,
     actionPlan: false,
   });
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('all');
+
+  // Get AI-generated personalized insights
+  const { insights: personalizedInsights, loading: insightsLoading } = usePersonalizedInsights({
+    profile: assessment?.profile,
+    careerRecommendations: assessment?.careerRecommendations,
+    assessmentId: params.id
+  });
 
   useEffect(() => {
     if (params.id) {
@@ -69,6 +108,28 @@ export default function AssessmentDetailPage() {
       ...prev,
       [sectionKey]: !prev[sectionKey]
     }));
+  };
+
+  const getAvailableIndustries = () => {
+    if (!assessment?.careerRecommendations) return [];
+
+    const industries = new Set<string>();
+
+    // Get industries from top recommendations
+    assessment.careerRecommendations.topRecommendations?.forEach(rec => {
+      rec.industryApplications?.forEach(app => {
+        industries.add(app.industry);
+      });
+    });
+
+    // Get industries from alternative paths
+    assessment.careerRecommendations.alternativePaths?.forEach(alt => {
+      alt.industryApplications?.forEach(app => {
+        industries.add(app.industry);
+      });
+    });
+
+    return Array.from(industries).sort();
   };
 
   const loadAssessment = async (id: string) => {
@@ -213,68 +274,95 @@ export default function AssessmentDetailPage() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-100 mb-4">Your Saved Career Assessment</h2>
             <div className="max-w-4xl mx-auto space-y-4">
-              <p className="text-lg text-gray-300 leading-relaxed">
-                This assessment identified {profile.synthesizedInsights.length} key patterns that reveal your unique professional identity.
-                {profile.completion >= 80 ? (
-                  <span> Your comprehensive profile shows strong alignment in multiple areas, providing clear career direction.</span>
-                ) : (
-                  <span> With {profile.completion}% completion, significant insights were discovered about your work preferences and motivations.</span>
-                )}
-              </p>
-
-              <p className="text-gray-400 leading-relaxed">
-                {profile.synthesizedInsights.length > 0 && (
-                  <>
-                    Your responses revealed {profile.synthesizedInsights.find(i => i.type === 'cross-domain') ? 'cross-domain interests suggesting versatile career options' : 'focused preferences indicating specialized career paths'}.
-                    {assessment.careerRecommendations && assessment.careerRecommendations.length > 0 && (
-                      <span> This analysis generated {assessment.careerRecommendations.length} personalized career recommendations with detailed matching rationale.</span>
+              {insightsLoading ? (
+                <div className="space-y-4">
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ) : personalizedInsights ? (
+                <div className="space-y-4">
+                  <p className="text-lg text-gray-300 leading-relaxed">
+                    {personalizedInsights.primaryInsight}
+                  </p>
+                  <p className="text-gray-400 leading-relaxed">
+                    {personalizedInsights.secondaryInsight}
+                    {assessment.careerRecommendations && assessment.careerRecommendations.topRecommendations.length > 0 && (
+                      <span> {personalizedInsights.careerDirection}</span>
                     )}
-                  </>
-                )}
-              </p>
-
-              {profile.authenticityProfile?.coreMotivation && (
-                <div className="bg-blue-900/20 rounded-lg p-4 border border-blue-600/30 mt-6">
-                  <p className="text-blue-100 italic text-center">
-                    <span className="text-blue-400 font-medium">Your Core Career Driver:</span> &ldquo;{profile.authenticityProfile.coreMotivation}&rdquo;
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-lg text-gray-300 leading-relaxed">
+                    We&apos;ve uncovered something fascinating about how your mind works. Your responses reveal a unique cognitive pattern—you process complex problems by {profile.completion >= 80 ? 'methodically connecting seemingly unrelated concepts, then synthesizing them into breakthrough solutions. This rare combination of systematic thinking and creative leaps' : 'instinctively seeking multiple perspectives before committing to a direction. This deliberate, multi-faceted approach to decision-making'} explains why traditional career advice has probably felt limiting to you.
+                  </p>
+                  <p className="text-gray-400 leading-relaxed">
+                    {profile.synthesizedInsights.length > 0 && (
+                      <>
+                        Here&apos;s what&apos;s particularly telling: your assessment pattern shows you&apos;re energized by {profile.synthesizedInsights.find(i => i.type === 'cross-domain') ? 'intellectual variety and resist being pigeonholed—you&apos;re the type who could revolutionize an industry precisely because you see connections others miss' : 'deep specialization but with an underlying need for meaningful impact—you want to be exceptionally good at something that genuinely matters'}.
+                        {assessment.careerRecommendations && assessment.careerRecommendations.topRecommendations.length > 0 && (
+                          <span> Based on this psychological profile, we&apos;ve identified {assessment.careerRecommendations.topRecommendations.length} career paths that don&apos;t just match your skills—they&apos;re designed around how you actually think and what secretly drives you.</span>
+                        )}
+                      </>
+                    )}
                   </p>
                 </div>
               )}
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-100 mb-2">Assessment Findings</h3>
-              <p className="text-gray-400 text-sm mb-1">{profile.synthesizedInsights.length} key insights discovered</p>
-              <p className="text-blue-400 text-sm">{profile.completion}% profile completion</p>
+              {personalizedInsights?.cognitivePattern && (
+                <div className="bg-purple-900/20 rounded-lg p-4 border border-purple-600/30 mt-6">
+                  <p className="text-purple-100 italic text-center">
+                    <span className="text-purple-400 font-medium">Your Cognitive Pattern:</span> {personalizedInsights.cognitivePattern}
+                  </p>
+                </div>
+              )}
+
+              {personalizedInsights?.uniqueStrength && (
+                <div className="bg-green-900/20 rounded-lg p-4 border border-green-600/30 mt-6">
+                  <p className="text-green-100 italic text-center">
+                    <span className="text-green-400 font-medium">Your Professional Superpower:</span> {personalizedInsights.uniqueStrength}
+                  </p>
+                </div>
+              )}
+
+              {personalizedInsights?.careerImplication && (
+                <div className="bg-orange-900/20 rounded-lg p-4 border border-orange-600/30 mt-6">
+                  <p className="text-orange-100 italic text-center">
+                    <span className="text-orange-400 font-medium">What This Means for Your Career:</span> {personalizedInsights.careerImplication}
+                  </p>
+                </div>
+              )}
+
+              {personalizedInsights?.opportunityTease && (
+                <div className="bg-indigo-900/20 rounded-lg p-4 border border-indigo-600/30 mt-6">
+                  <p className="text-indigo-100 italic text-center">
+                    <span className="text-indigo-400 font-medium">Your Career Opportunity:</span> {personalizedInsights.opportunityTease}
+                  </p>
+                </div>
+              )}
+
+              {(() => {
+                const coreMotivation = profile.authenticityProfile &&
+                  typeof profile.authenticityProfile === 'object' &&
+                  'coreMotivation' in profile.authenticityProfile ?
+                  profile.authenticityProfile.coreMotivation : null;
+
+                return coreMotivation ? (
+                  <div className="bg-blue-900/20 rounded-lg p-4 border border-blue-600/30 mt-6">
+                    <p className="text-blue-100 italic text-center">
+                      <span className="text-blue-400 font-medium">Your Core Career Driver:</span> &ldquo;{String(coreMotivation)}&rdquo;
+                    </p>
+                  </div>
+                ) : null;
+              })()}
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-100 mb-2">Career Recommendations</h3>
-              <p className="text-gray-400 text-sm mb-1">{assessment.careerRecommendations?.length || 0} personalized career matches</p>
-              <p className="text-green-400 text-sm">Based on your unique profile</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-100 mb-2">Action Plan</h3>
-              <p className="text-gray-400 text-sm mb-1">Next steps for career growth</p>
-              <p className="text-orange-400 text-sm">Concrete steps to move forward</p>
+            <div className="max-w-4xl mx-auto text-center mt-12">
+              <p className="text-gray-300">
+                Start with your <span className="font-semibold">Assessment Findings</span> to understand yourself, review <span className="font-semibold">Career Recommendations</span> to see where you fit, then use the <span className="font-semibold">Career Path</span> to begin your journey toward your ideal career. Each section builds on the previous one to create a complete roadmap from self-discovery to action.
+              </p>
             </div>
           </div>
         </div>
@@ -294,8 +382,7 @@ export default function AssessmentDetailPage() {
               <div>
                 <h2 className="text-xl font-bold text-gray-100">Your Assessment Findings</h2>
                 <p className="text-gray-400 text-sm mt-1">
-                  {profile.synthesizedInsights.length} cross-domain insights reveal patterns in your work preferences,
-                  strengths, and motivations that shape your ideal career path.
+                  This section reveals the deep psychological insights discovered through your responses, including your cognitive patterns, work preferences, and motivational drivers. These findings form the foundation for understanding who you are as a professional.
                 </p>
               </div>
             </div>
@@ -397,8 +484,7 @@ export default function AssessmentDetailPage() {
               <div>
                 <h2 className="text-xl font-bold text-gray-100">Your Career Recommendations</h2>
                 <p className="text-gray-400 text-sm mt-1">
-                  {assessment.careerRecommendations?.length || 0} personalized career matches based on your unique profile,
-                  experience, and exploration patterns.
+                  Building directly on your assessment findings, this section presents career paths that align with your unique psychological profile. Each recommendation explains why it fits your thinking style, strengths, and authentic motivations.
                 </p>
               </div>
             </div>
@@ -411,9 +497,49 @@ export default function AssessmentDetailPage() {
           {expandedSections.recommendations && (
             <div className="px-6 pb-6">
               <div className="border-t border-gray-700 pt-6">
-                {assessment.careerRecommendations && assessment.careerRecommendations.length > 0 ? (
-                  <div className="space-y-4">
-                    {assessment.careerRecommendations.map((rec, index) => (
+                {/* Industry Filter */}
+                {getAvailableIndustries().length > 0 && (
+                  <div className="mb-6 bg-slate-700/50 rounded-lg p-4">
+                    <h4 className="text-sm font-semibold text-gray-100 mb-3 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                      </svg>
+                      Filter by Industry
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setSelectedIndustry('all')}
+                        className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                          selectedIndustry === 'all'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-slate-600 text-gray-300 hover:bg-slate-500'
+                        }`}
+                      >
+                        All Industries
+                      </button>
+                      {getAvailableIndustries().map(industry => (
+                        <button
+                          key={industry}
+                          onClick={() => setSelectedIndustry(industry)}
+                          className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                            selectedIndustry === industry
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-600 text-gray-300 hover:bg-slate-500'
+                          }`}
+                        >
+                          {industry}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {assessment.careerRecommendations && assessment.careerRecommendations.topRecommendations.length > 0 ? (
+                  <div className="space-y-6">
+                    {/* Top Recommendations */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-gray-100">Top Career Matches</h3>
+                      {assessment.careerRecommendations.topRecommendations.map((rec, index) => (
                       <div key={index} className="bg-gradient-to-r from-green-900/20 to-blue-900/20 rounded-lg border border-green-600/30 p-5">
                         <div className="flex items-start justify-between mb-3">
                           <div>
@@ -460,8 +586,111 @@ export default function AssessmentDetailPage() {
                             </div>
                           ))}
                         </div>
+
+                        {rec.backgroundConnections && rec.backgroundConnections.length > 0 && (
+                          <div className="mt-4 bg-amber-900/20 rounded-lg p-4 border border-amber-600/30">
+                            <h5 className="text-sm font-semibold text-amber-400 mb-3 flex items-center gap-2">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                              </svg>
+                              How Your Background Fits
+                            </h5>
+                            <div className="space-y-2">
+                              {rec.backgroundConnections.map((connection, i) => (
+                                <div key={i} className="text-sm">
+                                  <div className="flex items-start gap-3">
+                                    <span className="text-amber-400 mt-0.5 text-xs">●</span>
+                                    <div>
+                                      <span className="font-medium text-amber-300">{connection.aspect}:</span>{' '}
+                                      <span className="text-gray-300">{connection.connection}</span>
+                                    </div>
+                                  </div>
+                                  <div className="ml-6 mt-1">
+                                    <span className="text-gray-400 text-xs italic">
+                                      → {connection.transferableValue}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {rec.industryApplications && rec.industryApplications.length > 0 && (
+                          <div className="mt-4 bg-blue-900/20 rounded-lg p-4 border border-blue-600/30">
+                            <h5 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                              </svg>
+                              Industry Applications
+                            </h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {rec.industryApplications
+                                .filter(app => selectedIndustry === 'all' || app.industry.toLowerCase() === selectedIndustry.toLowerCase())
+                                .map((app, i) => (
+                                <div key={i} className="bg-slate-700/50 rounded-lg p-3">
+                                  <div className="font-medium text-blue-300 text-sm mb-1">{app.industry}</div>
+                                  <div className="text-gray-300 text-sm mb-2">{app.application}</div>
+                                  <div className="text-gray-400 text-xs italic">{app.specificExample}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
+                    </div>
+
+                    {/* Alternative Paths */}
+                    {assessment.careerRecommendations.alternativePaths && assessment.careerRecommendations.alternativePaths.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="border-t border-gray-600 pt-6">
+                          <h3 className="text-lg font-semibold text-gray-100 mb-2 flex items-center gap-2">
+                            <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Alternative Paths
+                          </h3>
+                          <p className="text-gray-400 text-sm mb-4">
+                            These careers also match your profile well and might appeal to different aspects of your personality
+                          </p>
+                          {assessment.careerRecommendations.alternativePaths.map((alt, index) => (
+                            <div key={index} className="bg-gradient-to-r from-orange-900/20 to-amber-900/20 rounded-lg border border-orange-600/30 p-4 mb-3">
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <h4 className="font-semibold text-gray-100">{alt.jobTitle}</h4>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-sm text-orange-400 font-medium">{alt.category}</span>
+                                    <span className="text-sm text-gray-400">•</span>
+                                    <span className="text-sm text-gray-400">{alt.matchScore}% match</span>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-sm font-medium text-orange-400">{alt.personalityAspect}</div>
+                                </div>
+                              </div>
+                              <p className="text-gray-300 text-sm mb-3">{alt.appealReason}</p>
+
+                              {alt.industryApplications && alt.industryApplications.length > 0 && (
+                                <div className="mt-3 bg-slate-700/50 rounded-lg p-3">
+                                  <h6 className="text-xs font-semibold text-orange-300 mb-2">Industry Applications:</h6>
+                                  <div className="space-y-2">
+                                    {alt.industryApplications
+                                      .filter(app => selectedIndustry === 'all' || app.industry.toLowerCase() === selectedIndustry.toLowerCase())
+                                      .map((app, i) => (
+                                      <div key={i} className="text-xs">
+                                        <span className="font-medium text-orange-300">{app.industry}:</span>{' '}
+                                        <span className="text-gray-300">{app.application}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-8">
@@ -488,8 +717,7 @@ export default function AssessmentDetailPage() {
               <div>
                 <h2 className="text-xl font-bold text-gray-100">Your Career Path</h2>
                 <p className="text-gray-400 text-sm mt-1">
-                  Concrete next steps to advance your career based on your assessment findings and
-                  recommendations, with skills development and networking strategies.
+                  This final section transforms your insights and recommendations into concrete next steps. It includes skills development roadmaps, networking strategies, and interactive career timelines to help you move from understanding to action.
                 </p>
               </div>
             </div>
@@ -513,16 +741,97 @@ export default function AssessmentDetailPage() {
                   </div>
                 )}
 
-                {/* Career Roadmap */}
-                {careerPaths.length > 0 && (
+                {/* Interactive Career Paths */}
+                {assessment.careerRecommendations?.topRecommendations && assessment.careerRecommendations.topRecommendations.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-100 mb-6">Interactive Career Roadmaps</h3>
+                    <div className="space-y-6">
+                      {assessment.careerRecommendations.topRecommendations.slice(0, 3).map((rec, index) => {
+                        const interactiveCareerPath = InteractiveCareerGenerator.generateInteractiveCareerPath(
+                          rec.jobTitle,
+                          rec.matchScore,
+                          rec.reasons.map(r => r.explanation)
+                        );
+
+                        return (
+                          <InteractiveCareerPath
+                            key={index}
+                            initialPath={interactiveCareerPath}
+                            onSavePath={async (savedPath) => {
+                              try {
+                                const response = await fetch('/api/save-career-path', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    pathName: savedPath.pathName,
+                                    careerPath: savedPath,
+                                    customizations: {
+                                      timelinePreference: savedPath.timelinePreference,
+                                      selectedGeography: savedPath.selectedGeography,
+                                      skillsMarkedAsHave: savedPath.skillDevelopment
+                                        .filter(skill => skill.userHasSkill)
+                                        .map(skill => skill.name),
+                                      personalNotes: ''
+                                    }
+                                  })
+                                });
+
+                                if (response.ok) {
+                                  alert('Career path saved successfully!');
+                                } else {
+                                  throw new Error('Failed to save career path');
+                                }
+                              } catch (error) {
+                                console.error('Error saving career path:', error);
+                                alert('Failed to save career path. Please try again.');
+                              }
+                            }}
+                            onUpdatePath={(updatedPath) => {
+                              // Handle path updates if needed
+                              console.log('Career path updated:', updatedPath);
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Real-Time Market Timeline */}
+                {assessment.careerRecommendations?.topRecommendations && assessment.careerRecommendations.topRecommendations.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-100 mb-6">Market-Grounded Career Timeline</h3>
+                    <div className="space-y-6">
+                      {assessment.careerRecommendations.topRecommendations.slice(0, 2).map((rec, index) => (
+                        <EnhancedCareerTimeline
+                          key={index}
+                          careerPath={rec.jobTitle}
+                          userLocation="San Francisco, CA" // In production, get from user profile
+                          userProfile={{
+                            skills: [], // Would be populated from user's actual profile
+                            totalExperience: 0,
+                            location: "San Francisco, CA",
+                            preferredRemoteWork: true
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Traditional Career Roadmap (fallback) */}
+                {(!assessment.careerRecommendations?.topRecommendations || assessment.careerRecommendations.topRecommendations.length === 0) && careerPaths.length > 0 && (
                   <div className="mb-8">
                     <CareerPathVisualization trajectories={careerPaths} />
                   </div>
                 )}
 
-                {/* Action Plan Component */}
-                <ActionPlan
-                  actionPlan={generateActionPlan(profile as never)}
+                {/* Enhanced Action Plan Component */}
+                <EnhancedActionPlan
+                  profile={{
+                    ...profile,
+                    topCareers: transformedCareers
+                  } as never}
                   onRestartExploration={async () => {
                     if (confirm('This will start a new assessment. Continue?')) {
                       window.location.href = '/explore';

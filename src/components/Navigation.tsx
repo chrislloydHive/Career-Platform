@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 
 interface NavigationProps {
   title?: string;
@@ -13,6 +14,22 @@ interface NavigationProps {
 export function Navigation({ title, subtitle, actions }: NavigationProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.dropdown-container')) {
+        setOpenDropdown(null);
+      }
+    };
+
+    if (openDropdown) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [openDropdown]);
 
   const handleLogout = async () => {
     try {
@@ -26,18 +43,43 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
   };
 
   const navItems = [
-    { href: '/', label: 'Job Search', icon: SearchIcon },
-    { href: '/careers', label: 'Career Explorer', icon: BriefcaseIcon },
-    { href: '/saved', label: 'Saved', icon: BookmarkIcon },
-    { href: '/chat', label: 'Career Chat', icon: ChatIcon },
-    { href: '/resources', label: 'Resources', icon: BookIcon },
-    { href: '/explore', label: 'Self Discovery', icon: CompassIcon },
-    { href: '/assessments', label: 'Assessments', icon: DocumentIcon },
+    {
+      label: 'Discover',
+      icon: CompassIcon,
+      items: [
+        { href: '/explore', label: 'Self Discovery', icon: CompassIcon },
+        { href: '/assessments', label: 'Assessments', icon: DocumentIcon },
+      ]
+    },
+    {
+      label: 'Explore',
+      icon: BriefcaseIcon,
+      items: [
+        { href: '/careers', label: 'Career Explorer', icon: BriefcaseIcon },
+        { href: '/jobs', label: 'Job Search', icon: SearchIcon },
+      ]
+    },
+    {
+      label: 'Manage',
+      icon: BookmarkIcon,
+      items: [
+        { href: '/saved', label: 'Saved', icon: BookmarkIcon },
+        { href: '/progress', label: 'Progress', icon: ProgressIcon },
+      ]
+    },
+    {
+      label: 'Support',
+      icon: ChatIcon,
+      items: [
+        { href: '/chat', label: 'Career Chat', icon: ChatIcon },
+        { href: '/resources', label: 'Resources', icon: BookIcon },
+      ]
+    },
     { href: '/profile', label: 'Profile', icon: UserIcon },
   ];
 
   return (
-    <header className="bg-gray-900 border-b border-gray-700 sticky top-0 z-40 shadow-sm">
+    <header className="bg-gray-900 border-b border-gray-700 sticky top-0 z-50 shadow-sm relative">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center gap-2 sm:gap-8 flex-1 min-w-0">
@@ -48,24 +90,78 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
               <span className="text-gray-100 font-semibold text-sm sm:text-base hidden sm:block">Career Platform</span>
             </Link>
 
-            <nav className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto scrollbar-hide flex-1">
+            <nav className="flex items-center gap-0.5 sm:gap-1 overflow-visible flex-1">
               {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 sm:gap-2 flex-shrink-0 ${
-                      isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="hidden lg:inline whitespace-nowrap">{item.label}</span>
-                  </Link>
-                );
+                if ('items' in item) {
+                  // Dropdown group
+                  const isGroupActive = item.items.some(subItem => pathname === subItem.href);
+                  const Icon = item.icon;
+                  const isOpen = openDropdown === item.label;
+
+                  return (
+                    <div key={item.label} className="relative dropdown-container">
+                      <button
+                        data-dropdown={item.label}
+                        onClick={() => {
+                          setOpenDropdown(isOpen ? null : item.label);
+                        }}
+                        className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 sm:gap-2 flex-shrink-0 ${
+                          isGroupActive
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 flex-shrink-0" />
+                        <span className="hidden lg:inline whitespace-nowrap">{item.label}</span>
+                        <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      {isOpen && (
+                        <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl min-w-48 z-[60]">
+                          {item.items.map((subItem) => {
+                            const isActive = pathname === subItem.href;
+                            const SubIcon = subItem.icon;
+                            return (
+                              <Link
+                                key={subItem.href}
+                                href={subItem.href}
+                                onClick={() => setOpenDropdown(null)}
+                                className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                                  isActive
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                                }`}
+                              >
+                                <SubIcon className="w-4 h-4 flex-shrink-0" />
+                                <span>{subItem.label}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                } else {
+                  // Regular link
+                  const isActive = pathname === item.href;
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 sm:gap-2 flex-shrink-0 ${
+                        isActive
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="hidden lg:inline whitespace-nowrap">{item.label}</span>
+                    </Link>
+                  );
+                }
               })}
             </nav>
           </div>
@@ -153,6 +249,22 @@ function DocumentIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+}
+
+function ProgressIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+  );
+}
+
+function HomeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
     </svg>
   );
 }
