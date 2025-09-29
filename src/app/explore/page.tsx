@@ -14,6 +14,7 @@ import { generateActionPlan } from '@/lib/action-plan/action-plan-generator';
 import { SkillsGapAnalysis } from '@/components/SkillsGapAnalysis';
 import { SaveAssessmentDialog } from '@/components/SaveAssessmentDialog';
 import { ExitWarningDialog } from '@/components/ExitWarningDialog';
+import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
   topCareers?: CareerFitScore[];
@@ -29,6 +30,11 @@ export default function ExplorePage() {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [hasUnsavedResults, setHasUnsavedResults] = useState(false);
   const [showExitWarning, setShowExitWarning] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    findings: false,
+    recommendations: false,
+    actionPlan: false,
+  });
 
   const router = useRouter();
 
@@ -48,6 +54,13 @@ export default function ExplorePage() {
       }
       return newSet;
     });
+  };
+
+  const toggleSection = (sectionKey: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }));
   };
 
   const careerPaths = useMemo(() => {
@@ -154,7 +167,7 @@ export default function ExplorePage() {
                 onClick={() => setShowSaveDialog(true)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                   hasUnsavedResults
-                    ? 'bg-yellow-600 hover:bg-yellow-500 text-white ring-2 ring-yellow-400/50 animate-pulse'
+                    ? 'bg-yellow-600 hover:bg-yellow-500 text-white ring-2 ring-yellow-400/50'
                     : 'bg-blue-600 hover:bg-blue-500 text-white'
                 }`}
               >
@@ -163,12 +176,6 @@ export default function ExplorePage() {
                 </svg>
                 {hasUnsavedResults ? 'Save Assessment (Unsaved!)' : 'Save Assessment'}
               </button>
-              {hasUnsavedResults && !saveMessage && (
-                <div className="px-3 py-1 rounded-lg text-sm bg-yellow-900/50 text-yellow-400 border border-yellow-700/50 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                  Unsaved results - remember to save!
-                </div>
-              )}
               {saveMessage && (
                 <div className={`px-3 py-1 rounded-lg text-sm ${
                   saveMessage.includes('success')
@@ -187,57 +194,159 @@ export default function ExplorePage() {
             </Link>
           </div>
 
-          {/* Summary Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-              <div className="text-3xl font-bold text-blue-400 mb-1">
-                {profile.completion}%
-              </div>
-              <div className="text-sm text-gray-400">Profile Completion</div>
-            </div>
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-              <div className="text-3xl font-bold text-purple-400 mb-1">
-                {profile.synthesizedInsights.length}
-              </div>
-              <div className="text-sm text-gray-400">Cross-Domain Insights</div>
-            </div>
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-              <div className="text-3xl font-bold text-green-400 mb-1">
-                {profile.patterns.consistencyPatterns.length}
-              </div>
-              <div className="text-sm text-gray-400">Pattern Matches</div>
-            </div>
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-              <div className="text-3xl font-bold text-orange-400 mb-1">
-                {profile.patterns.hiddenMotivations.length}
-              </div>
-              <div className="text-sm text-gray-400">Core Motivations</div>
-            </div>
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-              <div className="text-3xl font-bold text-yellow-400 mb-1">
-                {Math.round((profile.insights.reduce((sum, i) => sum + i.confidence, 0) / profile.insights.length) * 100) || 0}%
-              </div>
-              <div className="text-sm text-gray-400">Avg Confidence</div>
-            </div>
-          </div>
-
-          {/* ============ SECTION 1: ASSESSMENT FINDINGS ============ */}
-          <div className="mb-12">
+          {/* Comprehensive Assessment Overview */}
+          <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
             <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-100 mb-2">Your Assessment Findings</h1>
-              <p className="text-gray-400 text-lg">Key insights discovered from your responses</p>
+              <h2 className="text-3xl font-bold text-gray-100 mb-4">Your Career Assessment Results</h2>
+              <div className="max-w-4xl mx-auto space-y-4">
+                <p className="text-lg text-gray-300 leading-relaxed">
+                  Based on your responses, we&apos;ve identified {profile.synthesizedInsights.length} key patterns that reveal your unique professional identity.
+                  {profile.completion >= 80 ? (
+                    <span> Your comprehensive profile shows strong alignment in {profile.patterns.consistencyPatterns?.length || 0} areas, suggesting clear career direction.</span>
+                  ) : (
+                    <span> While your profile is {profile.completion}% complete, we&apos;ve discovered significant insights about your work preferences and motivations.</span>
+                  )}
+                </p>
+
+                <p className="text-gray-400 leading-relaxed">
+                  {profile.synthesizedInsights.length > 0 && (
+                    <>
+                      Your responses reveal {profile.synthesizedInsights.find(i => i.type === 'cross-domain') ? 'cross-domain interests that suggest versatile career options' : 'focused preferences that indicate specialized career paths'}.
+                      {profile.patterns.hiddenMotivations?.length > 0 && (
+                        <span> We&apos;ve uncovered {profile.patterns.hiddenMotivations.length} core motivations that will be essential for your career satisfaction.</span>
+                      )}
+                      {profile.topCareers && profile.topCareers.length > 0 && (
+                        <span> This analysis has generated {profile.topCareers.length} personalized career recommendations with match scores ranging from {Math.round(Math.min(...profile.topCareers.map(c => c.currentScore)) * 100)}% to {Math.round(Math.max(...profile.topCareers.map(c => c.currentScore)) * 100)}%.</span>
+                      )}
+                    </>
+                  )}
+                </p>
+
+                {profile.patterns.valueHierarchy?.coreMotivation && (
+                  <div className="bg-blue-900/20 rounded-lg p-4 border border-blue-600/30 mt-6">
+                    <p className="text-blue-100 italic text-center">
+                      <span className="text-blue-400 font-medium">Your Core Career Driver:</span> &ldquo;{profile.patterns.valueHierarchy.coreMotivation}&rdquo;
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-100 mb-2">Assessment Findings</h3>
+                <p className="text-gray-400 text-sm mb-1">{profile.synthesizedInsights.length} key insights discovered</p>
+                <p className="text-blue-400 text-sm">{profile.completion}% profile completion</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-100 mb-2">Career Recommendations</h3>
+                <p className="text-gray-400 text-sm mb-1">{profile.topCareers?.length || 0} career matches identified</p>
+                <p className="text-green-400 text-sm">Based on your unique profile</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-100 mb-2">Action Plan</h3>
+                <p className="text-gray-400 text-sm mb-1">Next steps for career growth</p>
+                <p className="text-orange-400 text-sm">Concrete steps to move forward</p>
+              </div>
             </div>
           </div>
 
-          {/* Cross-Domain Insights - Featured Section */}
-          {profile.synthesizedInsights.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Cross-Domain Insights
-              </h2>
+          {/* Section 1: Your Assessment Findings */}
+          <div className="bg-gray-800 rounded-xl border border-gray-700 mb-6">
+            <button
+              onClick={() => toggleSection('findings')}
+              className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-700/50 transition-colors rounded-xl"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-100">Your Assessment Findings</h2>
+                  <div className="text-gray-400 text-sm mt-2 space-y-2 max-w-lg">
+                    <p>
+                      <span className="text-gray-300 font-medium">{profile.synthesizedInsights.length} Key Insights:</span> {
+                        profile.synthesizedInsights.length > 3 ? 'Your responses show complex, multi-faceted career interests with strong patterns across different work domains.' :
+                        profile.synthesizedInsights.length > 1 ? 'Clear patterns emerge showing your core work preferences and ideal environment characteristics.' :
+                        'Initial insights reveal your primary work motivations and preferred working style.'
+                      }
+                    </p>
+                    <p>
+                      <span className="text-gray-300 font-medium">Profile Strength:</span> {
+                        profile.completion >= 90 ? 'Comprehensive analysis with high confidence in recommendations.' :
+                        profile.completion >= 70 ? 'Strong profile foundation with reliable insights and clear direction.' :
+                        profile.completion >= 50 ? 'Solid baseline with room for additional depth through more responses.' :
+                        'Initial profile established, consider completing more questions for enhanced insights.'
+                      }
+                    </p>
+                    {profile.patterns.hiddenMotivations?.length > 0 && (
+                      <p>
+                        <span className="text-gray-300 font-medium">Core Motivations:</span> {profile.patterns.hiddenMotivations.length} deep-level drivers identified that will be crucial for long-term career satisfaction.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {expandedSections.findings ?
+                <ChevronDownIcon className="w-5 h-5 text-gray-400" /> :
+                <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+              }
+            </button>
+
+            {expandedSections.findings && (
+              <div className="px-6 pb-6">
+                <div className="border-t border-gray-700 pt-6">
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-gray-900 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-blue-400 mb-1">
+                        {profile.completion}%
+                      </div>
+                      <div className="text-xs text-gray-400">Profile Complete</div>
+                    </div>
+                    <div className="bg-gray-900 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-green-400 mb-1">
+                        {profile.synthesizedInsights.length}
+                      </div>
+                      <div className="text-xs text-gray-400">Key Insights</div>
+                    </div>
+                    <div className="bg-gray-900 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-orange-400 mb-1">
+                        {profile.patterns.hiddenMotivations.length}
+                      </div>
+                      <div className="text-xs text-gray-400">Core Motivations</div>
+                    </div>
+                    <div className="bg-gray-900 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-blue-300 mb-1">
+                        {Math.round((profile.insights.reduce((sum, i) => sum + i.confidence, 0) / profile.insights.length) * 100) || 0}%
+                      </div>
+                      <div className="text-xs text-gray-400">Confidence</div>
+                    </div>
+                  </div>
+
+                  {/* Detailed Insights */}
+                  {profile.synthesizedInsights && profile.synthesizedInsights.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-gray-100 mb-4">Cross-Domain Insights</h3>
               <div className="grid grid-cols-1 gap-4">
                 {profile.synthesizedInsights.map((insight, index) => (
                   <div key={index} className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-lg border-2 border-blue-600/60 p-6">
@@ -248,7 +357,7 @@ export default function ExplorePage() {
                             insight.type === 'cross-domain'
                               ? 'bg-blue-600 text-white'
                               : insight.type === 'paradox'
-                              ? 'bg-purple-600 text-white'
+                              ? 'bg-orange-600 text-white'
                               : insight.type === 'nuanced-preference'
                               ? 'bg-green-600 text-white'
                               : 'bg-orange-600 text-white'
@@ -324,428 +433,208 @@ export default function ExplorePage() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* 3. Core Values and Hidden Interests - Full Width Stacked */}
-          {profile.patterns && (
-            <div className="mb-8">
-              <div className="space-y-6">
-                {/* Core Values */}
-                {profile.patterns.valueHierarchy && profile.patterns.valueHierarchy.topValues.length > 0 && (
-                  <div className="bg-gradient-to-br from-blue-900/30 to-green-900/20 rounded-lg border border-blue-700/50 p-5">
-                    <h2 className="text-lg font-bold text-blue-400 mb-3">
-                      Core Values
-                    </h2>
-                    <p className="text-gray-400 text-xs mb-3">
-                      Your values hierarchy reveals what drives your career decisions and workplace satisfaction.
-                    </p>
-                    <p className="text-gray-300 mb-4 italic text-sm">
-                      &ldquo;{profile.patterns.valueHierarchy.coreMotivation}&rdquo;
-                    </p>
-
-                    <div className="space-y-3">
-                      {profile.patterns.valueHierarchy.topValues.map((value, index) => (
-                        <div key={index} className="bg-gray-900/50 rounded-lg p-3 border border-gray-700/30">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg font-bold text-indigo-400">#{index + 1}</span>
-                              <span className="text-gray-200 capitalize font-medium">{value.value}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-blue-500"
-                                  style={{ width: `${value.priority * 10}%` }}
-                                />
-                              </div>
-                              <span className="text-xs text-gray-400">{Math.round(value.confidence * 100)}%</span>
-                            </div>
-                          </div>
-
-                          {/* Value explanation */}
-                          <div className="text-xs text-gray-400 mb-2">
-                            {value.value === 'autonomy' && 'Having control over your work and decisions'}
-                            {value.value === 'creativity' && 'Expressing innovation and original thinking'}
-                            {value.value === 'stability' && 'Seeking security and predictable outcomes'}
-                            {value.value === 'achievement' && 'Accomplishing goals and measurable success'}
-                            {value.value === 'collaboration' && 'Working effectively with others toward shared goals'}
-                            {value.value === 'impact' && 'Making a meaningful difference in the world'}
-                            {value.value === 'learning' && 'Continuous growth and skill development'}
-                            {value.value === 'recognition' && 'Receiving acknowledgment for your contributions'}
-                            {value.value === 'flexibility' && 'Adapting to change and varied work environments'}
-                            {value.value === 'leadership' && 'Guiding and influencing others toward success'}
-                            {!['autonomy', 'creativity', 'stability', 'achievement', 'collaboration', 'impact', 'learning', 'recognition', 'flexibility', 'leadership'].includes(value.value) &&
-                              'A core principle that guides your career decisions'}
-                          </div>
-
-                          {/* Career implications for this value */}
-                          <div className="text-xs text-blue-300">
-                            <span className="font-medium">Career fit: </span>
-                            {value.value === 'autonomy' && 'Freelance, remote work, entrepreneurship, consulting'}
-                            {value.value === 'creativity' && 'Design, marketing, arts, innovation roles, R&D'}
-                            {value.value === 'stability' && 'Government, education, established corporations, finance'}
-                            {value.value === 'achievement' && 'Sales, competitive industries, goal-driven roles'}
-                            {value.value === 'collaboration' && 'Team-based roles, project management, cross-functional work'}
-                            {value.value === 'impact' && 'Non-profit, healthcare, education, social enterprises'}
-                            {value.value === 'learning' && 'Technology, research, training, academic roles'}
-                            {value.value === 'recognition' && 'Public-facing roles, awards-based fields, thought leadership'}
-                            {value.value === 'flexibility' && 'Consulting, varied project work, dynamic industries'}
-                            {value.value === 'leadership' && 'Management, executive roles, team lead positions'}
-                            {!['autonomy', 'creativity', 'stability', 'achievement', 'collaboration', 'impact', 'learning', 'recognition', 'flexibility', 'leadership'].includes(value.value) &&
-                              'Roles that align with and reinforce this core value'}
-                          </div>
-                        </div>
-                      ))}
                     </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
-                    {/* Additional context */}
-                    <div className="mt-4 p-3 bg-blue-900/20 rounded-lg border border-blue-700/30">
-                      <h4 className="text-xs font-semibold text-blue-400 mb-2">💡 How to use this information:</h4>
-                      <ul className="text-xs text-gray-300 space-y-1">
-                        <li>• Prioritize roles that align with your top 3 values</li>
-                        <li>• Ask about these values during interviews</li>
-                        <li>• Use them to evaluate job offers and career moves</li>
-                        <li>• Consider how company culture supports these values</li>
-                      </ul>
-                    </div>
+          {/* Section 2: Your Career Recommendations */}
+          <div className="bg-gray-800 rounded-xl border border-gray-700 mb-6">
+            <button
+              onClick={() => toggleSection('recommendations')}
+              className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-700/50 transition-colors rounded-xl"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-100">Your Career Recommendations</h2>
+                  <div className="text-gray-400 text-sm mt-2 space-y-2 max-w-lg">
+                    <p>
+                      <span className="text-gray-300 font-medium">{profile.topCareers?.length || 0} Career Matches:</span> {
+                        profile.topCareers && profile.topCareers.length > 0 ? (
+                          <>
+                            Ranging from {Math.round(Math.min(...profile.topCareers.map(c => c.currentScore)) * 100)}% to {Math.round(Math.max(...profile.topCareers.map(c => c.currentScore)) * 100)}% compatibility.
+                            {profile.topCareers.filter(c => c.currentScore >= 0.8).length > 0 ? ` ${profile.topCareers.filter(c => c.currentScore >= 0.8).length} high-confidence matches (80%+) identified.` :
+                             profile.topCareers.filter(c => c.currentScore >= 0.7).length > 0 ? ` ${profile.topCareers.filter(c => c.currentScore >= 0.7).length} strong matches (70%+) with good alignment.` :
+                             ' Several promising directions identified for exploration.'}
+                          </>
+                        ) : 'Career matching in progress based on your assessment responses.'
+                      }
+                    </p>
+                    {profile.topCareers && profile.topCareers.length > 0 && (
+                      <p>
+                        <span className="text-gray-300 font-medium">Top Categories:</span> {
+                          Array.from(new Set(profile.topCareers.slice(0, 3).map(c => c.careerCategory))).join(', ')
+                        } show strongest alignment with your interests and work style preferences.
+                      </p>
+                    )}
+                    <p>
+                      <span className="text-gray-300 font-medium">Match Basis:</span> Recommendations combine your assessment insights, work preferences, stated interests, and career exploration patterns for personalized results.
+                    </p>
                   </div>
-                )}
+                </div>
+              </div>
+              {expandedSections.recommendations ?
+                <ChevronDownIcon className="w-5 h-5 text-gray-400" /> :
+                <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+              }
+            </button>
 
-                {/* Hidden Interests */}
-                {profile.patterns?.hiddenMotivations && profile.patterns.hiddenMotivations.length > 0 && (
-                  <div className="bg-gradient-to-br from-green-900/20 to-blue-900/20 rounded-lg border border-green-700/50 p-5">
-                    <h2 className="text-lg font-bold text-green-400 mb-3">
-                      Hidden Interests
-                    </h2>
-                    <div className="space-y-3">
-                      {profile.patterns.hiddenMotivations.map((motivation, index) => (
-                        <div key={index} className="bg-gray-900/50 rounded-lg p-3">
-                          <div className="flex items-start justify-between mb-2">
-                            <h3 className="font-semibold text-green-300 text-sm">{motivation.motivation}</h3>
-                            <span className="text-xs text-gray-400">{Math.round(motivation.confidence * 100)}%</span>
+            {expandedSections.recommendations && (
+              <div className="px-6 pb-6">
+                <div className="border-t border-gray-700 pt-6">
+                  {profile.topCareers && profile.topCareers.length > 0 ? (
+                    <div className="space-y-4">
+                      {profile.topCareers.map((career, index) => (
+                        <div key={index} className="bg-gradient-to-r from-green-900/20 to-blue-900/20 rounded-lg border border-green-600/30 p-5">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h4 className="text-lg font-bold text-gray-100 mb-1">{career.careerTitle}</h4>
+                              <div className="flex items-center gap-3">
+                                <span className="text-sm text-green-400 font-medium">{career.careerCategory}</span>
+                                <span className="text-sm text-gray-400">•</span>
+                                <span className="text-sm text-gray-400">{Math.round(career.currentScore * 100)}% match</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <svg
+                                  key={i}
+                                  className={`w-4 h-4 ${
+                                    i < Math.round(career.currentScore * 5) ? 'text-green-400' : 'text-gray-600'
+                                  }`}
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
+                            </div>
                           </div>
-                          <p className="text-gray-300 text-xs mb-2">{motivation.insight}</p>
-                          <div className="flex flex-wrap gap-1">
-                            {motivation.relatedAreas.map((area, i) => (
-                              <span key={i} className="px-2 py-0.5 bg-green-900/50 text-green-400 rounded text-xs">
-                                {area}
-                              </span>
+
+                          <div className="space-y-2">
+                            <h5 className="text-sm font-semibold text-gray-100">Why this fits you:</h5>
+                            {career.matchFactors.map((factor, i) => (
+                              <div key={i} className="flex items-start gap-3 text-sm">
+                                <span className="text-green-400 mt-0.5 text-xs">▶</span>
+                                <span className="text-gray-300">{factor}</span>
+                              </div>
                             ))}
                           </div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* 5. Preference Intensity Analysis */}
-          {profile.patterns && profile.patterns.preferenceIntensities && profile.patterns.preferenceIntensities.length > 0 && (
-            <div className="mb-8">
-              <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-6">
-                <h2 className="text-xl font-bold text-blue-400 mb-4">
-                  Preference Intensity Analysis
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {profile.patterns.preferenceIntensities.map((intensity, index) => (
-                    <div key={index} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="font-medium text-gray-200">{intensity.preference}</span>
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          intensity.intensity === 'strong'
-                            ? 'bg-green-900/50 text-green-400'
-                            : intensity.intensity === 'moderate'
-                            ? 'bg-yellow-900/50 text-yellow-400'
-                            : 'bg-gray-700 text-gray-400'
-                        }`}>
-                          {intensity.intensity}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500 mb-2">
-                        {intensity.evidence.length} supporting responses • {Math.round(intensity.confidence * 100)}% confidence
-                      </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-400">No career recommendations available for this assessment.</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* 6. All Discovered Insights */}
-          <div className="mb-8">
-            <div className="bg-gray-800 rounded-lg border border-purple-700/30 p-6">
-              <h2 className="text-xl font-bold text-purple-400 mb-4">
-                All Discovered Insights
-              </h2>
-              <p className="text-gray-400 text-sm mb-6">
-                Comprehensive analysis of patterns detected across your responses. Each insight represents a validated discovery about your career preferences and behaviors.
-              </p>
-
-              {/* Insights Summary Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-700/50">
-                  <div className="text-lg font-bold text-purple-400">{profile.insights.length}</div>
-                  <div className="text-xs text-gray-400">Total Insights</div>
-                </div>
-                <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-700/50">
-                  <div className="text-lg font-bold text-purple-400">
-                    {Math.round((profile.insights.reduce((sum, i) => sum + i.confidence, 0) / profile.insights.length) * 100) || 0}%
-                  </div>
-                  <div className="text-xs text-gray-400">Avg Confidence</div>
-                </div>
-                <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-700/50">
-                  <div className="text-lg font-bold text-purple-400">
-                    {new Set(profile.insights.map(i => i.area)).size}
-                  </div>
-                  <div className="text-xs text-gray-400">Areas Explored</div>
-                </div>
-                <div className="bg-purple-900/30 rounded-lg p-3 border border-purple-700/50">
-                  <div className="text-lg font-bold text-purple-400">
-                    {profile.insights.filter(i => i.confidence > 0.8).length}
-                  </div>
-                  <div className="text-xs text-gray-400">High Confidence</div>
-                </div>
-              </div>
-
-              {/* Insights by Area */}
-              {Array.from(new Set(profile.insights.map(i => i.area))).map(area => {
-                const areaInsights = profile.insights.filter(i => i.area === area);
-                const areaName = area.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
-                return (
-                  <div key={area} className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-200 mb-3 flex items-center gap-2">
-                      <span className="w-3 h-3 bg-purple-500 rounded-full"></span>
-                      {areaName} ({areaInsights.length} insights)
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {areaInsights.map((insight, index) => (
-                        <div key={index} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700/50 hover:border-purple-500/50 transition-colors">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1">
-                              <div className="text-sm font-medium text-gray-200 mb-1">{insight.insight}</div>
-                              <div className="text-xs text-gray-400 mb-2">
-                                Pattern detected in your responses
-                              </div>
-                            </div>
-                            <div className="flex flex-col items-end gap-1">
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                insight.confidence > 0.8
-                                  ? 'bg-green-900/50 text-green-400'
-                                  : insight.confidence > 0.6
-                                  ? 'bg-yellow-900/50 text-yellow-400'
-                                  : 'bg-gray-700 text-gray-400'
-                              }`}>
-                                {Math.round(insight.confidence * 100)}%
-                              </span>
-                              <span className={`px-2 py-0.5 rounded text-xs ${
-                                insight.type === 'strength'
-                                  ? 'bg-blue-900/50 text-blue-400'
-                                  : insight.type === 'preference'
-                                  ? 'bg-green-900/50 text-green-400'
-                                  : insight.type === 'hidden-interest'
-                                  ? 'bg-purple-900/50 text-purple-400'
-                                  : 'bg-gray-700 text-gray-400'
-                              }`}>
-                                {insight.type?.replace('-', ' ') || 'insight'}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Career implications for this insight */}
-                          <div className="text-xs text-purple-300 bg-purple-900/20 rounded p-2 mt-2">
-                            <span className="font-medium">💡 Career relevance: </span>
-                            {insight.type === 'strength' && 'Leverage this in role selection and skill development'}
-                            {insight.type === 'preference' && 'Seek work environments that match this preference'}
-                            {insight.type === 'hidden-interest' && 'Explore careers that tap into this emerging interest'}
-                            {(!insight.type || !['strength', 'preference', 'hidden-interest'].includes(insight.type)) &&
-                              'Consider how this pattern influences your career decisions'}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* Additional context */}
-              <div className="mt-6 p-4 bg-purple-900/20 rounded-lg border border-purple-700/30">
-                <h4 className="text-sm font-semibold text-purple-400 mb-2">🔍 Understanding Your Insights</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-300">
-                  <div>
-                    <p className="font-medium mb-1">Confidence Levels:</p>
-                    <ul className="space-y-0.5">
-                      <li>• <span className="text-green-400">80-100%</span> - Strong patterns, high reliability</li>
-                      <li>• <span className="text-yellow-400">60-79%</span> - Moderate patterns, worth exploring</li>
-                      <li>• <span className="text-gray-400">Below 60%</span> - Emerging patterns, needs validation</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="font-medium mb-1">How to Use:</p>
-                    <ul className="space-y-0.5">
-                      <li>• Focus on high-confidence insights first</li>
-                      <li>• Look for patterns across multiple areas</li>
-                      <li>• Use insights to guide career exploration</li>
-                      <li>• Validate insights through real-world testing</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* ============ SECTION 2: CAREER RECOMMENDATIONS ============ */}
-          <div className="mb-12">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-100 mb-2">Your Career Recommendations</h1>
-              <p className="text-gray-400 text-lg">Careers that align with your profile and interests</p>
-            </div>
-          </div>
-
-          {/* Recommended Careers - Primary Focus */}
-          {profile.topCareers && profile.topCareers.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
-                  <svg className="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          {/* Section 3: Your Action Plan */}
+          <div className="bg-gray-800 rounded-xl border border-gray-700 mb-6">
+            <button
+              onClick={() => toggleSection('actionPlan')}
+              className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-700/50 transition-colors rounded-xl"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Your Top Career Matches
-                </h2>
-                <span className="text-sm text-gray-400">Based on {Object.keys(profile.responses).length} responses</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {profile.topCareers.map((career, index) => (
-                  <div key={index} className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg border-2 border-green-600/40 p-6 hover:border-green-500/60 transition-all">
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded">
-                            #{index + 1}
-                          </span>
-                          <h3 className="text-xl font-bold text-gray-100">{career.careerTitle}</h3>
-                        </div>
-                        {career.careerCategory && (
-                          <p className="text-sm text-gray-400 mb-3">{career.careerCategory}</p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-bold text-green-400 mb-1">
-                          {Math.round(career.currentScore)}%
-                        </div>
-                        <div className="text-xs text-gray-500">Match Score</div>
-                      </div>
-                    </div>
-
-                    {/* Match Factors */}
-                    <div className="space-y-3 mb-4">
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Why this fits you:</p>
-                      {career.matchFactors.slice(0, 3).map((factor, factorIdx) => (
-                        <div key={factorIdx} className="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50">
-                          <div className="flex items-start gap-2">
-                            <div className={`p-1 rounded ${
-                              factor.strength === 'strong' ? 'bg-green-500/20' :
-                              factor.strength === 'moderate' ? 'bg-yellow-500/20' :
-                              'bg-gray-500/20'
-                            }`}>
-                              {factor.strength === 'strong' && (
-                                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                              {factor.strength === 'moderate' && (
-                                <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                              {factor.strength === 'weak' && (
-                                <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-200 mb-1">{factor.factor}</p>
-                              {factor.basedOn.length > 0 && (
-                                <p className="text-xs text-gray-400 line-clamp-2">{factor.basedOn[0]}</p>
-                              )}
-                            </div>
-                            <span className={`text-xs font-semibold px-2 py-1 rounded ${
-                              factor.strength === 'strong' ? 'bg-green-500/10 text-green-400' :
-                              factor.strength === 'moderate' ? 'bg-yellow-500/10 text-yellow-400' :
-                              'bg-gray-500/10 text-gray-400'
-                            }`}>
-                              {factor.strength === 'strong' ? '★★★' : factor.strength === 'moderate' ? '★★' : '★'}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Action Button */}
-                    <a
-                      href={`/careers?id=${encodeURIComponent(career.careerTitle)}`}
-                      className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                      Explore This Career
-                    </a>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-100">Your Action Plan</h2>
+                  <div className="text-gray-400 text-sm mt-2 space-y-2 max-w-lg">
+                    <p>
+                      <span className="text-gray-300 font-medium">Skills Development:</span> {
+                        profile.analysis?.strengths?.length > 0 ?
+                          `Build on ${profile.analysis.strengths.length} identified strengths while addressing key skill gaps for your target roles.` :
+                          'Personalized skill development plan based on your career goals and current capabilities.'
+                      }
+                    </p>
+                    {profile.topCareers && profile.topCareers.length > 0 && (
+                      <p>
+                        <span className="text-gray-300 font-medium">Career Pathways:</span> {
+                          careerPaths.length > 0 ?
+                            `${careerPaths.length} potential career trajectories mapped, showing progression steps and timeline estimates.` :
+                            'Detailed career progression pathways for your recommended roles, including alternative routes.'
+                        }
+                      </p>
+                    )}
+                    <p>
+                      <span className="text-gray-300 font-medium">Implementation Focus:</span> Prioritized actions including immediate steps (0-3 months), medium-term development (3-12 months), and long-term career goals (1-3 years).
+                    </p>
+                    <p>
+                      <span className="text-gray-300 font-medium">Success Metrics:</span> Clear milestones and success indicators to track your progress toward your ideal career position and professional growth.
+                    </p>
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          )}
-
-          {/* Skills Gap Analysis */}
-          {profile.topCareers && profile.topCareers.length > 0 && (
-            <SkillsGapAnalysis
-              topCareers={profile.topCareers}
-              userStrengths={profile.analysis.strengths || []}
-              userExperience={[]} // Could be enhanced to include experience data
-            />
-          )}
-
-          {/* 8. Your Career Roadmap */}
-          {careerPaths.length > 0 && (
-            <CareerPathVisualization trajectories={careerPaths} />
-          )}
-
-          {/* ============ SECTION 3: YOUR ACTION PLAN ============ */}
-          <div className="mb-12">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-100 mb-2">Your Action Plan</h1>
-              <p className="text-gray-400 text-lg">Concrete next steps to advance your career transition</p>
-            </div>
-          </div>
-
-          <ActionPlan
-            actionPlan={generateActionPlan(profile)}
-            onRestartExploration={async () => {
-              if (confirm('Are you sure you want to restart? This will clear all your responses and start fresh.')) {
-                try {
-                  // Clear database state
-                  await fetch('/api/questionnaire', { method: 'DELETE' });
-                  // Reset local state
-                  setShowResults(false);
-                  setProfile(null);
-                  setQuestionnaireKey(prev => prev + 1);
-                  setHasUnsavedResults(false);
-                } catch (error) {
-                  console.error('Failed to clear questionnaire:', error);
-                  // Still reset even if delete fails
-                  setShowResults(false);
-                  setProfile(null);
-                  setQuestionnaireKey(prev => prev + 1);
-                  setHasUnsavedResults(false);
-                }
+              {expandedSections.actionPlan ?
+                <ChevronDownIcon className="w-5 h-5 text-gray-400" /> :
+                <ChevronRightIcon className="w-5 h-5 text-gray-400" />
               }
-            }}
-          />
+            </button>
+
+            {expandedSections.actionPlan && (
+              <div className="px-6 pb-6">
+                <div className="border-t border-gray-700 pt-6">
+                  {/* Skills Gap Analysis */}
+                  {profile.topCareers && profile.topCareers.length > 0 && (
+                    <div className="mb-8">
+                      <SkillsGapAnalysis
+                        topCareers={profile.topCareers}
+                        userStrengths={profile.analysis.strengths}
+                        userExperience={[]}
+                      />
+                    </div>
+                  )}
+
+                  {/* Career Roadmap */}
+                  {careerPaths.length > 0 && (
+                    <div className="mb-8">
+                      <CareerPathVisualization trajectories={careerPaths} />
+                    </div>
+                  )}
+
+                  {/* Action Plan Component */}
+                  <ActionPlan
+                    actionPlan={generateActionPlan(profile)}
+                    onRestartExploration={async () => {
+                      if (confirm('Are you sure you want to restart? This will clear all your responses and start fresh.')) {
+                        try {
+                          // Clear database state
+                          await fetch('/api/questionnaire', { method: 'DELETE' });
+                          // Reset local state
+                          setShowResults(false);
+                          setProfile(null);
+                          setQuestionnaireKey(prev => prev + 1);
+                          setHasUnsavedResults(false);
+                        } catch (error) {
+                          console.error('Failed to clear questionnaire:', error);
+                          // Still reset even if delete fails
+                          setShowResults(false);
+                          setProfile(null);
+                          setQuestionnaireKey(prev => prev + 1);
+                          setHasUnsavedResults(false);
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </main>
 
         {/* Save Assessment Dialog */}

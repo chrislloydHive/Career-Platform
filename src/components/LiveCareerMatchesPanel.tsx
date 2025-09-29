@@ -162,7 +162,7 @@ export function LiveCareerMatchesPanel({
   return (
     <div className="lg:sticky lg:top-4 space-y-4">
       {showUpdateBanner && latestUpdate && (
-        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg p-3 sm:p-4 shadow-lg animate-pulse">
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg p-3 sm:p-4 shadow-lg">
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -177,7 +177,7 @@ export function LiveCareerMatchesPanel({
           <div className="flex items-center justify-between">
             <h3 className="text-base sm:text-lg font-bold text-white">Live Career Matches</h3>
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse" />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full" />
               <span className="text-xs text-white/90 font-medium hidden sm:inline">Updating</span>
             </div>
           </div>
@@ -385,11 +385,11 @@ export function LiveCareerMatchesPanel({
                       </span>
                       {getTrendIcon(career.trend)}
                       {career.trend === 'rising' && (
-                        <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-medium flex items-center gap-1 animate-pulse-subtle">
+                        <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-medium flex items-center gap-1">
                           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
                           </svg>
-                          {isRapidlyRising ? '🔥 Hot' : 'Trending'}
+                          {isRapidlyRising ? 'Hot' : 'Trending'}
                         </span>
                       )}
                       {career.trend === 'new' && (
@@ -499,7 +499,7 @@ export function LiveCareerMatchesPanel({
               {risingCareers.map(career => (
                 <div key={career.careerTitle} className="flex items-center justify-between text-xs bg-gray-800/30 rounded-lg p-2 hover:bg-gray-800/50 transition-colors">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <svg className="w-3.5 h-3.5 text-green-400 flex-shrink-0 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-3.5 h-3.5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
                     <span className="text-gray-200 truncate font-medium">{career.careerTitle}</span>
