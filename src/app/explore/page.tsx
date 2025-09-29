@@ -523,7 +523,7 @@ export default function ExplorePage() {
                             {career.matchFactors.map((factor, i) => (
                               <div key={i} className="flex items-start gap-3 text-sm">
                                 <span className="text-green-400 mt-0.5 text-xs">▶</span>
-                                <span className="text-gray-300">{factor}</span>
+                                <span className="text-gray-300">{factor.factor}</span>
                               </div>
                             ))}
                           </div>
