@@ -473,7 +473,7 @@ export default function AssessmentDetailPage() {
           )}
         </div>
 
-        {/* Section 3: Your Action Plan */}
+        {/* Section 3: Your Career Path */}
         <div className="bg-gray-800 rounded-xl border border-gray-700 mb-6">
           <button
             onClick={() => toggleSection('actionPlan')}
@@ -486,7 +486,7 @@ export default function AssessmentDetailPage() {
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-100">Your Action Plan</h2>
+                <h2 className="text-xl font-bold text-gray-100">Your Career Path</h2>
                 <p className="text-gray-400 text-sm mt-1">
                   Concrete next steps to advance your career based on your assessment findings and
                   recommendations, with skills development and networking strategies.

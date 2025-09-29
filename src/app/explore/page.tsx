@@ -540,7 +540,7 @@ export default function ExplorePage() {
             )}
           </div>
 
-          {/* Section 3: Your Action Plan */}
+          {/* Section 3: Your Career Path */}
           <div className="bg-gray-800 rounded-xl border border-gray-700 mb-6">
             <button
               onClick={() => toggleSection('actionPlan')}
@@ -553,7 +553,7 @@ export default function ExplorePage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-100">Your Action Plan</h2>
+                  <h2 className="text-xl font-bold text-gray-100">Your Career Path</h2>
                   <div className="text-gray-400 text-sm mt-2 space-y-2 max-w-lg">
                     <p>
                       <span className="text-gray-300 font-medium">Skills Development:</span> {
