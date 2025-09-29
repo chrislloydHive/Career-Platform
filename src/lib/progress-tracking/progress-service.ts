@@ -45,23 +45,23 @@ export class ProgressTrackingService {
           lastSync: new Date(parsed.lastSync),
           skills: parsed.skills.map((skill: Record<string, unknown>) => ({
             ...skill,
-            lastUpdated: new Date(skill.lastUpdated),
+            lastUpdated: new Date(skill.lastUpdated as string),
             courses: (skill.courses as Record<string, unknown>[]).map((course: Record<string, unknown>) => ({
               ...course,
-              dateAdded: new Date(course.dateAdded),
-              dateStarted: course.dateStarted ? new Date(course.dateStarted) : undefined,
-              dateCompleted: course.dateCompleted ? new Date(course.dateCompleted) : undefined
+              dateAdded: new Date(course.dateAdded as string),
+              dateStarted: course.dateStarted ? new Date(course.dateStarted as string) : undefined,
+              dateCompleted: course.dateCompleted ? new Date(course.dateCompleted as string) : undefined
             }))
           })),
           progressEntries: parsed.progressEntries.map((entry: Record<string, unknown>) => ({
             ...entry,
-            date: new Date(entry.date)
+            date: new Date(entry.date as string)
           })),
           opportunities: parsed.opportunities.map((opp: Record<string, unknown>) => ({
             ...opp,
-            dateAdded: new Date(opp.dateAdded),
-            startDate: opp.startDate ? new Date(opp.startDate) : undefined,
-            endDate: opp.endDate ? new Date(opp.endDate) : undefined
+            dateAdded: new Date(opp.dateAdded as string),
+            startDate: opp.startDate ? new Date(opp.startDate as string) : undefined,
+            endDate: opp.endDate ? new Date(opp.endDate as string) : undefined
           }))
         };
       }
@@ -537,7 +537,7 @@ export class ProgressTrackingService {
         week: weekStart.toISOString().split('T')[0],
         timeSpent: weekEntries.reduce((sum, e) => sum + (e.timeSpent || 0), 0),
         coursesCompleted: weekEntries.filter(e => e.type === 'course_completed').length,
-        skillsWorkedOn: [...new Set(weekEntries.map(e => e.skillArea).filter(Boolean))]
+        skillsWorkedOn: [...new Set(weekEntries.map(e => e.skillArea).filter((area): area is string => Boolean(area)))]
       });
     }
 
@@ -602,7 +602,7 @@ export class ProgressTrackingService {
       case 'achievement':
         return { achievements: this.state.summary.recentAchievements };
       case 'help_request':
-        return { helpWith: additionalData?.helpWith || [] };
+        return { helpWith: (additionalData?.helpWith as string[]) || [] };
       default:
         return {};
     }

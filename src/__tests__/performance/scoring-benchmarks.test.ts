@@ -79,9 +79,9 @@ describe('Scoring Performance Benchmarks', () => {
         id: `job-${i}`,
       }));
 
-      const initialMemory = (performance as any).memory?.usedJSHeapSize || 0;
+      const initialMemory = (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize || 0;
       scorer.scoreJobs(jobs, criteria);
-      const finalMemory = (performance as any).memory?.usedJSHeapSize || 0;
+      const finalMemory = (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize || 0;
 
       const memoryIncrease = finalMemory - initialMemory;
       expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024);

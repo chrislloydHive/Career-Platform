@@ -207,7 +207,7 @@ export function ProgressNotifications() {
     switch (notification.type) {
       case 'opportunity':
         if (notification.data?.opportunity) {
-          const opportunity: LearningOpportunity = notification.data.opportunity;
+          const opportunity = notification.data.opportunity as LearningOpportunity;
           if (opportunity.url) {
             window.open(opportunity.url, '_blank');
           }
@@ -381,7 +381,7 @@ export function WeeklyProgressDigest() {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 max-w-2xl w-full max-h-96 overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-100">{digest.title}</h2>
+          <h2 className="text-xl font-bold text-gray-100">{String(digest.title)}</h2>
           <button
             onClick={dismissDigest}
             className="text-gray-400 hover:text-gray-200"
@@ -390,9 +390,9 @@ export function WeeklyProgressDigest() {
           </button>
         </div>
 
-        <p className="text-gray-300 mb-6">{digest.summary}</p>
+        <p className="text-gray-300 mb-6">{String(digest.summary)}</p>
 
-        {digest.skillFocus.length > 0 && (
+        {Array.isArray(digest.skillFocus) && digest.skillFocus.length > 0 && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-200 mb-2">🎯 Focus This Week</h3>
             <div className="flex flex-wrap gap-2">
@@ -408,7 +408,7 @@ export function WeeklyProgressDigest() {
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-200 mb-3">🚀 Top Opportunities</h3>
           <div className="space-y-3">
-            {digest.topOpportunities.map((opportunity: LearningOpportunity) => (
+            {Array.isArray(digest.topOpportunities) && digest.topOpportunities.map((opportunity: LearningOpportunity) => (
               <div key={opportunity.id} className="bg-gray-900/50 rounded-lg p-3 border border-gray-700">
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="font-medium text-gray-200">{opportunity.title}</h4>

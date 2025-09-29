@@ -362,7 +362,7 @@ export default function JobSearchPage() {
                 onLoadMore={handleLoadMore}
                 isLoadingMore={isLoadingMore}
                 hasMoreResults={hasMoreResults}
-                searchMetadata={searchMetadata}
+                searchMetadata={searchMetadata || undefined}
               />
             ) : (
               <div className="bg-gray-800 rounded-lg shadow-md p-6 sm:p-8 lg:p-12 text-center">

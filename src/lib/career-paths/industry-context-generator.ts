@@ -559,7 +559,12 @@ export class IndustryContextGenerator {
     requiredPreparation: string[];
     successTips: string[];
   }> {
-    const transitions: Record<string, any> = {};
+    const transitions: Record<string, {
+      difficulty: 'easy' | 'moderate' | 'hard' | 'very-hard';
+      timeToTransition: string;
+      requiredPreparation: string[];
+      successTips: string[];
+    }> = {};
 
     industries.forEach(industry => {
       transitions[industry] = {

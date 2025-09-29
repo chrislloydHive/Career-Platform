@@ -94,7 +94,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
               {navItems.map((item) => {
                 if ('items' in item) {
                   // Dropdown group
-                  const isGroupActive = item.items.some(subItem => pathname === subItem.href);
+                  const isGroupActive = item.items?.some(subItem => pathname === subItem.href) || false;
                   const Icon = item.icon;
                   const isOpen = openDropdown === item.label;
 
@@ -120,7 +120,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
 
                       {isOpen && (
                         <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl min-w-48 z-[60]">
-                          {item.items.map((subItem) => {
+                          {item.items?.map((subItem) => {
                             const isActive = pathname === subItem.href;
                             const SubIcon = subItem.icon;
                             return (

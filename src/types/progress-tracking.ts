@@ -56,7 +56,7 @@ export interface LearningOpportunity {
   id: string;
   title: string;
   description: string;
-  type: 'course' | 'certification' | 'event' | 'book' | 'bootcamp' | 'webinar';
+  type: 'course' | 'certification' | 'event' | 'book' | 'bootcamp' | 'webinar' | 'practice';
   provider: string;
   skillAreas: string[];
   relevanceScore: number; // 0-100
@@ -143,7 +143,7 @@ export interface NotificationSettings {
 export interface ProgressPreferences {
   targetCareerPath: string;
   weeklyTimeGoal: number; // minutes
-  preferredLearningTypes: ('course' | 'certification' | 'book' | 'practice' | 'bootcamp')[];
+  preferredLearningTypes: ('course' | 'certification' | 'book' | 'practice' | 'bootcamp' | 'event' | 'webinar')[];
   notifications: NotificationSettings;
   shareWithMentors: boolean;
   autoTrackTime: boolean;

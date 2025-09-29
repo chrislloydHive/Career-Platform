@@ -319,8 +319,8 @@ describe('Error Scenario Tests', () => {
       const criteria = {
         query: 'engineer',
         salary: {
-          min: '100000' as any,
-          max: '150000' as any,
+          min: '100000' as unknown as number,
+          max: '150000' as unknown as number,
         },
       };
 
@@ -332,7 +332,7 @@ describe('Error Scenario Tests', () => {
     it('should reject non-string location', () => {
       const criteria = {
         query: 'engineer',
-        location: 123 as any,
+        location: 123 as unknown as string,
       };
 
       const result = validateSearchCriteria(criteria);
@@ -343,7 +343,7 @@ describe('Error Scenario Tests', () => {
     it('should reject non-array keywords', () => {
       const criteria = {
         query: 'engineer',
-        keywords: 'react' as any,
+        keywords: 'react' as unknown as string[],
       };
 
       const result = validateSearchCriteria(criteria);

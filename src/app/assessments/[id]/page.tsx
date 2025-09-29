@@ -94,7 +94,7 @@ export default function AssessmentDetailPage() {
   const { insights: personalizedInsights, loading: insightsLoading } = usePersonalizedInsights({
     profile: assessment?.profile,
     careerRecommendations: assessment?.careerRecommendations,
-    assessmentId: params.id
+    assessmentId: Array.isArray(params.id) ? params.id[0] : params.id
   });
 
   useEffect(() => {

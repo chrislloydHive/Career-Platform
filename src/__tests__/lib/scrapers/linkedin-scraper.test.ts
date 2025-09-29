@@ -1,5 +1,6 @@
 import { LinkedInScraper } from '@/lib/scrapers/linkedin-scraper';
 import { mockRawJobLinkedIn } from '../../fixtures/jobs';
+import puppeteer from 'puppeteer-extra';
 
 jest.mock('puppeteer-extra', () => {
   const mockPage = {
@@ -66,7 +67,7 @@ describe('LinkedInScraper', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      const puppeteer = require('puppeteer-extra');
+      // Using imported puppeteer
       puppeteer.launch.mockRejectedValueOnce(new Error('Browser launch failed'));
 
       const config = {
@@ -111,7 +112,7 @@ describe('LinkedInScraper', () => {
 
   describe('retry mechanism', () => {
     it('should retry on transient failures', async () => {
-      const puppeteer = require('puppeteer-extra');
+      // Using imported puppeteer
       const mockBrowser = await puppeteer.launch();
       const mockPage = await mockBrowser.newPage();
 

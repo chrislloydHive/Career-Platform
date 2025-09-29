@@ -427,7 +427,7 @@ export function InteractiveCareerPath({
       {/* Industry Context */}
       <div className="mt-8">
         <IndustryContext
-          industryContext={IndustryContextGenerator.generateIndustryContext(path.careerTitle)}
+          industryContext={IndustryContextGenerator.generateIndustryContext(path.pathName)}
         />
       </div>
     </div>
