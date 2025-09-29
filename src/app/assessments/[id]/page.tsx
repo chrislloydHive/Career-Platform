@@ -12,7 +12,6 @@ import { EnhancedActionPlan } from '@/components/EnhancedActionPlan';
 import { SkillsGapAnalysis } from '@/components/SkillsGapAnalysis';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { usePersonalizedInsights } from '@/hooks/usePersonalizedInsights';
 
 type SavedProfile = {
   responses: Record<string, unknown>;
@@ -90,12 +89,9 @@ export default function AssessmentDetailPage() {
   });
   const [selectedIndustry, setSelectedIndustry] = useState<string>('all');
 
-  // Get AI-generated personalized insights
-  const { insights: personalizedInsights, loading: insightsLoading } = usePersonalizedInsights({
-    profile: assessment?.profile,
-    careerRecommendations: assessment?.careerRecommendations,
-    assessmentId: Array.isArray(params.id) ? params.id[0] : params.id
-  });
+  // Use stored insights from the database instead of regenerating
+  const hasStoredInsights = assessment?.profile?.insights && Array.isArray(assessment.profile.insights) && assessment.profile.insights.length > 0;
+  const hasNarrativeInsights = assessment?.profile?.narrativeInsights && Array.isArray(assessment.profile.narrativeInsights) && assessment.profile.narrativeInsights.length > 0;
 
   useEffect(() => {
     if (params.id) {
@@ -274,24 +270,56 @@ export default function AssessmentDetailPage() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-100 mb-4">Your Saved Career Assessment</h2>
             <div className="max-w-4xl mx-auto space-y-4">
-              {insightsLoading ? (
+              {hasStoredInsights ? (
                 <div className="space-y-4">
-                  <div className="animate-pulse">
-                    <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-                  </div>
-                </div>
-              ) : personalizedInsights ? (
-                <div className="space-y-4">
-                  <p className="text-lg text-gray-300 leading-relaxed">
-                    {personalizedInsights.primaryInsight}
-                  </p>
-                  <p className="text-gray-400 leading-relaxed">
-                    {personalizedInsights.secondaryInsight}
-                    {assessment.careerRecommendations && assessment.careerRecommendations.topRecommendations.length > 0 && (
-                      <span> {personalizedInsights.careerDirection}</span>
-                    )}
-                  </p>
+                  {/* Display AI-generated insights from database */}
+                  {assessment.profile.insights.map((insight: any, index: number) => (
+                    <div key={index} className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg p-4 border border-blue-600/30">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        </div>
+                        <div>
+                          <p className="text-lg text-gray-200 leading-relaxed mb-2">
+                            <strong className="text-blue-300">{insight.area}:</strong> {insight.insight}
+                          </p>
+                          {insight.confidence && (
+                            <div className="text-sm text-gray-400">
+                              Confidence: {Math.round(insight.confidence * 100)}%
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Display synthesized insights if available */}
+                  {assessment.profile.synthesizedInsights && assessment.profile.synthesizedInsights.length > 0 && (
+                    <div className="mt-6">
+                      <h3 className="text-xl font-semibold text-gray-200 mb-4">Key Insights</h3>
+                      <div className="space-y-3">
+                        {assessment.profile.synthesizedInsights.map((insight: any, index: number) => (
+                          <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/30">
+                            <h4 className="text-lg font-medium text-gray-100 mb-2">{insight.title}</h4>
+                            <p className="text-gray-300 mb-3">{insight.description}</p>
+                            {insight.implications && insight.implications.length > 0 && (
+                              <div>
+                                <p className="text-sm font-medium text-gray-400 mb-1">Implications:</p>
+                                <ul className="text-sm text-gray-400 space-y-1">
+                                  {insight.implications.map((implication: string, impIndex: number) => (
+                                    <li key={impIndex} className="flex items-start gap-2">
+                                      <span className="text-blue-400 mt-1">→</span>
+                                      <span>{implication}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -311,37 +339,6 @@ export default function AssessmentDetailPage() {
                 </div>
               )}
 
-              {personalizedInsights?.cognitivePattern && (
-                <div className="bg-purple-900/20 rounded-lg p-4 border border-purple-600/30 mt-6">
-                  <p className="text-purple-100 italic text-center">
-                    <span className="text-purple-400 font-medium">Your Cognitive Pattern:</span> {personalizedInsights.cognitivePattern}
-                  </p>
-                </div>
-              )}
-
-              {personalizedInsights?.uniqueStrength && (
-                <div className="bg-green-900/20 rounded-lg p-4 border border-green-600/30 mt-6">
-                  <p className="text-green-100 italic text-center">
-                    <span className="text-green-400 font-medium">Your Professional Superpower:</span> {personalizedInsights.uniqueStrength}
-                  </p>
-                </div>
-              )}
-
-              {personalizedInsights?.careerImplication && (
-                <div className="bg-orange-900/20 rounded-lg p-4 border border-orange-600/30 mt-6">
-                  <p className="text-orange-100 italic text-center">
-                    <span className="text-orange-400 font-medium">What This Means for Your Career:</span> {personalizedInsights.careerImplication}
-                  </p>
-                </div>
-              )}
-
-              {personalizedInsights?.opportunityTease && (
-                <div className="bg-indigo-900/20 rounded-lg p-4 border border-indigo-600/30 mt-6">
-                  <p className="text-indigo-100 italic text-center">
-                    <span className="text-indigo-400 font-medium">Your Career Opportunity:</span> {personalizedInsights.opportunityTease}
-                  </p>
-                </div>
-              )}
 
               {(() => {
                 const coreMotivation = profile.authenticityProfile &&

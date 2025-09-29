@@ -21,7 +21,7 @@ function ToastItem({ toast, onDismiss }: ToastProps) {
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    const duration = toast.duration || 5000;
+    const duration = toast.duration || 8000;
     const timer = setTimeout(() => {
       setIsExiting(true);
       setTimeout(() => onDismiss(toast.id), 300);
@@ -62,7 +62,7 @@ function ToastItem({ toast, onDismiss }: ToastProps) {
 
   return (
     <div
-      className={`${bgColors[toast.type]} border rounded-lg shadow-lg p-4 mb-3 transition-all duration-300 ${
+      className={`${bgColors[toast.type]} border rounded-lg shadow-lg p-4 transition-all duration-300 ${
         isExiting ? 'opacity-0 translate-x-full' : 'opacity-100 translate-x-0'
       }`}
     >
@@ -97,7 +97,7 @@ export function ToastContainer({ toasts, onDismiss }: ToastContainerProps) {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 w-full max-w-sm">
+    <div className="fixed top-20 right-4 z-[9999] w-full max-w-sm space-y-2">
       {toasts.map(toast => (
         <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
       ))}

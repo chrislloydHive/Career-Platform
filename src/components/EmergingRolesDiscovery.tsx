@@ -145,7 +145,7 @@ export function EmergingRolesDiscovery({ category = 'technology' }: EmergingRole
               Found {emergingRoles.length} Emerging {emergingRoles.length === 1 ? 'Role' : 'Roles'}
             </h3>
             <span className="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm flex items-center gap-1">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
               Live Results
             </span>
           </div>

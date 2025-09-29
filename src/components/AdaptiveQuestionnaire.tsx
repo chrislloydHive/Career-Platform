@@ -991,17 +991,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             {/* Animated gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/10 to-transparent animate-shimmer pointer-events-none" />
 
-            {/* Enhanced sparkle effect with green */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-              <div className="absolute top-2 right-2 w-2 h-2 bg-green-300 rounded-full animate-ping" />
-              <div className="absolute top-4 right-8 w-1.5 h-1.5 bg-green-400 rounded-full animate-ping" style={{ animationDelay: '100ms' }} />
-              <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-green-300 rounded-full animate-ping" style={{ animationDelay: '200ms' }} />
-              <div className="absolute top-6 right-6 w-1 h-1 bg-white rounded-full animate-ping" style={{ animationDelay: '300ms' }} />
-              <div className="absolute top-5 right-16 w-1 h-1 bg-green-200 rounded-full animate-ping" style={{ animationDelay: '400ms' }} />
-            </div>
 
             <div className="flex items-start gap-3 relative">
-              <div className="p-2.5 bg-gradient-to-br from-green-400/30 to-blue-400/30 rounded-xl animate-pulse-subtle">
+              <div className="p-2.5 bg-gradient-to-br from-green-400/30 to-blue-400/30 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
@@ -1063,14 +1055,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           }`}>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer pointer-events-none" />
 
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-              <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-ping" />
-              <div className="absolute top-4 right-8 w-1.5 h-1.5 bg-white/80 rounded-full animate-ping" style={{ animationDelay: '100ms' }} />
-              <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-white/80 rounded-full animate-ping" style={{ animationDelay: '200ms' }} />
-            </div>
 
             <div className="flex items-start gap-3 relative">
-              <div className={`p-2.5 rounded-xl animate-pulse-subtle ${
+              <div className={`p-2.5 rounded-xl ${
                 latestPattern.type === 'consistency' ? 'bg-purple-400/30' :
                 latestPattern.type === 'preference' ? 'bg-indigo-400/30' :
                 latestPattern.type === 'value' ? 'bg-pink-400/30' :
@@ -1186,11 +1173,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       {/* {showNewSuggestion && latestSuggestion && (
         <div className="fixed top-20 right-4 left-4 sm:left-auto z-50 animate-slide-in-right">
           <div className="bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 rounded-xl shadow-2xl p-4 sm:p-5 max-w-md border-2 border-amber-400/50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-              <div className="absolute top-2 right-2 w-2 h-2 bg-amber-300 rounded-full animate-ping" />
-              <div className="absolute top-4 right-8 w-1 h-1 bg-amber-300 rounded-full animate-ping delay-100" />
-              <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-amber-300 rounded-full animate-ping delay-200" />
-            </div>
 
             <div className="flex items-start gap-3 relative">
               <div className="p-2.5 bg-white/30 rounded-xl">
@@ -1238,7 +1220,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-100 mb-1">Adaptive Career Exploration</h1>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <div className="w-2 h-2 bg-green-400 rounded-full" />
                   <span>AI adapting questions</span>
                 </div>
               </div>
@@ -1329,7 +1311,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                   </div>
                   <div className="text-xs text-gray-500 group-hover:text-gray-400">patterns</div>
                   {patternHistory.length > 0 && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full animate-pulse" />
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full" />
                   )}
                 </button>
               )}
@@ -1652,15 +1634,15 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             </div>
             <div className="flex items-center gap-4 mt-4 px-6 py-3 bg-gray-800/60 rounded-lg border border-blue-500/30">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 <span className="text-xs text-gray-300">Pattern detection</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
                 <span className="text-xs text-gray-300">Insight synthesis</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                 <span className="text-xs text-gray-300">Career matching</span>
               </div>
             </div>
@@ -1712,7 +1694,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
                 </span>
               )}
               {Object.keys(engine.getState().responses).length > 0 && Object.keys(engine.getState().responses).length % 5 === 0 && (
-                <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-green-900/30 text-green-300 rounded-full text-xs flex items-center gap-1.5 animate-pulse-subtle">
+                <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-green-900/30 text-green-300 rounded-full text-xs flex items-center gap-1.5">
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>

@@ -30,7 +30,7 @@ export function AiCareerSuggestionsPanel() {
   if (loading) {
     return (
       <div className="mb-8 bg-gradient-to-br from-blue-900/20 via-blue-800/10 to-cyan-900/20 rounded-xl border-2 border-blue-500/30 p-6">
-        <div className="animate-pulse">
+        <div>
           <div className="h-6 bg-blue-500/20 rounded w-1/3 mb-4"></div>
           <div className="space-y-3">
             <div className="h-20 bg-blue-500/10 rounded"></div>
