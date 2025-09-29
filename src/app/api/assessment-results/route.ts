@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import { auth } from '@/lib/auth/config';
+import { getUserProfile, buildUserContextPrompt, getQuestionnaireInsights } from '@/lib/storage/user-profile-db';
+import { careerRecommendationsAI, CareerRecommendation } from '@/lib/ai/career-recommendations-ai';
+import { JobCategory } from '@/types/career';
 
 export async function GET() {
   try {
@@ -15,6 +18,7 @@ export async function GET() {
         title,
         description,
         completion_percentage,
+        career_recommendations,
         saved_at,
         created_at
       FROM assessment_results
@@ -55,6 +59,72 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let careerRecommendations: CareerRecommendation[] = [];
+    try {
+      const userProfile = await getUserProfile(session.user.id);
+      const questionnaireData = await getQuestionnaireInsights(session.user.id);
+
+      if (userProfile) {
+        const userContext = buildUserContextPrompt(userProfile, questionnaireData || undefined);
+
+        const careersResult = await sql`
+          SELECT * FROM career_research
+          WHERE user_id = ${session.user.id}
+          ORDER BY created_at DESC
+        `;
+
+        const exploredCareers = careersResult.rows.map(row => ({
+          id: row.id,
+          title: row.title,
+          category: row.category,
+          description: row.description,
+          salaryRanges: row.salary_ranges || [],
+          careerProgression: row.career_progression || [],
+          requiredSkills: [],
+          dailyTasks: [],
+        }));
+
+        const interactionsResult = await sql`
+          SELECT action, context, timestamp
+          FROM interaction_history
+          WHERE user_id = ${session.user.id}
+          AND action IN ('career_search', 'career_research', 'chat_query')
+          ORDER BY timestamp DESC
+          LIMIT 50
+        `;
+
+        const searchedJobs: string[] = [];
+        const chatHistory: Array<{ query: string; timestamp: Date }> = [];
+
+        interactionsResult.rows.forEach(row => {
+          if (row.action === 'career_search' || row.action === 'career_research') {
+            if (row.context && !searchedJobs.includes(row.context)) {
+              searchedJobs.push(row.context);
+            }
+          } else if (row.action === 'chat_query') {
+            chatHistory.push({
+              query: row.context,
+              timestamp: new Date(row.timestamp)
+            });
+          }
+        });
+
+        const questionnaireCompletion = questionnaireData?.completion_percentage || 0;
+
+        careerRecommendations = await careerRecommendationsAI.generateRecommendations(
+          userContext,
+          {
+            searchedJobs,
+            exploredCareers: exploredCareers as unknown as JobCategory[],
+            chatHistory,
+            questionnaireCompletion,
+          }
+        );
+      }
+    } catch (recommendationError) {
+      console.error('Error generating career recommendations:', recommendationError);
+    }
+
     const result = await sql`
       INSERT INTO assessment_results (
         user_id,
@@ -70,7 +140,8 @@ export async function POST(request: NextRequest) {
         patterns,
         analysis,
         top_careers,
-        completion_percentage
+        completion_percentage,
+        career_recommendations
       ) VALUES (
         ${session.user.id},
         ${title},
@@ -85,7 +156,8 @@ export async function POST(request: NextRequest) {
         ${JSON.stringify(profile.patterns || {})}::jsonb,
         ${JSON.stringify(profile.analysis || {})}::jsonb,
         ${JSON.stringify(profile.topCareers || [])}::jsonb,
-        ${profile.completion || 0}
+        ${profile.completion || 0},
+        ${JSON.stringify(careerRecommendations)}::jsonb
       )
       RETURNING id
     `;

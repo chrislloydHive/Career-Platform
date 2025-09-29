@@ -42,6 +42,7 @@ export async function GET(
           topCareers: assessment.top_careers,
           completion: assessment.completion_percentage
         },
+        careerRecommendations: assessment.career_recommendations,
         savedAt: assessment.saved_at,
         createdAt: assessment.created_at
       }
