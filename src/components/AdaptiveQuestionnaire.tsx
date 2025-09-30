@@ -136,6 +136,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           }
           setNarrativeInsights(data.narrativeInsights || []);
           setConfidenceEvolutions(data.confidenceEvolutions || []);
+          setSkippedQuestions(data.skippedQuestions || []);
 
           // Load pattern data from the engine state
           const engineState = engine.getState();
@@ -184,6 +185,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         confidenceEvolutions,
         lastQuestionId,
         completionPercentage,
+        skippedQuestions,
       };
 
       console.log('Saving questionnaire state...', {
@@ -551,8 +553,18 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     }
   };
 
-  const handleComeBackLater = () => {
+  const handleComeBackLater = async () => {
     handleSkip();
+    // Immediately save the state with the skipped question
+    await saveState();
+    // Show feedback that it was saved
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+    notification.textContent = '✓ Question saved for later';
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      notification.remove();
+    }, 2000);
   };
 
   const handleAnswerSkippedQuestion = (question: AdaptiveQuestion) => {

@@ -30,6 +30,7 @@ export async function GET() {
       confidenceEvolutions: row.confidence_evolutions,
       lastQuestionId: row.last_question_id,
       completionPercentage: row.completion_percentage,
+      skippedQuestions: row.skipped_questions || [],
       updatedAt: row.updated_at,
     });
   } catch (error) {
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
     const authenticityProfileJson = data.authenticityProfile ? JSON.stringify(data.authenticityProfile) : null;
     const narrativeInsightsJson = JSON.stringify(data.narrativeInsights || []);
     const confidenceEvolutionsJson = JSON.stringify(data.confidenceEvolutions || []);
+    const skippedQuestionsJson = JSON.stringify(data.skippedQuestions || []);
 
     console.log('[Questionnaire API] JSON sizes:', {
       state: stateJson.length,
@@ -90,6 +92,7 @@ export async function POST(request: NextRequest) {
         confidence_evolutions,
         last_question_id,
         completion_percentage,
+        skipped_questions,
         updated_at
       ) VALUES (
         ${session.user.id},
@@ -102,6 +105,7 @@ export async function POST(request: NextRequest) {
         ${confidenceEvolutionsJson}::jsonb,
         ${data.lastQuestionId || null},
         ${data.completionPercentage || 0},
+        ${skippedQuestionsJson}::jsonb,
         NOW()
       )
       ON CONFLICT (user_id)
@@ -115,6 +119,7 @@ export async function POST(request: NextRequest) {
         confidence_evolutions = ${confidenceEvolutionsJson}::jsonb,
         last_question_id = ${data.lastQuestionId || null},
         completion_percentage = ${data.completionPercentage || 0},
+        skipped_questions = ${skippedQuestionsJson}::jsonb,
         updated_at = NOW()
     `;
 
