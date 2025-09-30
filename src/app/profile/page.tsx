@@ -111,15 +111,17 @@ export default function ProfilePage() {
       // Switch to overview tab
       setActiveTab('overview');
 
-      // Clear form
+      // Clear form only on success
       setResumeFile(null);
       setLinkedInUrl('');
       setAdditionalDocs([]);
       setAdditionalInfo('');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to analyze profile:', error);
-      setUploadStatus('Failed to analyze profile. Please try again.');
+      const errorMessage = error.message || 'Failed to analyze profile. Please try again.';
+      setUploadStatus(`Error: ${errorMessage}`);
+      // Don't clear the form on error so user can try again
     } finally {
       setUploading(false);
     }

@@ -44,10 +44,18 @@ export async function POST(request: NextRequest) {
       success: true,
       documentUrls,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Upload error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+    });
     return NextResponse.json(
-      { error: 'Failed to upload files' },
+      {
+        error: 'Failed to upload files',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     );
   }

@@ -134,10 +134,18 @@ Only include information you can confidently infer from what was provided. Be ho
       success: true,
       analysis,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Analysis error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+    });
     return NextResponse.json(
-      { error: 'Failed to analyze profile' },
+      {
+        error: 'Failed to analyze profile',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     );
   }
