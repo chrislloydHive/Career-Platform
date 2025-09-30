@@ -129,7 +129,7 @@ export default function ProfilePage() {
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
             }`}
           >
-            Upload
+            Share
           </button>
         </div>
 
@@ -263,11 +263,11 @@ export default function ProfilePage() {
                     Analyzing...
                   </span>
                 ) : (
-                  'Let AI Analyze My Profile'
+                  'Analyze My Profile'
                 )}
               </button>
               <p className="text-sm text-gray-400 text-center mt-3">
-                Our AI will review everything you uploaded and build a comprehensive profile in seconds
+                Our AI will review everything you shared and build a comprehensive profile in seconds
               </p>
             </div>
           </div>
