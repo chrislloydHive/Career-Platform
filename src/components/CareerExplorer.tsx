@@ -42,14 +42,28 @@ const UNCOMMON_CAREERS = [
   { title: 'Technical Writer', description: 'Explain complicated stuff in simple terms', degreeRequired: false },
 ];
 
-// Company type exploration
-const COMPANY_TYPES = [
-  { type: 'Startups (0-50 employees)', pros: 'Wear many hats, fast growth, learn tons', cons: 'Less structure, can be chaotic', good_for: 'People who like variety and moving fast' },
-  { type: 'Scale-ups (50-500 employees)', pros: 'Still growing, more established, equity potential', cons: 'In-between phase can be messy', good_for: 'Want impact but some structure' },
-  { type: 'Corporate (500+ employees)', pros: 'Structure, benefits, clear paths', cons: 'Slower, more bureaucracy', good_for: 'People who like defined roles and stability' },
-  { type: 'Remote-First Companies', pros: 'Work from anywhere, flexible schedule', cons: 'Need self-discipline, can feel isolated', good_for: 'Self-starters who value flexibility' },
-  { type: 'Agencies', pros: 'Variety of projects and clients, fast-paced', cons: 'Can be demanding, client-driven', good_for: 'People who get bored easily' },
-  { type: 'Non-Profits', pros: 'Mission-driven, meaningful work', cons: 'Usually lower pay', good_for: 'Values-driven decision makers' },
+// High demand careers
+const HIGH_DEMAND_CAREERS = [
+  { title: 'Customer Success Associate', description: 'Companies are desperate for people who can keep customers happy', openings: '15,000+ open roles' },
+  { title: 'Sales Development Representative', description: 'Every company needs people reaching out to potential customers', openings: '20,000+ open roles' },
+  { title: 'Account Executive', description: 'SaaS companies hiring like crazy for quota-carrying sales roles', openings: '12,000+ open roles' },
+  { title: 'Marketing Coordinator', description: 'Brands need help with campaigns, social, and content constantly', openings: '18,000+ open roles' },
+  { title: 'Operations Associate', description: 'Someone has to keep the business running smoothly', openings: '10,000+ open roles' },
+  { title: 'Executive Assistant', description: 'Execs always need organized people to manage their chaos', openings: '14,000+ open roles' },
+  { title: 'HR Coordinator', description: 'Growing companies need help with recruiting and people ops', openings: '8,000+ open roles' },
+  { title: 'Data Analyst', description: 'Every team wants someone who can make sense of their data', openings: '16,000+ open roles' },
+];
+
+// No experience required careers
+const NO_EXPERIENCE_CAREERS = [
+  { title: 'Customer Service Representative', description: 'They train you—just need patience and good communication', training: 'Full training provided' },
+  { title: 'Sales Development Representative', description: 'Learn on the job, usually with a mentor and scripts', training: '2-4 week bootcamp' },
+  { title: 'Administrative Assistant', description: 'Organization and basic computer skills get you in the door', training: 'On-the-job training' },
+  { title: 'Social Media Coordinator', description: 'If you already use social media daily, you qualify', training: 'Learn as you go' },
+  { title: 'Recruiting Coordinator', description: 'They need people skills more than recruiting experience', training: '1-2 week onboarding' },
+  { title: 'Junior Copywriter', description: 'Writing samples matter more than a marketing degree', training: 'Editor will guide you' },
+  { title: 'Content Moderator', description: 'Review user content—just need attention to detail', training: 'Policy training included' },
+  { title: 'Operations Coordinator', description: 'Organized? Good at spreadsheets? You\'re hired', training: 'Process training provided' },
 ];
 
 // Emerging careers that didn't exist 5 years ago
@@ -78,9 +92,12 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendationMetadata, setRecommendationMetadata] = useState<RecommendationMetadata | null>(null);
   const [showUncommonCareers, setShowUncommonCareers] = useState(false);
-  const [showCompanyTypes, setShowCompanyTypes] = useState(false);
+  const [showHighDemand, setShowHighDemand] = useState(false);
+  const [showNoExperience, setShowNoExperience] = useState(false);
   const [showEmergingCareers, setShowEmergingCareers] = useState(false);
   const [uncommonCareersLimit, setUncommonCareersLimit] = useState(8);
+  const [highDemandLimit, setHighDemandLimit] = useState(8);
+  const [noExperienceLimit, setNoExperienceLimit] = useState(8);
   const [emergingCareersLimit, setEmergingCareersLimit] = useState(8);
 
   useEffect(() => {
@@ -330,23 +347,23 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           )}
         </div>
 
-        {/* Company Types - Collapsible */}
+        {/* High Demand Careers - Collapsible */}
         <div className="mb-6">
           <button
-            onClick={() => setShowCompanyTypes(!showCompanyTypes)}
-            className="w-full bg-gradient-to-r from-blue-900/30 to-cyan-900/30 hover:from-blue-900/40 hover:to-cyan-900/40 rounded-xl border border-blue-600/40 p-4 transition-all flex items-center justify-between"
+            onClick={() => setShowHighDemand(!showHighDemand)}
+            className="w-full bg-gradient-to-r from-orange-900/30 to-red-900/30 hover:from-orange-900/40 hover:to-red-900/40 rounded-xl border border-orange-600/40 p-4 transition-all flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
               <div className="text-left">
-                <h3 className="text-lg font-bold text-gray-100">Where Do You Want to Work?</h3>
-                <p className="text-sm text-gray-400">Different company types = completely different vibes</p>
+                <h3 className="text-lg font-bold text-gray-100">High Demand Right Now</h3>
+                <p className="text-sm text-gray-400">Tons of openings—these companies are actively hiring</p>
               </div>
             </div>
             <svg
-              className={`w-6 h-6 text-blue-400 transition-transform ${showCompanyTypes ? 'rotate-180' : ''}`}
+              className={`w-6 h-6 text-orange-400 transition-transform ${showHighDemand ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -355,29 +372,99 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
             </svg>
           </button>
 
-          {showCompanyTypes && (
-            <div className="mt-4 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-600/30 p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {COMPANY_TYPES.map((company, index) => (
-                  <div key={index} className="bg-gray-800/50 rounded-lg p-5 border border-gray-700">
-                    <h3 className="text-lg font-bold text-gray-100 mb-3">{company.type}</h3>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <span className="text-green-400 font-medium">Pros:</span>
-                        <span className="text-gray-300 ml-2">{company.pros}</span>
-                      </div>
-                      <div>
-                        <span className="text-orange-400 font-medium">Cons:</span>
-                        <span className="text-gray-300 ml-2">{company.cons}</span>
-                      </div>
-                      <div className="pt-2 border-t border-gray-700">
-                        <span className="text-blue-400 font-medium text-xs">Good for:</span>
-                        <span className="text-gray-400 ml-2 text-xs">{company.good_for}</span>
-                      </div>
+          {showHighDemand && (
+            <div className="mt-4 bg-gradient-to-r from-orange-900/20 to-red-900/20 rounded-xl border border-orange-600/30 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {HIGH_DEMAND_CAREERS.slice(0, highDemandLimit).map((career, index) => (
+                  <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-orange-500/50 transition-colors">
+                    <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
+                    <p className="text-xs text-gray-400 mb-2">{career.description}</p>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="px-2 py-0.5 bg-orange-600/30 text-orange-300 rounded text-xs font-medium">{career.openings}</span>
                     </div>
+                    <button
+                      onClick={() => {
+                        setSearchQuery(career.title);
+                        setShowSuggestions(false);
+                      }}
+                      className="text-xs text-orange-400 hover:text-orange-300 font-medium"
+                    >
+                      Learn more →
+                    </button>
                   </div>
                 ))}
               </div>
+              {highDemandLimit < HIGH_DEMAND_CAREERS.length && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => setHighDemandLimit(prev => prev + 8)}
+                    className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
+                  >
+                    Show More Jobs
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* No Experience Required - Collapsible */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowNoExperience(!showNoExperience)}
+            className="w-full bg-gradient-to-r from-blue-900/30 to-cyan-900/30 hover:from-blue-900/40 hover:to-cyan-900/40 rounded-xl border border-blue-600/40 p-4 transition-all flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <div className="text-left">
+                <h3 className="text-lg font-bold text-gray-100">No Experience? No Problem.</h3>
+                <p className="text-sm text-gray-400">They'll train you—just bring your willingness to learn</p>
+              </div>
+            </div>
+            <svg
+              className={`w-6 h-6 text-blue-400 transition-transform ${showNoExperience ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showNoExperience && (
+            <div className="mt-4 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-600/30 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {NO_EXPERIENCE_CAREERS.slice(0, noExperienceLimit).map((career, index) => (
+                  <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-colors">
+                    <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
+                    <p className="text-xs text-gray-400 mb-2">{career.description}</p>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="px-2 py-0.5 bg-blue-600/30 text-blue-300 rounded text-xs font-medium">{career.training}</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSearchQuery(career.title);
+                        setShowSuggestions(false);
+                      }}
+                      className="text-xs text-blue-400 hover:text-blue-300 font-medium"
+                    >
+                      Learn more →
+                    </button>
+                  </div>
+                ))}
+              </div>
+              {noExperienceLimit < NO_EXPERIENCE_CAREERS.length && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => setNoExperienceLimit(prev => prev + 8)}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                  >
+                    Show More Jobs
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
