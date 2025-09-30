@@ -11,6 +11,8 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<'upload' | 'overview' | 'preferences' | 'history' | 'insights'>('overview');
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [generatingInsights, setGeneratingInsights] = useState(false);
+  const [insightMessage, setInsightMessage] = useState<string>('');
 
   // Share tab form state
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -49,15 +51,39 @@ export default function ProfilePage() {
         const data = await response.json();
         setProfile(data.profile);
 
-        // Trigger insight generation in background
+        // Show insight generation message
+        setGeneratingInsights(true);
+        setInsightMessage('Generating personalized insights from your preferences...');
+
+        // Trigger insight generation
         fetch('/api/profile/generate-insights', {
           method: 'POST',
-        }).then(() => {
-          console.log('Insights generation triggered');
-          // Reload profile to get new insights
-          loadProfile();
+        }).then(async (insightRes) => {
+          if (insightRes.ok) {
+            const insightData = await insightRes.json();
+            setInsightMessage(`✓ Generated ${insightData.count} new insights! Check the AI Insights tab.`);
+            // Reload profile to get new insights
+            await loadProfile();
+            // Auto-switch to insights tab after a moment
+            setTimeout(() => {
+              setActiveTab('insights');
+              setInsightMessage('');
+              setGeneratingInsights(false);
+            }, 2000);
+          } else {
+            setInsightMessage('Failed to generate insights. Your preferences were saved.');
+            setTimeout(() => {
+              setInsightMessage('');
+              setGeneratingInsights(false);
+            }, 3000);
+          }
         }).catch(err => {
           console.error('Failed to generate insights:', err);
+          setInsightMessage('Failed to generate insights. Your preferences were saved.');
+          setTimeout(() => {
+            setInsightMessage('');
+            setGeneratingInsights(false);
+          }, 3000);
         });
       }
     } catch (error) {
@@ -169,6 +195,18 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-950">
       <Navigation title="Your Profile" subtitle="AI learns about you with every interaction" />
+
+      {/* Insight Generation Toast */}
+      {insightMessage && (
+        <div className="fixed top-20 right-4 z-50 bg-blue-600 text-white px-6 py-4 rounded-lg shadow-lg border border-blue-500 max-w-md animate-slide-in">
+          <div className="flex items-center gap-3">
+            {generatingInsights && (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            )}
+            <p className="text-sm font-medium">{insightMessage}</p>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         <div className="mb-4 sm:mb-6 flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide pb-2">
