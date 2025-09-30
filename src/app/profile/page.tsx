@@ -38,6 +38,7 @@ export default function ProfilePage() {
 
   async function handleSavePreferences(preferences: CareerPreferences) {
     try {
+      // Save preferences
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -47,6 +48,17 @@ export default function ProfilePage() {
       if (response.ok) {
         const data = await response.json();
         setProfile(data.profile);
+
+        // Trigger insight generation in background
+        fetch('/api/profile/generate-insights', {
+          method: 'POST',
+        }).then(() => {
+          console.log('Insights generation triggered');
+          // Reload profile to get new insights
+          loadProfile();
+        }).catch(err => {
+          console.error('Failed to generate insights:', err);
+        });
       }
     } catch (error) {
       console.error('Failed to save preferences:', error);
@@ -548,32 +560,79 @@ export default function ProfilePage() {
             {/* Intro Section */}
             <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-6">
               <p className="text-gray-300 leading-relaxed">
-                These are the key insights our AI has learned about you - your strengths, interests, work style preferences, and career patterns. Each insight includes a confidence level showing how certain we are based on the data you've shared. These insights power your job recommendations and help us give you better advice.
+                These are personalized insights our AI has generated based on your profile, preferences, and interactions. These insights help identify opportunities, highlight your unique strengths, and guide your career exploration.
               </p>
             </div>
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">AI Insights</h3>
-            <div className="space-y-3 sm:space-y-4">
-              {profile.aiInsights.slice().reverse().map((insight, idx) => (
-                <div key={idx} className="bg-gray-900 border border-gray-700 rounded-lg p-3 sm:p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2 mb-2">
-                    <div className="text-xs text-gray-500">
-                      {new Date(insight.timestamp).toLocaleDateString()} • {insight.source}
-                    </div>
-                    <div className="text-xs font-medium text-blue-400">
-                      {Math.round(insight.confidence * 100)}% confidence
-                    </div>
-                  </div>
-                  <p className="text-xs sm:text-sm text-gray-200">{insight.insight}</p>
-                </div>
-              ))}
-              {profile.aiInsights.length === 0 && (
-                <p className="text-xs sm:text-sm text-gray-500 text-center py-8">
-                  No AI insights yet. Keep using the platform and AI will learn about your preferences!
+
+            {profile.aiInsights.length === 0 ? (
+              <div className="bg-gray-800 rounded-lg border border-gray-700 p-8 text-center">
+                <svg className="w-12 h-12 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                <p className="text-gray-400 mb-4">No AI insights yet</p>
+                <p className="text-sm text-gray-500 mb-6">
+                  Add your preferences, upload your resume, or take the assessment to start generating personalized insights.
                 </p>
-              )}
-            </div>
-            </div>
+                <button
+                  onClick={() => setActiveTab('preferences')}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                >
+                  Add Preferences
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3 sm:space-y-4">
+                {profile.aiInsights.slice().reverse().map((insight, idx) => {
+                  // Parse insight if it's JSON
+                  let insightData;
+                  try {
+                    insightData = typeof insight.insight === 'string' ? JSON.parse(insight.insight) : insight.insight;
+                  } catch {
+                    insightData = { content: insight.insight };
+                  }
+
+                  const typeColors = {
+                    opportunity: 'border-green-600/30 bg-green-900/20',
+                    strength: 'border-blue-600/30 bg-blue-900/20',
+                    caution: 'border-yellow-600/30 bg-yellow-900/20',
+                    recommendation: 'border-purple-600/30 bg-purple-900/20',
+                  };
+
+                  const typeIcons = {
+                    opportunity: '🚀',
+                    strength: '💪',
+                    caution: '⚠️',
+                    recommendation: '💡',
+                  };
+
+                  const typeColor = typeColors[insightData.type as keyof typeof typeColors] || 'border-gray-700 bg-gray-900';
+                  const typeIcon = typeIcons[insightData.type as keyof typeof typeIcons] || '📊';
+
+                  return (
+                    <div key={idx} className={`rounded-lg border p-4 sm:p-5 ${typeColor}`}>
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl flex-shrink-0">{typeIcon}</span>
+                        <div className="flex-1">
+                          {insightData.title && (
+                            <h4 className="font-semibold text-gray-100 mb-2">{insightData.title}</h4>
+                          )}
+                          <p className="text-sm text-gray-300 leading-relaxed mb-3">{insightData.content}</p>
+                          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                            <span>{new Date(insight.timestamp).toLocaleDateString()}</span>
+                            <span>•</span>
+                            <span className="capitalize">{insight.source.replace('_', ' ')}</span>
+                            <span>•</span>
+                            <span className="text-blue-400 font-medium">
+                              {Math.round(insight.confidence * 100)}% confidence
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </main>
