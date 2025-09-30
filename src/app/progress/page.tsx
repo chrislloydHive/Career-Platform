@@ -149,8 +149,8 @@ export default function ProgressPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-gray-300">
             <div>
-              <h3 className="font-semibold text-gray-200 mb-3">Prepare 3 Stories</h3>
-              <p className="text-sm">Have 3 concrete examples ready: one where you solved a problem, one where you worked with a team, and one where you learned from a mistake. Use STAR format (Situation, Task, Action, Result).</p>
+              <h3 className="font-semibold text-gray-200 mb-3">Pick THE 3 Things About You</h3>
+              <p className="text-sm">Choose 3 specific stories that show THE three things you want them to know about you. Not "I'm a team player" - actual examples like "I led a group project where we had to pivot our entire strategy." Your whole interview strategy is finding ways to tell these 3 stories no matter what they ask.</p>
             </div>
             <div>
               <h3 className="font-semibold text-gray-200 mb-3">Research the Company (5 Minutes)</h3>

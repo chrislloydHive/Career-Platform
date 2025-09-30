@@ -123,6 +123,63 @@ export default function ProfilePage() {
 
         {activeTab === 'overview' && (
           <div className="space-y-4 sm:space-y-6">
+            {/* Assessment Progress */}
+            {profile.questionnaireInsights && (
+              <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border border-blue-600/30 p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3">Assessment Progress</h3>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex-1">
+                    <div className="flex justify-between text-sm text-gray-300 mb-2">
+                      <span>Completion</span>
+                      <span>{profile.questionnaireInsights.completion_percentage}%</span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full transition-all"
+                        style={{ width: `${profile.questionnaireInsights.completion_percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="text-sm text-gray-400">
+                  {profile.questionnaireInsights.state?.responses &&
+                    `${Object.keys(profile.questionnaireInsights.state.responses).length} questions answered`
+                  }
+                </div>
+              </div>
+            )}
+
+            {/* Saved Assessments */}
+            {profile.assessmentResults && profile.assessmentResults.length > 0 && (
+              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Saved Assessments</h3>
+                <div className="space-y-3">
+                  {profile.assessmentResults.map((assessment: any) => (
+                    <div key={assessment.id} className="bg-gray-900 border border-gray-700 rounded-lg p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-gray-100">{assessment.title}</h4>
+                        <span className="text-xs text-gray-500">
+                          {new Date(assessment.saved_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {assessment.description && (
+                        <p className="text-sm text-gray-400 mb-2">{assessment.description}</p>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs text-gray-500">{assessment.completion_percentage}% complete</div>
+                        <a
+                          href={`/assessments/${assessment.id}`}
+                          className="text-xs text-blue-400 hover:text-blue-300"
+                        >
+                          View Results →
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 sm:mb-4">
                 <div className="flex-1">
