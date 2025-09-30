@@ -8,9 +8,19 @@ import { JobCategory } from '@/types/career';
 export async function GET() {
   try {
     const session = await auth();
+    console.log('[Assessment Results GET] Session:', JSON.stringify({
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email
+    }));
+
     if (!session?.user?.id) {
+      console.error('[Assessment Results GET] No session or user ID');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    console.log('[Assessment Results GET] Fetching for user:', session.user.id);
 
     const result = await sql`
       SELECT
@@ -26,12 +36,14 @@ export async function GET() {
       ORDER BY saved_at DESC
     `;
 
+    console.log('[Assessment Results GET] Found assessments:', result.rows.length);
+
     return NextResponse.json({
       success: true,
       assessments: result.rows
     });
   } catch (error) {
-    console.error('Error loading assessment results:', error);
+    console.error('[Assessment Results GET] Error loading assessment results:', error);
     return NextResponse.json(
       { error: 'Failed to load assessment results' },
       { status: 500 }
