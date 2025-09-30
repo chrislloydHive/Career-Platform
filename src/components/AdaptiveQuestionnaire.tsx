@@ -344,7 +344,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       setLatestInsightNotification(latest);
       setShowInsightNotification(true);
-      setTimeout(() => setShowInsightNotification(false), 4000);
+      setTimeout(() => setShowInsightNotification(false), 8000); // 8 seconds to give more time to read
     }
 
     setInsights(newInsights);
