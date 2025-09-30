@@ -67,6 +67,25 @@ export interface UserProfile {
     source: string;
   }[];
 
+  // Additional enriched data from database
+  questionnaireInsights?: {
+    insights?: any[];
+    synthesized_insights?: any[];
+    completion_percentage?: number;
+    state?: {
+      responses?: Record<string, any>;
+    };
+  };
+
+  assessmentResults?: {
+    id: number;
+    title: string;
+    description?: string;
+    completion_percentage: number;
+    saved_at: string;
+    career_recommendations?: any;
+  }[];
+
   lastUpdated: Date;
 }
 
