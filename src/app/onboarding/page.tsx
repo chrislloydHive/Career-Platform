@@ -447,6 +447,91 @@ function ProfileStep({
     linkedinUrl: data.linkedinUrl || '',
     hasUploadedResume: data.hasUploadedResume || false
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleFileSelect = (file: File) => {
+    setUploadError('');
+
+    // Validate file type
+    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!validTypes.includes(file.type)) {
+      setUploadError('Please upload a PDF, DOC, or DOCX file');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('File size must be less than 5MB');
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    setUploading(true);
+    setUploadError('');
+
+    try {
+      const formDataToUpload = new FormData();
+      formDataToUpload.append('resume', selectedFile);
+
+      const response = await fetch('/api/profile/upload', {
+        method: 'POST',
+        body: formDataToUpload,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+      const resumeData = result.documentUrls?.find((doc: any) => doc.type === 'resume');
+
+      setFormData({
+        ...formData,
+        resumeUrl: resumeData?.url || '',
+        hasUploadedResume: true
+      });
+    } catch (error) {
+      setUploadError('Upload failed. Please try again.');
+      console.error('Upload error:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = () => {
     onNext(formData);
@@ -468,22 +553,73 @@ function ProfileStep({
         {/* Resume Upload */}
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-gray-100 mb-4">Resume Upload</h3>
-          <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              isDragging
+                ? 'border-blue-500 bg-blue-500/10'
+                : 'border-gray-600'
+            }`}
+          >
             <div className="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
             </div>
-            <h4 className="text-lg font-medium text-gray-200 mb-2">Upload Your Resume</h4>
+            <h4 className="text-lg font-medium text-gray-200 mb-2">
+              {selectedFile ? selectedFile.name : 'Upload Your Resume'}
+            </h4>
             <p className="text-gray-400 text-sm mb-4">
-              PDF, DOC, or DOCX files up to 5MB
+              {isDragging ? 'Drop file here' : 'PDF, DOC, or DOCX files up to 5MB'}
             </p>
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-              Choose File
-            </button>
-            <p className="text-xs text-gray-500 mt-2">
-              Coming soon - File upload functionality will be available in the next update
-            </p>
+
+            {!selectedFile ? (
+              <>
+                <input
+                  type="file"
+                  id="resume-upload"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleFileInputChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="resume-upload"
+                  className="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer"
+                >
+                  Choose File
+                </label>
+                <p className="text-xs text-gray-500 mt-2">
+                  or drag and drop your file here
+                </p>
+              </>
+            ) : (
+              <div className="flex gap-2 justify-center">
+                <button
+                  onClick={handleUpload}
+                  disabled={uploading}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors"
+                >
+                  {uploading ? 'Uploading...' : 'Upload'}
+                </button>
+                <button
+                  onClick={() => setSelectedFile(null)}
+                  disabled={uploading}
+                  className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+
+            {uploadError && (
+              <p className="text-sm text-red-400 mt-2">{uploadError}</p>
+            )}
+
+            {formData.hasUploadedResume && (
+              <p className="text-sm text-green-400 mt-2">✓ Resume uploaded successfully</p>
+            )}
           </div>
         </div>
 
