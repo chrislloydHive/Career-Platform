@@ -56,44 +56,69 @@ export function CareerPreferencesEditor({ preferences: initialPreferences, onSav
   ) => {
     const items = preferences[field];
     if (!Array.isArray(items)) return null;
+    const [inputValue, setInputValue] = useState('');
+
+    const handleAddItem = () => {
+      if (inputValue.trim()) {
+        addToList(field, inputValue);
+        setInputValue('');
+        setEditingField(null);
+      }
+    };
 
     return (
       <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
         <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3">{label}</h3>
-        <div className="space-y-2 mb-3">
-          {items.map((item, index) => (
-            <div key={index} className="flex items-center gap-2 bg-gray-900 rounded-lg p-2 sm:p-3">
-              <span className="flex-1 text-sm text-gray-300">{item}</span>
-              <button
-                onClick={() => removeFromList(field, index)}
-                className="text-red-400 hover:text-red-300 p-1"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          ))}
-        </div>
+        {items.length > 0 && (
+          <div className="space-y-2 mb-3">
+            {items.map((item, index) => (
+              <div key={index} className="flex items-center gap-2 bg-gray-900 rounded-lg p-2 sm:p-3">
+                <span className="flex-1 text-sm text-gray-300">{item}</span>
+                <button
+                  onClick={() => removeFromList(field, index)}
+                  className="text-red-400 hover:text-red-300 p-1"
+                  title="Remove"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         {editingField === field ? (
           <div className="flex gap-2">
             <input
               type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
               placeholder={placeholder}
               className="flex-1 px-3 py-2 bg-gray-900 text-gray-100 border border-gray-600 rounded-lg text-sm"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  addToList(field, e.currentTarget.value);
-                  e.currentTarget.value = '';
+                  handleAddItem();
+                } else if (e.key === 'Escape') {
+                  setInputValue('');
+                  setEditingField(null);
                 }
               }}
               autoFocus
             />
             <button
-              onClick={() => setEditingField(null)}
+              onClick={handleAddItem}
+              className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+            >
+              Add
+            </button>
+            <button
+              onClick={() => {
+                setInputValue('');
+                setEditingField(null);
+              }}
               className="px-3 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 text-sm"
             >
-              Done
+              Cancel
             </button>
           </div>
         ) : (
