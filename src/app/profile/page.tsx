@@ -414,94 +414,97 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            {/* Your Profile Summary */}
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3">Who You Are</h3>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-4">{profile.bio}</p>
-              <div className="flex flex-wrap gap-2">
-                {profile.skills.slice(0, 5).map((skill, idx) => (
-                  <span key={idx} className="px-2 sm:px-3 py-1 bg-blue-900/50 text-blue-400 rounded-full text-xs">
-                    {skill}
-                  </span>
-                ))}
-                {profile.skills.length > 5 && (
-                  <span className="px-2 sm:px-3 py-1 bg-gray-700 text-gray-400 rounded-full text-xs">
-                    +{profile.skills.length - 5} more
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Career Pattern Analysis */}
-            <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-600/30 p-4 sm:p-6">
-              <div className="flex items-start gap-3 mb-3">
-                <svg className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-                <div className="flex-1">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Your Unique Combination</h3>
-                  <p className="text-sm text-gray-300 leading-relaxed">
-                    {profile.skills.length > 0 && profile.interests.length > 0 ? (
-                      <>Your background in <span className="text-blue-400 font-medium">{profile.skills[0]}</span> combined with your interest in <span className="text-purple-400 font-medium">{profile.interests[0]}</span> opens up opportunities in roles that blend technical skills with creative thinking.</>
-                    ) : (
-                      <>Upload your resume or share more about yourself to see personalized insights about your unique skill combinations.</>
-                    )}
-                  </p>
+            {/* Profile Overview Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              {/* Your Profile Summary */}
+              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6 lg:col-span-2">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3">Who You Are</h3>
+                <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-4">{profile.bio}</p>
+                <div className="flex flex-wrap gap-2">
+                  {profile.skills.slice(0, 5).map((skill, idx) => (
+                    <span key={idx} className="px-2 sm:px-3 py-1 bg-blue-900/50 text-blue-400 rounded-full text-xs">
+                      {skill}
+                    </span>
+                  ))}
+                  {profile.skills.length > 5 && (
+                    <span className="px-2 sm:px-3 py-1 bg-gray-700 text-gray-400 rounded-full text-xs">
+                      +{profile.skills.length - 5} more
+                    </span>
+                  )}
                 </div>
               </div>
-            </div>
 
-            {/* Where People Like You Succeed */}
-            {profile.careerGoals && profile.careerGoals.length > 0 && (
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <div className="flex items-start gap-3 mb-4">
-                  <svg className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              {/* Career Pattern Analysis */}
+              <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-600/30 p-4 sm:p-6">
+                <div className="flex items-start gap-3 mb-3">
+                  <svg className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                   <div className="flex-1">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Career Path Recommendations</h3>
-                    <p className="text-sm text-gray-400 mb-4">
-                      Based on your goals and background, here are paths that align with what you're looking for:
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Your Unique Combination</h3>
+                    <p className="text-sm text-gray-300 leading-relaxed">
+                      {profile.skills.length > 0 && profile.interests.length > 0 ? (
+                        <>Your background in <span className="text-blue-400 font-medium">{profile.skills[0]}</span> combined with your interest in <span className="text-purple-400 font-medium">{profile.interests[0]}</span> opens up opportunities in roles that blend technical skills with creative thinking.</>
+                      ) : (
+                        <>Upload your resume or share more about yourself to see personalized insights about your unique skill combinations.</>
+                      )}
                     </p>
-                    <div className="space-y-3">
-                      {profile.careerGoals.slice(0, 3).map((goal, idx) => (
-                        <div key={idx} className="bg-gray-900 border border-gray-700 rounded-lg p-3">
-                          <div className="flex items-start gap-2">
-                            <span className="text-green-400 mt-1">→</span>
-                            <span className="text-sm text-gray-300">{goal}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* What to Develop Next */}
+              {profile.strengths && profile.strengths.length > 0 && (
+                <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
+                  <div className="flex items-start gap-3 mb-4">
+                    <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <div className="flex-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Your Edge</h3>
+                      <p className="text-sm text-gray-400 mb-4">
+                        These strengths set you apart and will help you stand out in your target roles:
+                      </p>
+                      <div className="grid grid-cols-1 gap-2">
+                        {profile.strengths.slice(0, 4).map((strength, idx) => (
+                          <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                            <span className="text-green-400 mt-0.5">✓</span>
+                            <span>{strength}</span>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* What to Develop Next */}
-            {profile.strengths && profile.strengths.length > 0 && (
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <div className="flex items-start gap-3 mb-4">
-                  <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  <div className="flex-1">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Your Edge</h3>
-                    <p className="text-sm text-gray-400 mb-4">
-                      These strengths set you apart and will help you stand out in your target roles:
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {profile.strengths.slice(0, 4).map((strength, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                          <span className="text-green-400 mt-0.5">✓</span>
-                          <span>{strength}</span>
-                        </div>
-                      ))}
+              {/* Where People Like You Succeed */}
+              {profile.careerGoals && profile.careerGoals.length > 0 && (
+                <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6 lg:col-span-2">
+                  <div className="flex items-start gap-3 mb-4">
+                    <svg className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    <div className="flex-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Career Path Recommendations</h3>
+                      <p className="text-sm text-gray-400 mb-4">
+                        Based on your goals and background, here are paths that align with what you're looking for:
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {profile.careerGoals.slice(0, 3).map((goal, idx) => (
+                          <div key={idx} className="bg-gray-900 border border-gray-700 rounded-lg p-3">
+                            <div className="flex items-start gap-2">
+                              <span className="text-green-400 mt-1">→</span>
+                              <span className="text-sm text-gray-300">{goal}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* AI-Generated Insights */}
             {profile.aiInsights.length === 0 ? (
