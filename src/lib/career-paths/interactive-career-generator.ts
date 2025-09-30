@@ -363,16 +363,26 @@ export class InteractiveCareerGenerator {
       const baseYears = this.parseTimeframe(stage.baselineTimeframe);
       const adjustedYears = baseYears.map(year => Math.ceil(year * preference.timeMultiplier));
 
+      // Update job description based on timeline preference
+      const updatedJobDescription = this.adjustJobDescriptionForTimeline(stage.jobDescription, preference);
+
       return {
         ...stage,
-        timeframe: this.formatTimeframe(adjustedYears)
+        timeframe: this.formatTimeframe(adjustedYears),
+        jobDescription: updatedJobDescription
       };
     });
+
+    // Update skill development plan based on timeline preference
+    const updatedSkillDevelopment = this.adjustSkillDevelopmentForTimeline(path.skillDevelopment, preference);
+    const updatedDevelopmentPlan = this.generatePersonalizedDevelopmentPlan(updatedSkillDevelopment);
 
     return {
       ...path,
       timelinePreference: preference,
-      stages: updatedStages
+      stages: updatedStages,
+      skillDevelopment: updatedSkillDevelopment,
+      developmentPlan: updatedDevelopmentPlan
     };
   }
 
@@ -409,5 +419,93 @@ export class InteractiveCareerGenerator {
       return `${years[0]} year${years[0] > 1 ? 's' : ''}`;
     }
     return `${years[0]}-${years[1]} years`;
+  }
+
+  private static adjustJobDescriptionForTimeline(
+    jobDescription: DetailedJobDescription,
+    preference: TimelinePreference
+  ): DetailedJobDescription {
+    // Create different content based on timeline preference
+    if (preference.speed === 'accelerated') {
+      return {
+        ...jobDescription,
+        overview: jobDescription.overview + ' Fast-track progression requires intense focus and accelerated skill development.',
+        dayInLife: jobDescription.dayInLife.map(scenario => ({
+          ...scenario,
+          description: scenario.description + ' (Accelerated pace requires efficient execution)'
+        })),
+        coreResponsibilities: [
+          ...jobDescription.coreResponsibilities,
+          'Maintain accelerated learning schedule',
+          'Seek rapid feedback and iteration cycles'
+        ]
+      };
+    } else if (preference.speed === 'deliberate') {
+      return {
+        ...jobDescription,
+        overview: jobDescription.overview + ' Deliberate progression allows for deep mastery and thorough understanding.',
+        dayInLife: jobDescription.dayInLife.map(scenario => ({
+          ...scenario,
+          description: scenario.description + ' (Deliberate pace allows for comprehensive exploration)'
+        })),
+        coreResponsibilities: [
+          ...jobDescription.coreResponsibilities,
+          'Focus on mastery over speed',
+          'Build comprehensive domain expertise'
+        ]
+      };
+    }
+
+    // Standard pace - return as is
+    return jobDescription;
+  }
+
+  private static adjustSkillDevelopmentForTimeline(
+    skills: InteractiveSkill[],
+    preference: TimelinePreference
+  ): InteractiveSkill[] {
+    return skills.map(skill => {
+      if (preference.speed === 'accelerated') {
+        // Accelerated timeline - shorter learning times, more intensive methods
+        const timeMatch = skill.timeToLearn.match(/(\d+)-?(\d+)?/);
+        if (timeMatch) {
+          const reducedTime = Math.max(1, Math.ceil(parseInt(timeMatch[1]) * 0.7));
+          const reducedTimeEnd = timeMatch[2] ? Math.max(1, Math.ceil(parseInt(timeMatch[2]) * 0.7)) : reducedTime;
+
+          return {
+            ...skill,
+            timeToLearn: timeMatch[2] ? `${reducedTime}-${reducedTimeEnd} months` : `${reducedTime} months`,
+            howToLearn: [
+              'Intensive bootcamps',
+              'Accelerated online programs',
+              'Immersive workshops',
+              ...skill.howToLearn.slice(0, 2)
+            ]
+          };
+        }
+      } else if (preference.speed === 'deliberate') {
+        // Deliberate timeline - longer learning times, more comprehensive methods
+        const timeMatch = skill.timeToLearn.match(/(\d+)-?(\d+)?/);
+        if (timeMatch) {
+          const extendedTime = Math.ceil(parseInt(timeMatch[1]) * 1.5);
+          const extendedTimeEnd = timeMatch[2] ? Math.ceil(parseInt(timeMatch[2]) * 1.5) : extendedTime;
+
+          return {
+            ...skill,
+            timeToLearn: timeMatch[2] ? `${extendedTime}-${extendedTimeEnd} months` : `${extendedTime} months`,
+            howToLearn: [
+              'Comprehensive university courses',
+              'In-depth self-study',
+              'Mentorship programs',
+              'Multiple practice projects',
+              ...skill.howToLearn.slice(0, 2)
+            ]
+          };
+        }
+      }
+
+      // Standard pace - return as is
+      return skill;
+    });
   }
 }

@@ -85,12 +85,12 @@ export function EnhancedActionPlan({ profile, onRestartExploration }: EnhancedAc
   }
 
   const tabs = [
-    { id: 'overview' as const, label: 'Overview', icon: '📊', count: 0 },
-    { id: 'careers' as const, label: 'Career Research', icon: '🔍', count: actionPlan.careerResearchTasks.length },
-    { id: 'skills' as const, label: 'Skill Building', icon: '🎯', count: actionPlan.skillBuildingTasks.length },
-    { id: 'network' as const, label: 'Networking', icon: '🤝', count: actionPlan.networkingTasks.length },
-    { id: 'search' as const, label: 'Job Search', icon: '💼', count: actionPlan.jobSearchTasks.length },
-    { id: 'timeline' as const, label: 'Timeline', icon: '📅', count: actionPlan.unifiedTimeline.length }
+    { id: 'overview' as const, label: 'Overview', icon: '', count: 0 },
+    { id: 'careers' as const, label: 'Career Research', icon: '', count: actionPlan.careerResearchTasks.length },
+    { id: 'skills' as const, label: 'Skill Building', icon: '', count: actionPlan.skillBuildingTasks.length },
+    { id: 'network' as const, label: 'Networking', icon: '', count: actionPlan.networkingTasks.length },
+    { id: 'search' as const, label: 'Job Search', icon: '', count: actionPlan.jobSearchTasks.length },
+    { id: 'timeline' as const, label: 'Timeline', icon: '', count: actionPlan.unifiedTimeline.length }
   ];
 
   const allTasks = [
@@ -303,7 +303,7 @@ function ActionPlanOverview({
 
       {/* Next Actions */}
       <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
-        <h4 className="text-lg font-semibold text-gray-100 mb-4">🚀 Next Actions</h4>
+        <h4 className="text-lg font-semibold text-gray-100 mb-4">Next Actions</h4>
         <div className="space-y-3">
           {nextActions.map(task => (
             <div key={task.id} className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
@@ -332,7 +332,7 @@ function ActionPlanOverview({
       {/* Task Categories Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-gray-100 mb-4">📋 Tasks by Category</h4>
+          <h4 className="text-lg font-semibold text-gray-100 mb-4">Tasks by Category</h4>
           <div className="space-y-3">
             {[
               { name: 'Career Research', count: actionPlan.careerResearchTasks.length, color: 'text-blue-400' },
@@ -349,7 +349,7 @@ function ActionPlanOverview({
         </div>
 
         <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-gray-100 mb-4">⚡ Priority Distribution</h4>
+          <h4 className="text-lg font-semibold text-gray-100 mb-4">Priority Distribution</h4>
           <div className="space-y-3">
             {Object.entries(tasksByPriority).map(([priority, tasks]) => (
               <div key={priority} className="flex items-center justify-between">
@@ -369,7 +369,7 @@ function ActionPlanOverview({
 
       {/* Skills Alignment Preview */}
       <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
-        <h4 className="text-lg font-semibold text-gray-100 mb-4">🎯 Skills-Actions Alignment</h4>
+        <h4 className="text-lg font-semibold text-gray-100 mb-4">Skills-Actions Alignment</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {actionPlan.skillAlignmentMap.slice(0, 4).map(alignment => (
             <div key={alignment.skillName} className="bg-gray-800/50 rounded-lg p-4">
@@ -412,7 +412,7 @@ function CareerResearchSection({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-gray-100">🔍 Career Research Tasks</h3>
+        <h3 className="text-xl font-bold text-gray-100">Career Research Tasks</h3>
         <div className="text-sm text-gray-400">
           {tasks.filter(t => completedTasks.has(t.id)).length} of {tasks.length} completed
         </div>
@@ -489,7 +489,7 @@ function SkillBuildingSection({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-gray-100">🎯 Skill Building Tasks</h3>
+        <h3 className="text-xl font-bold text-gray-100">Skill Building Tasks</h3>
         <div className="text-sm text-gray-400">
           {tasks.filter(t => completedTasks.has(t.id)).length} of {tasks.length} completed
         </div>
@@ -554,7 +554,7 @@ function NetworkingSection({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-gray-100">🤝 Networking Tasks</h3>
+        <h3 className="text-xl font-bold text-gray-100">Networking Tasks</h3>
         <div className="text-sm text-gray-400">
           {tasks.filter(t => completedTasks.has(t.id)).length} of {tasks.length} completed
         </div>
@@ -616,7 +616,7 @@ function JobSearchSection({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-gray-100">💼 Job Search Tasks</h3>
+        <h3 className="text-xl font-bold text-gray-100">Job Search Tasks</h3>
         <div className="text-sm text-gray-400">
           {tasks.filter(t => completedTasks.has(t.id)).length} of {tasks.length} completed
         </div>
@@ -641,7 +641,7 @@ function JobSearchSection({
                   {Object.entries(task.applicationMaterials).map(([material, required]) => (
                     <div key={material} className="flex items-center gap-2 text-xs">
                       <span className={required ? 'text-green-400' : 'text-gray-500'}>
-                        {required ? '✓' : '○'}
+                        {required ? 'Required' : 'Optional'}
                       </span>
                       <span className="text-gray-300 capitalize">{material.replace(/([A-Z])/g, ' $1').trim()}</span>
                     </div>
@@ -680,7 +680,7 @@ function TimelineSection({
 
   return (
     <div className="space-y-6">
-      <h3 className="text-xl font-bold text-gray-100">📅 Unified Timeline</h3>
+      <h3 className="text-xl font-bold text-gray-100">Unified Timeline</h3>
 
       {/* Timeline Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -702,7 +702,7 @@ function TimelineSection({
 
       {/* Upcoming Events */}
       <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
-        <h4 className="text-lg font-semibold text-gray-100 mb-4">🔮 Upcoming Events</h4>
+        <h4 className="text-lg font-semibold text-gray-100 mb-4">Upcoming Events</h4>
         <div className="space-y-3">
           {upcomingEvents.map(event => (
             <TimelineEventCard key={event.id} event={event} />
@@ -713,7 +713,7 @@ function TimelineSection({
       {/* Past Events */}
       {pastEvents.length > 0 && (
         <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-gray-100 mb-4">📅 Recent Events</h4>
+          <h4 className="text-lg font-semibold text-gray-100 mb-4">Recent Events</h4>
           <div className="space-y-3">
             {pastEvents.map(event => (
               <TimelineEventCard key={event.id} event={event} isPast={true} />
@@ -750,9 +750,9 @@ function TaskCard({
   };
 
   const difficultyIcons = {
-    easy: '🟢',
-    medium: '🟡',
-    hard: '🔴'
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard'
   };
 
   return (
@@ -781,8 +781,8 @@ function TaskCard({
             </h4>
             <p className="text-gray-400 text-sm mt-1">{task.description}</p>
             <div className="flex items-center gap-4 mt-2 text-xs">
-              <span className="text-gray-500">⏱ {task.estimatedTime}</span>
-              <span className="text-gray-500">{difficultyIcons[task.difficulty]} {task.difficulty}</span>
+              <span className="text-gray-500">Duration: {task.estimatedTime}</span>
+              <span className="text-gray-500">{difficultyIcons[task.difficulty]}</span>
               <span className={`px-2 py-1 rounded ${
                 task.priority === 'critical' ? 'bg-red-900/50 text-red-300' :
                 task.priority === 'high' ? 'bg-orange-900/50 text-orange-300' :
@@ -793,7 +793,7 @@ function TaskCard({
               </span>
               {task.dueDate && (
                 <span className="text-gray-500">
-                  📅 {task.dueDate.toLocaleDateString()}
+                  Due: {task.dueDate.toLocaleDateString()}
                 </span>
               )}
             </div>
@@ -830,7 +830,7 @@ function TaskCard({
           {/* Prerequisites */}
           {task.prerequisites.length > 0 && (
             <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-3">
-              <h5 className="text-sm font-semibold text-yellow-400 mb-2">⚠️ Prerequisites</h5>
+              <h5 className="text-sm font-semibold text-yellow-400 mb-2">Prerequisites</h5>
               <ul className="space-y-1">
                 {task.prerequisites.map(prereq => (
                   <li key={prereq} className="text-xs text-gray-300">• {prereq}</li>
@@ -842,7 +842,7 @@ function TaskCard({
           {/* Resources */}
           {task.resources.length > 0 && (
             <div className="bg-gray-800/50 rounded-lg p-4">
-              <h5 className="text-sm font-semibold text-blue-400 mb-3">📚 Resources</h5>
+              <h5 className="text-sm font-semibold text-blue-400 mb-3">Resources</h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {task.resources.map(resource => (
                   <ResourceCard key={resource.id} resource={resource} />
@@ -854,7 +854,7 @@ function TaskCard({
           {/* Templates */}
           {task.templates.length > 0 && (
             <div className="bg-gray-800/50 rounded-lg p-4">
-              <h5 className="text-sm font-semibold text-green-400 mb-3">📝 Templates</h5>
+              <h5 className="text-sm font-semibold text-green-400 mb-3">Templates</h5>
               <div className="space-y-2">
                 {task.templates.map(template => (
                   <div key={template.id} className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
@@ -880,13 +880,13 @@ function TaskCard({
 
 function ResourceCard({ resource }: { resource: TaskResource }) {
   const typeIcons = {
-    article: '📄',
-    video: '🎥',
-    tool: '🔧',
-    template: '📝',
-    course: '🎓',
-    book: '📚',
-    website: '🌐'
+    article: 'Article',
+    video: 'Video',
+    tool: 'Tool',
+    template: 'Template',
+    course: 'Course',
+    book: 'Book',
+    website: 'Website'
   };
 
   const costColors = {
@@ -899,7 +899,7 @@ function ResourceCard({ resource }: { resource: TaskResource }) {
     <div className="bg-gray-700/50 rounded-lg p-3 hover:bg-gray-700/70 transition-colors">
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span>{typeIcons[resource.type]}</span>
+          <span className="text-xs text-gray-400 uppercase">{typeIcons[resource.type]}</span>
           <span className="text-sm font-medium text-gray-200">{resource.title}</span>
         </div>
         <span className={`text-xs ${costColors[resource.cost]} capitalize`}>
@@ -928,12 +928,12 @@ function ResourceCard({ resource }: { resource: TaskResource }) {
 
 function TimelineEventCard({ event, isPast = false }: { event: UnifiedTimelineEvent; isPast?: boolean }) {
   const typeIcons = {
-    skill: '🎯',
-    task: '📋',
-    milestone: '🏆',
-    application: '💼',
-    networking: '🤝',
-    interview: '🎤'
+    skill: 'Skill',
+    task: 'Task',
+    milestone: 'Milestone',
+    application: 'Application',
+    networking: 'Networking',
+    interview: 'Interview'
   };
 
   const statusColors = {
@@ -953,7 +953,7 @@ function TimelineEventCard({ event, isPast = false }: { event: UnifiedTimelineEv
       event.priority === 'high' ? 'border-orange-500' :
       event.priority === 'medium' ? 'border-yellow-500' : 'border-green-500'
     }`}>
-      <div className="text-2xl">{typeIcons[event.type]}</div>
+      <div className="text-xs text-gray-400 uppercase font-semibold">{typeIcons[event.type]}</div>
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
           <h5 className="text-sm font-medium text-gray-200">{event.title}</h5>
@@ -963,8 +963,8 @@ function TimelineEventCard({ event, isPast = false }: { event: UnifiedTimelineEv
         </div>
         <div className="text-xs text-gray-400 mb-1">{event.description}</div>
         <div className="flex items-center gap-3 text-xs text-gray-500">
-          <span>📅 {event.date.toLocaleDateString()}</span>
-          <span>⏱ {event.duration} day{event.duration !== 1 ? 's' : ''}</span>
+          <span>Date: {event.date.toLocaleDateString()}</span>
+          <span>Duration: {event.duration} day{event.duration !== 1 ? 's' : ''}</span>
           {!isPast && daysFromNow >= 0 && (
             <span className={daysFromNow <= 7 ? 'text-orange-400' : 'text-gray-400'}>
               {daysFromNow === 0 ? 'Today' :
@@ -996,7 +996,7 @@ function TemplateModal({
             onClick={onClose}
             className="text-gray-400 hover:text-gray-200"
           >
-            ✕
+            Close
           </button>
         </div>
 
