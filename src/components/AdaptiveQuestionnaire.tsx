@@ -1842,6 +1842,38 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       </div>
 
+      {/* Skipped Questions - Come Back Later - RIGHT BELOW QUESTION */}
+      {skippedQuestions.length > 0 && (
+        <div id="saved-for-later-section" className="mb-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border-2 border-blue-500/50 p-6 scroll-mt-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-100 flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Saved for Later ({skippedQuestions.length})
+            </h3>
+          </div>
+          <div className="space-y-3">
+            {skippedQuestions.map((question) => (
+              <div key={question.id} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="text-xs text-blue-400 mb-1 font-medium">{getAreaLabel(question.area)}</div>
+                    <p className="text-sm text-gray-200">{question.text}</p>
+                  </div>
+                  <button
+                    onClick={() => handleAnswerSkippedQuestion(question)}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
+                  >
+                    Answer Now
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Latest Insights - Compact Preview Above the Fold */}
       {(insights.length > 0 || synthesizedInsights.length > 0) && (
         <div className="mb-6 bg-gradient-to-br from-blue-900/20 via-blue-800/10 to-blue-900/20 rounded-xl border-2 border-blue-500/30 p-5 relative">
@@ -1915,37 +1947,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )}
 
-      {/* Skipped Questions - Come Back Later */}
-      {skippedQuestions.length > 0 && (
-        <div id="saved-for-later-section" className="mb-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border-2 border-blue-500/50 p-6 scroll-mt-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-100 flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Saved for Later ({skippedQuestions.length})
-            </h3>
-          </div>
-          <div className="space-y-3">
-            {skippedQuestions.map((question) => (
-              <div key={question.id} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="text-xs text-gray-500 mb-1">{getAreaLabel(question.area)}</div>
-                    <p className="text-sm text-gray-300">{question.text}</p>
-                  </div>
-                  <button
-                    onClick={() => handleAnswerSkippedQuestion(question)}
-                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors whitespace-nowrap"
-                  >
-                    Answer Now
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Synthesized Insights - Priority Display */}
       {synthesizedInsights.length > 0 && (
