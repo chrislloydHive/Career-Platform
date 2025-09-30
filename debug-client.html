@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug Assessment Results</title>
+</head>
+<body>
+  <h1>Debug Assessment Results API</h1>
+  <button onclick="testAPI()">Test API</button>
+  <pre id="output"></pre>
+
+  <script>
+    async function testAPI() {
+      const output = document.getElementById('output');
+      output.textContent = 'Loading...';
+
+      try {
+        const response = await fetch('/api/assessment-results');
+        const data = await response.json();
+
+        output.textContent = JSON.stringify({
+          status: response.status,
+          statusText: response.statusText,
+          data: data
+        }, null, 2);
+      } catch (error) {
+        output.textContent = 'Error: ' + error.message;
+      }
+    }
+  </script>
+</body>
+</html>

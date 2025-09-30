@@ -51,15 +51,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
+      console.log('[JWT Callback]', { hasUser: !!user, userId: user?.id, tokenId: token.id });
       if (user) {
         token.id = user.id;
       }
+      console.log('[JWT Callback] Returning token with id:', token.id);
       return token;
     },
     async session({ session, token }) {
+      console.log('[Session Callback]', {
+        hasToken: !!token,
+        tokenId: token?.id,
+        hasSession: !!session,
+        hasSessionUser: !!session?.user
+      });
       if (token && session.user) {
         session.user.id = token.id as string;
       }
+      console.log('[Session Callback] Returning session with user.id:', session?.user?.id);
       return session;
     },
     async authorized({ auth, request }) {
