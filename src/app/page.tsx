@@ -38,10 +38,10 @@ export default function Homepage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href={currentUser ? "/explore" : "/signup"}
+                href={currentUser ? "/profile" : "/signup"}
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-blue-600/25"
               >
-                Start Your Career Discovery
+                Build Your Profile
               </Link>
               <button
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
@@ -246,10 +246,10 @@ export default function Homepage() {
             Takes about 10 minutes. Free. No more "I guess I'll just apply to everything and see what happens."
           </p>
           <Link
-            href={currentUser ? "/explore" : "/signup"}
+            href={currentUser ? "/profile" : "/signup"}
             className="inline-block px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xl font-semibold transition-colors shadow-lg hover:shadow-blue-600/25"
           >
-            Start the Assessment
+            Build Your Profile
           </Link>
         </div>
       </section>
