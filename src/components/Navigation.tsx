@@ -16,6 +16,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -88,7 +89,8 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
               <Logo size="sm" className="text-base sm:text-xl" />
             </div>
 
-            <nav className="flex items-center gap-0.5 sm:gap-1 overflow-visible flex-1">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-0.5 sm:gap-1 overflow-visible flex-1">
               {navItems.map((item) => {
                 if ('items' in item) {
                   // Dropdown group
@@ -164,17 +166,136 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
             </nav>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-2">
+          <div className="flex items-center gap-2 flex-shrink-0 ml-2">
             {actions}
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+              title="Menu"
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+
+            {/* Desktop logout button */}
             <button
               onClick={handleLogout}
-              className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+              className="hidden md:block p-1.5 sm:p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
               title="Logout"
             >
               <LogoutIcon className="w-4 h-4" />
             </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden py-3 border-t border-gray-700">
+            <nav className="space-y-1">
+              {navItems.map((item) => {
+                if ('items' in item) {
+                  // Dropdown group for mobile
+                  const isGroupActive = item.items?.some(subItem => pathname === subItem.href) || false;
+                  const Icon = item.icon;
+                  const isOpen = openDropdown === item.label;
+
+                  return (
+                    <div key={item.label}>
+                      <button
+                        onClick={() => setOpenDropdown(isOpen ? null : item.label)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          isGroupActive
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icon className="w-4 h-4" />
+                          <span>{item.label}</span>
+                        </div>
+                        <svg
+                          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      {isOpen && (
+                        <div className="mt-1 ml-4 space-y-1">
+                          {item.items?.map((subItem) => {
+                            const isActive = pathname === subItem.href;
+                            const SubIcon = subItem.icon;
+                            return (
+                              <Link
+                                key={subItem.href}
+                                href={subItem.href}
+                                onClick={() => {
+                                  setMobileMenuOpen(false);
+                                  setOpenDropdown(null);
+                                }}
+                                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                                  isActive
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                                }`}
+                              >
+                                <SubIcon className="w-4 h-4" />
+                                <span>{subItem.label}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                } else {
+                  // Regular link for mobile
+                  const isActive = pathname === item.href;
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                }
+              })}
+
+              {/* Mobile logout button */}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+              >
+                <LogoutIcon className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </nav>
+          </div>
+        )}
 
         {(title || subtitle) && (
           <div className="pb-3 sm:pb-4 pt-1">

@@ -32,14 +32,38 @@ interface CareerExplorerProps {
 
 // Uncommon but accessible careers
 const UNCOMMON_CAREERS = [
-  { title: 'UX Research Assistant', description: 'Test products and talk to users—no design degree needed', degreeRequired: false },
-  { title: 'Customer Success Associate', description: 'Help customers succeed (basically problem-solving + people skills)', degreeRequired: false },
-  { title: 'Social Media Coordinator', description: 'If you already spend hours online, get paid for it', degreeRequired: false },
-  { title: 'Operations Coordinator', description: 'Keep things running smoothly behind the scenes', degreeRequired: false },
-  { title: 'Content Creator', description: 'Write, film, or design—companies need content constantly', degreeRequired: false },
-  { title: 'Sales Development Representative', description: 'Reach out to potential customers (great for extroverts)', degreeRequired: false },
-  { title: 'Junior Data Analyst', description: 'Excel wizardry can be learned—companies will train you', degreeRequired: false },
-  { title: 'Technical Writer', description: 'Explain complicated stuff in simple terms', degreeRequired: false },
+  { title: 'Professional Cuddler', description: 'Get paid $80/hour to provide platonic therapeutic touch and comfort to clients', degreeRequired: false },
+  { title: 'Golf Ball Diver', description: 'Scuba dive in golf course ponds to retrieve balls, make $100K+ selling them back', degreeRequired: false },
+  { title: 'Pet Food Taster', description: 'Taste-test dog and cat food for quality control at major pet food companies', degreeRequired: false },
+  { title: 'Netflix Tagger', description: 'Watch shows all day and tag them with descriptors to improve recommendations', degreeRequired: false },
+  { title: 'Professional Sleeper', description: 'Sleep in store mattresses, hotels, or sleep studies—literally get paid to nap', degreeRequired: false },
+  { title: 'LEGO Designer', description: 'Get paid to build LEGO sets and design new products for the company', degreeRequired: false },
+  { title: 'Iceberg Mover', description: 'Tow icebergs away from oil rigs in the North Atlantic—seriously', degreeRequired: false },
+  { title: 'Fortune Cookie Writer', description: 'Write the fortunes that go inside fortune cookies for major manufacturers', degreeRequired: false },
+  { title: 'Professional Bridesmaid', description: 'Hired by brides who need extra support/friends for their wedding day', degreeRequired: false },
+  { title: 'Waterslide Tester', description: 'Travel to resorts and water parks to test slides for safety and fun factor', degreeRequired: false },
+  { title: 'Crime Scene Cleaner', description: 'Clean up after crime scenes and traumatic events—morbid but pays $35-80/hour', degreeRequired: false },
+  { title: 'Voice-Over Artist for Elevators', description: 'Record "doors closing" and floor announcements for elevator companies', degreeRequired: false },
+  { title: 'Professional Line Stander', description: 'Stand in line for other people at store openings, concerts, or government offices', degreeRequired: false },
+  { title: 'Snake Milker', description: 'Extract venom from snakes for antivenin production—requires steady hands', degreeRequired: false },
+  { title: 'Train Pusher', description: 'Literally push people onto crowded trains in Japan during rush hour', degreeRequired: false },
+  { title: 'Ostrich Babysitter', description: 'Watch over baby ostriches at farms—surprisingly lucrative exotic animal care', degreeRequired: false },
+  { title: 'Paper Towel Sniffer', description: 'Smell paper products to ensure they don\'t have weird odors before shipping', degreeRequired: false },
+  { title: 'Professional Mourner', description: 'Attend funerals and cry for families who want bigger crowds', degreeRequired: false },
+  { title: 'Face Feeler', description: 'Test skincare products by feeling people\'s faces for texture and moisture', degreeRequired: false },
+  { title: 'Dice Inspector', description: 'Check casino dice for imperfections using calipers and precision tools', degreeRequired: false },
+  { title: 'Furniture Tester', description: 'Sit, sleep, and lounge on furniture all day to test comfort and durability', degreeRequired: false },
+  { title: 'Subway Pusher', description: 'Help pack commuters into subway cars during peak hours in Tokyo', degreeRequired: false },
+  { title: 'Professional Hitchhiker', description: 'Get paid to hitchhike and review the experience for travel companies', degreeRequired: false },
+  { title: 'Chicken Sexer', description: 'Determine the gender of baby chicks—specialists make $60K+ per year', degreeRequired: false },
+  { title: 'Odor Judge', description: 'Smell armpits and breath to test deodorant and mouthwash effectiveness', degreeRequired: false },
+  { title: 'Island Caretaker', description: 'Live on tropical islands and maintain vacation properties—free housing included', degreeRequired: false },
+  { title: 'Professional Queuer', description: 'Wait in lines for busy people at restaurants, stores, or government offices', degreeRequired: false },
+  { title: 'Bre aker', description: 'Break in new shoes for people by wearing them around until comfortable', degreeRequired: false },
+  { title: 'Gross Stunt Tester', description: 'Test disgusting challenges for reality TV shows before contestants try them', degreeRequired: false },
+  { title: 'Professional Pusher', description: 'Push shoppers\' carts at crowded stores and help them navigate aisles', degreeRequired: false },
+  { title: 'Worm Picker', description: 'Collect earthworms at night for bait shops—can make $50K+ during peak season', degreeRequired: false },
+  { title: 'Panda Nanny', description: 'Take care of baby pandas at conservation centers in China', degreeRequired: false },
 ];
 
 // High demand careers
@@ -52,6 +76,28 @@ const HIGH_DEMAND_CAREERS = [
   { title: 'Executive Assistant', description: 'Execs always need organized people to manage their chaos', openings: '14,000+ open roles' },
   { title: 'HR Coordinator', description: 'Growing companies need help with recruiting and people ops', openings: '8,000+ open roles' },
   { title: 'Data Analyst', description: 'Every team wants someone who can make sense of their data', openings: '16,000+ open roles' },
+  { title: 'Registered Nurse', description: 'Healthcare systems are experiencing critical shortages nationwide', openings: '200,000+ open roles' },
+  { title: 'Software Engineer', description: 'Tech companies can\'t hire developers fast enough', openings: '150,000+ open roles' },
+  { title: 'Cybersecurity Analyst', description: 'Every company needs protection from hackers and data breaches', openings: '50,000+ open roles' },
+  { title: 'Product Manager', description: 'Companies need people who can ship products customers actually want', openings: '25,000+ open roles' },
+  { title: 'UX Designer', description: 'Digital products need people who understand user experience', openings: '22,000+ open roles' },
+  { title: 'Financial Analyst', description: 'Every business needs someone to make sense of their money', openings: '30,000+ open roles' },
+  { title: 'Project Manager', description: 'Someone has to keep all these projects on track', openings: '35,000+ open roles' },
+  { title: 'Business Analyst', description: 'Bridge the gap between business needs and technical solutions', openings: '28,000+ open roles' },
+  { title: 'Content Writer', description: 'Everyone needs content—blogs, emails, social posts, you name it', openings: '19,000+ open roles' },
+  { title: 'Graphic Designer', description: 'Visual content is everywhere and companies need designers', openings: '24,000+ open roles' },
+  { title: 'DevOps Engineer', description: 'Keep software running smoothly—companies will pay big for this', openings: '40,000+ open roles' },
+  { title: 'Recruiter', description: 'Companies are always hiring and need people to find talent', openings: '32,000+ open roles' },
+  { title: 'Accountant', description: 'Tax season never ends and every business needs number crunchers', openings: '45,000+ open roles' },
+  { title: 'Social Media Manager', description: 'Brands need someone to manage their online presence full-time', openings: '17,000+ open roles' },
+  { title: 'Physical Therapist', description: 'Aging population means massive demand for PT services', openings: '38,000+ open roles' },
+  { title: 'Electrician', description: 'Skilled trades shortage means electricians can name their price', openings: '42,000+ open roles' },
+  { title: 'Plumber', description: 'Pipes don\'t fix themselves—plumbers are in huge demand', openings: '36,000+ open roles' },
+  { title: 'HVAC Technician', description: 'Climate control specialists needed everywhere, year-round', openings: '34,000+ open roles' },
+  { title: 'Truck Driver', description: 'Supply chain needs drivers—often $70K+ with benefits', openings: '80,000+ open roles' },
+  { title: 'Medical Assistant', description: 'Healthcare clinics desperately need assistants to support doctors', openings: '55,000+ open roles' },
+  { title: 'Dental Hygienist', description: 'Everyone needs their teeth cleaned—job security at its finest', openings: '26,000+ open roles' },
+  { title: 'Construction Manager', description: 'Building boom means massive need for people to run job sites', openings: '31,000+ open roles' },
 ];
 
 // No experience required careers
@@ -64,6 +110,28 @@ const NO_EXPERIENCE_CAREERS = [
   { title: 'Junior Copywriter', description: 'Writing samples matter more than a marketing degree', training: 'Editor will guide you' },
   { title: 'Content Moderator', description: 'Review user content—just need attention to detail', training: 'Policy training included' },
   { title: 'Operations Coordinator', description: 'Organized? Good at spreadsheets? You\'re hired', training: 'Process training provided' },
+  { title: 'Bank Teller', description: 'Banks train you on everything—cash handling, customer service, systems', training: '2-3 week training program' },
+  { title: 'Warehouse Associate', description: 'Amazon and others hire constantly—they teach you the systems', training: 'Same-day onboarding' },
+  { title: 'Delivery Driver', description: 'Have a car and GPS? Companies like DoorDash start you immediately', training: 'App-based training' },
+  { title: 'Retail Sales Associate', description: 'Stores hire and train—product knowledge comes with time', training: 'On-the-job training' },
+  { title: 'Receptionist', description: 'Answer phones, greet visitors—they\'ll teach you their system', training: 'First week training' },
+  { title: 'Data Entry Clerk', description: 'Can you type? You\'re qualified—accuracy matters more than experience', training: 'Software training provided' },
+  { title: 'Production Worker', description: 'Factories train you on assembly lines and machinery operation', training: 'Safety & process training' },
+  { title: 'Security Guard', description: 'Companies provide training and certifications you need', training: 'Certification provided' },
+  { title: 'Restaurant Server', description: 'No experience? Restaurants train you on menu and POS systems', training: 'Shadowing & training shifts' },
+  { title: 'Call Center Agent', description: 'They give you scripts and train you on software—just need clear voice', training: '1-2 week classroom training' },
+  { title: 'Hotel Front Desk', description: 'Hospitality trains you on booking systems and customer service', training: 'Full onboarding program' },
+  { title: 'Pharmacy Technician', description: 'Most training happens on the job while getting certified', training: 'Apprenticeship model' },
+  { title: 'Medical Billing Specialist', description: 'Companies train you on coding systems and insurance claims', training: '4-8 week training course' },
+  { title: 'Property Manager Assistant', description: 'Learn real estate management while on the job', training: 'Mentor-based training' },
+  { title: 'Janitorial Services', description: 'They train you on cleaning protocols and equipment use', training: 'Equipment & safety training' },
+  { title: 'Salon Receptionist', description: 'Booking and customer service—no beauty license needed', training: 'Software training included' },
+  { title: 'Insurance Sales Agent', description: 'Companies provide licensing training and sales coaching', training: 'License exam prep included' },
+  { title: 'Mortgage Loan Processor', description: 'Banks train you on paperwork and compliance requirements', training: 'Extensive onboarding' },
+  { title: 'Paralegal Assistant', description: 'Law firms teach you legal procedures and document prep', training: 'On-the-job apprenticeship' },
+  { title: 'Junior Accountant', description: 'Accounting firms train you on their systems and processes', training: 'Rotation program' },
+  { title: 'IT Help Desk', description: 'Tech-savvy? Companies train you on troubleshooting and ticketing', training: 'Technical training provided' },
+  { title: 'Quality Control Inspector', description: 'Factories teach you inspection standards and procedures', training: 'Process & equipment training' },
 ];
 
 // Emerging careers that didn't exist 5 years ago
@@ -76,6 +144,29 @@ const EMERGING_CAREERS = [
   { title: 'TikTok Marketing Specialist', description: 'Create viral content strategies for brands', yearEmerged: '2020' },
   { title: 'Podcast Producer', description: 'Edit, produce, and grow audio content shows', yearEmerged: '2019' },
   { title: 'Diversity & Inclusion Coordinator', description: 'Help companies build more inclusive workplaces', yearEmerged: '2020' },
+  { title: 'ChatGPT Integration Specialist', description: 'Help businesses integrate AI into their workflows and products', yearEmerged: '2023' },
+  { title: 'Metaverse Event Planner', description: 'Organize conferences, concerts, and gatherings in virtual worlds', yearEmerged: '2021' },
+  { title: 'AI Ethics Officer', description: 'Make sure companies use AI responsibly and without bias', yearEmerged: '2023' },
+  { title: 'Carbon Credit Trader', description: 'Buy and sell emissions credits as companies go carbon neutral', yearEmerged: '2021' },
+  { title: 'Vertical Farm Technician', description: 'Grow food in indoor urban farms using hydroponics and automation', yearEmerged: '2020' },
+  { title: 'Drone Traffic Controller', description: 'Manage airspace for delivery drones in urban areas', yearEmerged: '2022' },
+  { title: 'Virtual Real Estate Agent', description: 'Sell digital land and properties in the metaverse', yearEmerged: '2021' },
+  { title: 'Twitch Stream Manager', description: 'Manage live streams, chat, and monetization for content creators', yearEmerged: '2020' },
+  { title: 'AI Training Data Specialist', description: 'Label and curate data sets to train machine learning models', yearEmerged: '2022' },
+  { title: 'Digital Fashion Designer', description: 'Design virtual clothing and accessories for avatars and games', yearEmerged: '2021' },
+  { title: 'EV Charging Infrastructure Planner', description: 'Plan and optimize electric vehicle charging station networks', yearEmerged: '2021' },
+  { title: 'Live Commerce Host', description: 'Sell products through live video shopping streams', yearEmerged: '2020' },
+  { title: 'Meme Marketing Manager', description: 'Create viral meme campaigns for brands on social media', yearEmerged: '2020' },
+  { title: 'Personal Data Broker', description: 'Help people monetize and control their personal data', yearEmerged: '2022' },
+  { title: 'Voice App Designer', description: 'Build experiences for Alexa, Google Home, and voice assistants', yearEmerged: '2020' },
+  { title: 'Cryptocurrency Tax Specialist', description: 'Navigate complex tax rules for crypto traders and investors', yearEmerged: '2021' },
+  { title: 'Digital Wellness Coach', description: 'Help people manage screen time and develop healthy tech habits', yearEmerged: '2020' },
+  { title: 'Anti-Misinformation Specialist', description: 'Combat fake news and verify content authenticity for platforms', yearEmerged: '2020' },
+  { title: 'Space Tourism Guide', description: 'Train and guide tourists for commercial space flights', yearEmerged: '2022' },
+  { title: 'Gig Economy Benefits Administrator', description: 'Manage healthcare and benefits for freelance and gig workers', yearEmerged: '2021' },
+  { title: 'AI-Generated Content Editor', description: 'Polish and fact-check content created by AI writing tools', yearEmerged: '2023' },
+  { title: 'Electric Scooter Mechanic', description: 'Maintain and repair shared e-scooter and e-bike fleets', yearEmerged: '2020' },
+  { title: 'Personalized Medicine Coordinator', description: 'Help patients access treatments tailored to their genetics', yearEmerged: '2021' },
 ];
 
 export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleComparison, filterCategory }: CareerExplorerProps) {
@@ -95,6 +186,10 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
   const [showHighDemand, setShowHighDemand] = useState(false);
   const [showNoExperience, setShowNoExperience] = useState(false);
   const [showEmergingCareers, setShowEmergingCareers] = useState(false);
+  const [uncommonCareersLimit, setUncommonCareersLimit] = useState(4);
+  const [highDemandLimit, setHighDemandLimit] = useState(4);
+  const [noExperienceLimit, setNoExperienceLimit] = useState(4);
+  const [emergingCareersLimit, setEmergingCareersLimit] = useState(4);
 
   useEffect(() => {
     async function loadUserCareers() {
@@ -275,33 +370,38 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
 
   return (
     <div className="bg-gray-900 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Jobs You Can Actually Get Container */}
-        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 mb-8">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-100 mb-2">Jobs You Can Actually Get</h1>
-            <p className="text-gray-400">
+        <div className="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="mb-4 sm:mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-2">Jobs You Can Actually Get</h1>
+            <p className="text-sm sm:text-base text-gray-400">
               Entry-level roles, weird job titles you&apos;ve never heard of, and where to find them
             </p>
           </div>
 
           {/* Uncommon Careers - Collapsible */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
           <button
-            onClick={() => setShowUncommonCareers(!showUncommonCareers)}
-            className="w-full bg-gradient-to-r from-purple-900/30 to-pink-900/30 hover:from-purple-900/40 hover:to-pink-900/40 rounded-xl border border-purple-600/40 p-4 transition-all flex items-center justify-between"
+            onClick={() => {
+              if (showUncommonCareers) {
+                setUncommonCareersLimit(4);
+              }
+              setShowUncommonCareers(!showUncommonCareers);
+            }}
+            className="w-full bg-gradient-to-r from-purple-900/30 to-pink-900/30 hover:from-purple-900/40 hover:to-pink-900/40 rounded-xl border border-purple-600/40 p-3 sm:p-4 transition-all flex items-center justify-between"
           >
-            <div className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
               <div className="text-left">
-                <h3 className="text-lg font-bold text-gray-100">Wait, That's a Real Job?</h3>
-                <p className="text-sm text-gray-400">Careers you probably didn't know existed (no degree required)</p>
+                <h3 className="text-base sm:text-lg font-bold text-gray-100">Wait, That's a Real Job?</h3>
+                <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Careers you probably didn't know existed (no degree required)</p>
               </div>
             </div>
             <svg
-              className={`w-6 h-6 text-purple-400 transition-transform ${showUncommonCareers ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 sm:w-6 sm:h-6 text-purple-400 transition-transform flex-shrink-0 ${showUncommonCareers ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -311,59 +411,65 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           </button>
 
           {showUncommonCareers && (
-            <div className="mt-4 bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded-xl border border-purple-600/30 p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {UNCOMMON_CAREERS.slice(0, 4).map((career, index) => (
-                  <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-purple-500/50 transition-colors">
-                    <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
-                    <p className="text-xs text-gray-400 mb-3">{career.description}</p>
+            <div className="mt-3 sm:mt-4 bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded-xl border border-purple-600/30 p-3 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {UNCOMMON_CAREERS.slice(0, uncommonCareersLimit).map((career, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700 hover:border-purple-500/50 transition-colors animate-slide-in-right"
+                    style={{ animationDelay: `${(index % 4) * 50}ms` }}
+                  >
+                    <h3 className="text-sm sm:text-base font-bold text-gray-100 mb-2">{career.title}</h3>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-3">{career.description}</p>
                     <button
                       onClick={() => {
                         setSearchQuery(career.title);
                         setShowSuggestions(false);
                         document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
-                      className="text-xs text-purple-400 hover:text-purple-300 font-medium"
+                      className="text-xs sm:text-sm text-purple-400 hover:text-purple-300 font-medium"
                     >
                       Learn more →
                     </button>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => {
-                    // Set a category filter or search term that shows all uncommon careers
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                    document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  See All {UNCOMMON_CAREERS.length} Jobs →
-                </button>
-              </div>
+              {uncommonCareersLimit < UNCOMMON_CAREERS.length && (
+                <div className="mt-3 sm:mt-4 text-center">
+                  <button
+                    onClick={() => setUncommonCareersLimit(prev => prev + 4)}
+                    className="px-4 sm:px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm sm:text-base rounded-lg font-medium transition-colors"
+                  >
+                    Show More
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {/* High Demand Careers - Collapsible */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <button
-            onClick={() => setShowHighDemand(!showHighDemand)}
-            className="w-full bg-gradient-to-r from-orange-900/30 to-red-900/30 hover:from-orange-900/40 hover:to-red-900/40 rounded-xl border border-orange-600/40 p-4 transition-all flex items-center justify-between"
+            onClick={() => {
+              if (showHighDemand) {
+                setHighDemandLimit(4);
+              }
+              setShowHighDemand(!showHighDemand);
+            }}
+            className="w-full bg-gradient-to-r from-orange-900/30 to-red-900/30 hover:from-orange-900/40 hover:to-red-900/40 rounded-xl border border-orange-600/40 p-3 sm:p-4 transition-all flex items-center justify-between"
           >
-            <div className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
               <div className="text-left">
-                <h3 className="text-lg font-bold text-gray-100">High Demand Right Now</h3>
-                <p className="text-sm text-gray-400">Tons of openings—these companies are actively hiring</p>
+                <h3 className="text-base sm:text-lg font-bold text-gray-100">High Demand Right Now</h3>
+                <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Tons of openings—these companies are actively hiring</p>
               </div>
             </div>
             <svg
-              className={`w-6 h-6 text-orange-400 transition-transform ${showHighDemand ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 sm:w-6 sm:h-6 text-orange-400 transition-transform flex-shrink-0 ${showHighDemand ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -373,12 +479,16 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           </button>
 
           {showHighDemand && (
-            <div className="mt-4 bg-gradient-to-r from-orange-900/20 to-red-900/20 rounded-xl border border-orange-600/30 p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {HIGH_DEMAND_CAREERS.slice(0, 4).map((career, index) => (
-                  <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-orange-500/50 transition-colors">
-                    <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
-                    <p className="text-xs text-gray-400 mb-2">{career.description}</p>
+            <div className="mt-3 sm:mt-4 bg-gradient-to-r from-orange-900/20 to-red-900/20 rounded-xl border border-orange-600/30 p-3 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {HIGH_DEMAND_CAREERS.slice(0, highDemandLimit).map((career, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700 hover:border-orange-500/50 transition-colors animate-slide-in-right"
+                    style={{ animationDelay: `${(index % 4) * 50}ms` }}
+                  >
+                    <h3 className="text-sm sm:text-base font-bold text-gray-100 mb-2">{career.title}</h3>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-2">{career.description}</p>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="px-2 py-0.5 bg-orange-600/30 text-orange-300 rounded text-xs font-medium">{career.openings}</span>
                     </div>
@@ -388,46 +498,49 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                         setShowSuggestions(false);
                         document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
-                      className="text-xs text-orange-400 hover:text-orange-300 font-medium"
+                      className="text-xs sm:text-sm text-orange-400 hover:text-orange-300 font-medium"
                     >
                       Learn more →
                     </button>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                    document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  See All {HIGH_DEMAND_CAREERS.length} Jobs →
-                </button>
-              </div>
+              {highDemandLimit < HIGH_DEMAND_CAREERS.length && (
+                <div className="mt-3 sm:mt-4 text-center">
+                  <button
+                    onClick={() => setHighDemandLimit(prev => prev + 4)}
+                    className="px-4 sm:px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm sm:text-base rounded-lg font-medium transition-colors"
+                  >
+                    Show More
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {/* No Experience Required - Collapsible */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <button
-            onClick={() => setShowNoExperience(!showNoExperience)}
-            className="w-full bg-gradient-to-r from-blue-900/30 to-cyan-900/30 hover:from-blue-900/40 hover:to-cyan-900/40 rounded-xl border border-blue-600/40 p-4 transition-all flex items-center justify-between"
+            onClick={() => {
+              if (showNoExperience) {
+                setNoExperienceLimit(4);
+              }
+              setShowNoExperience(!showNoExperience);
+            }}
+            className="w-full bg-gradient-to-r from-blue-900/30 to-cyan-900/30 hover:from-blue-900/40 hover:to-cyan-900/40 rounded-xl border border-blue-600/40 p-3 sm:p-4 transition-all flex items-center justify-between"
           >
-            <div className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
               <div className="text-left">
-                <h3 className="text-lg font-bold text-gray-100">No Experience? No Problem.</h3>
-                <p className="text-sm text-gray-400">They'll train you—just bring your willingness to learn</p>
+                <h3 className="text-base sm:text-lg font-bold text-gray-100">No Experience? No Problem.</h3>
+                <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">They'll train you—just bring your willingness to learn</p>
               </div>
             </div>
             <svg
-              className={`w-6 h-6 text-blue-400 transition-transform ${showNoExperience ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 sm:w-6 sm:h-6 text-blue-400 transition-transform flex-shrink-0 ${showNoExperience ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -437,12 +550,16 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           </button>
 
           {showNoExperience && (
-            <div className="mt-4 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-600/30 p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {NO_EXPERIENCE_CAREERS.slice(0, 4).map((career, index) => (
-                  <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-colors">
-                    <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
-                    <p className="text-xs text-gray-400 mb-2">{career.description}</p>
+            <div className="mt-3 sm:mt-4 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-600/30 p-3 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {NO_EXPERIENCE_CAREERS.slice(0, noExperienceLimit).map((career, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700 hover:border-blue-500/50 transition-colors animate-slide-in-right"
+                    style={{ animationDelay: `${(index % 4) * 50}ms` }}
+                  >
+                    <h3 className="text-sm sm:text-base font-bold text-gray-100 mb-2">{career.title}</h3>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-2">{career.description}</p>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="px-2 py-0.5 bg-blue-600/30 text-blue-300 rounded text-xs font-medium">{career.training}</span>
                     </div>
@@ -452,46 +569,49 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                         setShowSuggestions(false);
                         document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
-                      className="text-xs text-blue-400 hover:text-blue-300 font-medium"
+                      className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 font-medium"
                     >
                       Learn more →
                     </button>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                    document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  See All {NO_EXPERIENCE_CAREERS.length} Jobs →
-                </button>
-              </div>
+              {noExperienceLimit < NO_EXPERIENCE_CAREERS.length && (
+                <div className="mt-3 sm:mt-4 text-center">
+                  <button
+                    onClick={() => setNoExperienceLimit(prev => prev + 4)}
+                    className="px-4 sm:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base rounded-lg font-medium transition-colors"
+                  >
+                    Show More
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {/* Emerging Careers - Collapsible */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <button
-            onClick={() => setShowEmergingCareers(!showEmergingCareers)}
-            className="w-full bg-gradient-to-r from-green-900/30 to-emerald-900/30 hover:from-green-900/40 hover:to-emerald-900/40 rounded-xl border border-green-600/40 p-4 transition-all flex items-center justify-between"
+            onClick={() => {
+              if (showEmergingCareers) {
+                setEmergingCareersLimit(4);
+              }
+              setShowEmergingCareers(!showEmergingCareers);
+            }}
+            className="w-full bg-gradient-to-r from-green-900/30 to-emerald-900/30 hover:from-green-900/40 hover:to-emerald-900/40 rounded-xl border border-green-600/40 p-3 sm:p-4 transition-all flex items-center justify-between"
           >
-            <div className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               <div className="text-left">
-                <h3 className="text-lg font-bold text-gray-100">Jobs That Didn't Exist 5 Years Ago</h3>
-                <p className="text-sm text-gray-400">Brand new careers emerging from tech and culture shifts</p>
+                <h3 className="text-base sm:text-lg font-bold text-gray-100">Jobs That Didn't Exist 5 Years Ago</h3>
+                <p className="text-xs sm:text-sm text-gray-400 hidden sm:block">Brand new careers emerging from tech and culture shifts</p>
               </div>
             </div>
             <svg
-              className={`w-6 h-6 text-green-400 transition-transform ${showEmergingCareers ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 sm:w-6 sm:h-6 text-green-400 transition-transform flex-shrink-0 ${showEmergingCareers ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -501,70 +621,73 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           </button>
 
           {showEmergingCareers && (
-            <div className="mt-4 bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-xl border border-green-600/30 p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {EMERGING_CAREERS.slice(0, 4).map((career, index) => (
-                  <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-green-500/50 transition-colors">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-sm font-bold text-gray-100">{career.title}</h3>
+            <div className="mt-3 sm:mt-4 bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-xl border border-green-600/30 p-3 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {EMERGING_CAREERS.slice(0, emergingCareersLimit).map((career, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700 hover:border-green-500/50 transition-colors animate-slide-in-right"
+                    style={{ animationDelay: `${(index % 4) * 50}ms` }}
+                  >
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <h3 className="text-sm sm:text-base font-bold text-gray-100">{career.title}</h3>
                       <span className="px-2 py-0.5 bg-green-600/30 text-green-300 rounded text-xs">New {career.yearEmerged}</span>
                     </div>
-                    <p className="text-xs text-gray-400 mb-3">{career.description}</p>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-3">{career.description}</p>
                     <button
                       onClick={() => {
                         setSearchQuery(career.title);
                         setShowSuggestions(false);
                         document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
-                      className="text-xs text-green-400 hover:text-green-300 font-medium"
+                      className="text-xs sm:text-sm text-green-400 hover:text-green-300 font-medium"
                     >
                       Learn more →
                     </button>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                    document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  See All {EMERGING_CAREERS.length} Jobs →
-                </button>
-              </div>
+              {emergingCareersLimit < EMERGING_CAREERS.length && (
+                <div className="mt-3 sm:mt-4 text-center">
+                  <button
+                    onClick={() => setEmergingCareersLimit(prev => prev + 4)}
+                    className="px-4 sm:px-6 py-2 bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base rounded-lg font-medium transition-colors"
+                  >
+                    Show More
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
         </div>
 
         {/* Find Your Next Role Container */}
-        <div id="find-your-role" className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-          <div className="mb-6 flex items-start justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-100 mb-2">Find Your Next Role</h1>
-              <p className="text-gray-400">
+        <div id="find-your-role" className="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6">
+          <div className="mb-4 sm:mb-6">
+            <div className="mb-3 sm:mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-2">Find Your Next Role</h1>
+              <p className="text-sm sm:text-base text-gray-400">
                 Search and filter through our database of entry-level careers
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3 flex-wrap">
               <a
                 href="/careers/compare"
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                className="px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-2"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                Compare Paths
+                <span className="hidden sm:inline">Compare Paths</span>
+                <span className="sm:hidden">Compare</span>
               </a>
               {onToggleComparison && (
                 <button
                   onClick={onToggleComparison}
-                  className="px-4 py-2 bg-gray-700 text-gray-300 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                  className="px-3 sm:px-4 py-2 bg-gray-700 text-gray-300 hover:bg-gray-600 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-2"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                   </svg>
                   Quick Compare
