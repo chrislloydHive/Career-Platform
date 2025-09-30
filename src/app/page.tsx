@@ -112,7 +112,7 @@ export default function Homepage() {
               Here's How We Help
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Build your profile → AI analyzes → Take assessment (optional) → Get matched → Search for jobs
+              Build your profile → AI analyzes → Take assessment → Get matched → Find jobs
             </p>
           </div>
 
@@ -162,7 +162,7 @@ export default function Homepage() {
                 4
               </div>
               <h3 className="text-xl font-bold text-gray-100 mb-4">
-                Search for Jobs
+                Find Jobs
               </h3>
               <p className="text-gray-400 leading-relaxed">
                 Start applying to roles that fit. Your profile keeps learning from every interaction to get better recommendations.
