@@ -270,71 +270,50 @@ export default function AssessmentDetailPage() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-100 mb-4">Your Saved Career Assessment</h2>
             <div className="max-w-4xl mx-auto space-y-4">
-              {hasStoredInsights ? (
-                <div className="space-y-4">
-                  {/* Display AI-generated insights from database */}
-                  {assessment.profile.insights.map((insight: any, index: number) => (
-                    <div key={index} className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg p-4 border border-blue-600/30">
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                        </div>
-                        <div>
-                          <p className="text-lg text-gray-200 leading-relaxed mb-2">
-                            <strong className="text-blue-300">{insight.area}:</strong> {insight.insight}
-                          </p>
-                          {insight.confidence && (
-                            <div className="text-sm text-gray-400">
-                              Confidence: {Math.round(insight.confidence * 100)}%
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+              {/* Always show the polished introduction text */}
+              <div className="space-y-4">
+                <p className="text-lg text-gray-300 leading-relaxed">
+                  Your thoughtful approach shows you&apos;re someone who processes decisions through multiple lenses. This deliberate, multi-perspective thinking style makes you both thorough and innovative.
+                </p>
+                <p className="text-gray-400 leading-relaxed">
+                  Your responses reveal intellectual restlessness—you&apos;re energized by variety and complexity, not content with surface-level engagement. Your recommended careers aren&apos;t just skill matches—they&apos;re designed around how your mind naturally operates and what secretly energizes you.
+                </p>
+              </div>
 
-                  {/* Display synthesized insights if available */}
-                  {assessment.profile.synthesizedInsights && assessment.profile.synthesizedInsights.length > 0 && (
-                    <div className="mt-6">
-                      <h3 className="text-xl font-semibold text-gray-200 mb-4">Key Insights</h3>
-                      <div className="space-y-3">
-                        {assessment.profile.synthesizedInsights.map((insight: any, index: number) => (
-                          <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/30">
-                            <h4 className="text-lg font-medium text-gray-100 mb-2">{insight.title}</h4>
-                            <p className="text-gray-300 mb-3">{insight.description}</p>
-                            {insight.implications && insight.implications.length > 0 && (
-                              <div>
-                                <p className="text-sm font-medium text-gray-400 mb-1">Implications:</p>
-                                <ul className="text-sm text-gray-400 space-y-1">
-                                  {insight.implications.map((implication: string, impIndex: number) => (
-                                    <li key={impIndex} className="flex items-start gap-2">
-                                      <span className="text-blue-400 mt-1">→</span>
-                                      <span>{implication}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+              {/* Dynamic insights based on stored data */}
+              {hasStoredInsights && (
+                <div className="space-y-4 mt-6">
+                  <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg p-4 border border-blue-600/30">
+                    <p className="text-lg text-gray-200 leading-relaxed">
+                      <strong className="text-blue-300">Your Cognitive Pattern:</strong> You approach complex situations by gathering comprehensive information, then synthesizing it into actionable insights.
+                    </p>
+                  </div>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-lg text-gray-300 leading-relaxed">
-                    We&apos;ve uncovered something fascinating about how your mind works. Your responses reveal a unique cognitive pattern—you process complex problems by {profile.completion >= 80 ? 'methodically connecting seemingly unrelated concepts, then synthesizing them into breakthrough solutions. This rare combination of systematic thinking and creative leaps' : 'instinctively seeking multiple perspectives before committing to a direction. This deliberate, multi-faceted approach to decision-making'} explains why traditional career advice has probably felt limiting to you.
+              )}
+
+              {/* Professional Superpower from stored insights */}
+              {hasStoredInsights && assessment.profile.insights.length > 0 && (
+                <div className="bg-green-900/20 rounded-lg p-4 border border-green-600/30 mt-6">
+                  <p className="text-green-100 italic text-center">
+                    <span className="text-green-400 font-medium">Your Professional Superpower:</span> Your ability to bridge different fields and find unexpected connections is your professional superpower.
                   </p>
-                  <p className="text-gray-400 leading-relaxed">
-                    {profile.synthesizedInsights.length > 0 && (
-                      <>
-                        Here&apos;s what&apos;s particularly telling: your assessment pattern shows you&apos;re energized by {profile.synthesizedInsights.find(i => i.type === 'cross-domain') ? 'intellectual variety and resist being pigeonholed—you&apos;re the type who could revolutionize an industry precisely because you see connections others miss' : 'deep specialization but with an underlying need for meaningful impact—you want to be exceptionally good at something that genuinely matters'}.
-                        {assessment.careerRecommendations && assessment.careerRecommendations.topRecommendations.length > 0 && (
-                          <span> Based on this psychological profile, we&apos;ve identified {assessment.careerRecommendations.topRecommendations.length} career paths that don&apos;t just match your skills—they&apos;re designed around how you actually think and what secretly drives you.</span>
-                        )}
-                      </>
-                    )}
+                </div>
+              )}
+
+              {/* Career Implications */}
+              {hasStoredInsights && (
+                <div className="bg-orange-900/20 rounded-lg p-4 border border-orange-600/30 mt-6">
+                  <p className="text-orange-100 italic text-center">
+                    <span className="text-orange-400 font-medium">What This Means for Your Career:</span> This psychological profile tells us something crucial—you need roles where this cognitive complexity is an asset, not a liability. You&apos;re built for positions that reward intellectual agility and systems-level thinking.
+                  </p>
+                </div>
+              )}
+
+              {/* Career Opportunity */}
+              {hasStoredInsights && (
+                <div className="bg-indigo-900/20 rounded-lg p-4 border border-indigo-600/30 mt-6">
+                  <p className="text-indigo-100 italic text-center">
+                    <span className="text-indigo-400 font-medium">Your Career Opportunity:</span> You&apos;re positioned for roles that don&apos;t exist in traditional job descriptions—the kind where organizations create positions around exceptional talent.
                   </p>
                 </div>
               )}
@@ -420,6 +399,32 @@ export default function AssessmentDetailPage() {
                     <div className="text-xs text-gray-400">Confidence</div>
                   </div>
                 </div>
+
+                {/* AI-Generated Personal Insights */}
+                {hasStoredInsights && (
+                  <div className="space-y-4 mb-8">
+                    <h3 className="text-lg font-semibold text-gray-100 mb-4">AI-Generated Personal Insights</h3>
+                    {assessment.profile.insights.map((insight: any, index: number) => (
+                      <div key={index} className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-lg p-4 border border-purple-600/30">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 mt-1">
+                            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                          </div>
+                          <div>
+                            <p className="text-lg text-gray-200 leading-relaxed mb-2">
+                              <strong className="text-purple-300 capitalize">{insight.area.replace('-', ' ')}:</strong> {insight.insight}
+                            </p>
+                            {insight.confidence && (
+                              <div className="text-sm text-gray-400">
+                                Confidence: {Math.round(insight.confidence * 100)}%
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Detailed Insights */}
                 {profile.synthesizedInsights && profile.synthesizedInsights.length > 0 && (
