@@ -27,6 +27,11 @@ export default function ProfilePage() {
   async function loadProfile() {
     try {
       const response = await fetch('/api/profile');
+      if (response.status === 401) {
+        // Redirect to login if not authenticated
+        window.location.href = '/api/auth/signin?callbackUrl=/profile';
+        return;
+      }
       if (response.ok) {
         const data = await response.json();
         setProfile(data.profile);
