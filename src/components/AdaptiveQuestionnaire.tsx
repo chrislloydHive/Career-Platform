@@ -536,19 +536,25 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   };
 
   const handleSkip = () => {
+    console.log('[Skip] Current index:', currentQuestionIndex, 'Total questions:', currentQuestions.length);
+
     if (currentQuestion) {
       setSkippedQuestions(prev => {
         if (prev.some(q => q.id === currentQuestion.id)) {
+          console.log('[Skip] Question already skipped');
           return prev;
         }
+        console.log('[Skip] Adding question to skipped list');
         return [...prev, currentQuestion];
       });
     }
 
     if (currentQuestionIndex < currentQuestions.length - 1) {
+      console.log('[Skip] Moving to next question in current batch');
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       resetResponse();
     } else {
+      console.log('[Skip] Loading next batch of questions');
       loadNextQuestions();
     }
   };
