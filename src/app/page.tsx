@@ -1,18 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { Navigation } from '@/components/Navigation';
 import { Logo } from '@/components/Logo';
 
 export default function Homepage() {
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const { data: session } = useSession();
 
-  useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem('currentUser');
-    setCurrentUser(user);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -38,7 +33,7 @@ export default function Homepage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href={currentUser ? "/profile" : "/signup"}
+                href={session ? "/profile" : "/signup"}
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-blue-600/25"
               >
                 Build Your Profile
@@ -246,7 +241,7 @@ export default function Homepage() {
             Takes about 10 minutes. Free. No more "I guess I'll just apply to everything and see what happens."
           </p>
           <Link
-            href={currentUser ? "/profile" : "/signup"}
+            href={session ? "/profile" : "/signup"}
             className="inline-block px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xl font-semibold transition-colors shadow-lg hover:shadow-blue-600/25"
           >
             Build Your Profile
