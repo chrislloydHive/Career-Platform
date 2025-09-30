@@ -73,7 +73,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 5,
     title: "Ready to Begin",
-    description: "Your personalized career platform is ready!",
+    description: "Your personalized MyNextRole experience is ready!",
     component: "completion"
   }
 ];

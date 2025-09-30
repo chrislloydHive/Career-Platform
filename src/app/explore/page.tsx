@@ -651,7 +651,25 @@ function ExplorePageContent() {
         subtitle="Let's figure out what you're actually good at"
       />
 
-      <main>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Intro Section */}
+        <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-100 mb-4">
+            Alright, let's figure this out together
+          </h2>
+          <div className="space-y-4 text-gray-300 leading-relaxed">
+            <p>
+              This isn't your typical "what's your favorite color?" career quiz. We're going to ask you some questions about what you actually enjoy doing, what you're good at, and what matters to you in a job.
+            </p>
+            <p>
+              <span className="text-blue-400 font-semibold">Here's how it works:</span> Answer honestly (not what sounds impressive), and we'll use AI to spot patterns you might not even see yourself. The more you answer, the better we get at matching you with roles that actually fit.
+            </p>
+            <p className="text-sm text-gray-400">
+              Takes about 10-15 minutes. You can save your progress and come back anytime.
+            </p>
+          </div>
+        </div>
+
         <AdaptiveQuestionnaire
           key={questionnaireKey}
           onComplete={handleComplete}

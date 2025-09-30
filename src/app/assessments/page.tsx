@@ -27,6 +27,10 @@ export default function AssessmentsPage() {
       console.log('[Assessments Page] Loading assessments...');
       const response = await fetch('/api/assessment-results');
       console.log('[Assessments Page] Response status:', response.status);
+      if (response.status === 401) {
+        setError('Please log in to view your assessments');
+        return;
+      }
       if (!response.ok) {
         throw new Error('Failed to load assessments');
       }
@@ -36,7 +40,7 @@ export default function AssessmentsPage() {
       setAssessments(data.assessments || []);
     } catch (error) {
       console.error('[Assessments Page] Error loading assessments:', error);
-      setError('Failed to load assessments');
+      setError('Failed to load assessments. Please try again.');
     } finally {
       setLoading(false);
     }

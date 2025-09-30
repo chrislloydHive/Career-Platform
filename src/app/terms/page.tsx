@@ -19,7 +19,7 @@ export default function TermsPage() {
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-8">
             <h2 className="text-2xl font-bold text-gray-100 mb-4">Acceptance of Terms</h2>
             <p className="text-gray-300 leading-relaxed">
-              By accessing and using Career Platform, you accept and agree to be bound by the terms
+              By accessing and using MyNextRole, you accept and agree to be bound by the terms
               and provision of this agreement. If you do not agree to abide by the above, please do
               not use this service.
             </p>
@@ -28,7 +28,7 @@ export default function TermsPage() {
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-8">
             <h2 className="text-2xl font-bold text-gray-100 mb-4">Use License</h2>
             <p className="text-gray-300 leading-relaxed mb-4">
-              Permission is granted to temporarily use Career Platform for personal, non-commercial
+              Permission is granted to temporarily use MyNextRole for personal, non-commercial
               transitory viewing only. This is the grant of a license, not a transfer of title, and
               under this license you may not:
             </p>
@@ -79,7 +79,7 @@ export default function TermsPage() {
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-8">
             <h2 className="text-2xl font-bold text-gray-100 mb-4">Disclaimer</h2>
             <p className="text-gray-300 leading-relaxed">
-              Career Platform provides career guidance and recommendations for informational purposes only.
+              MyNextRole provides career guidance and recommendations for informational purposes only.
               We do not guarantee employment outcomes or career success. Users are responsible for making
               their own career decisions based on their personal circumstances and professional judgment.
             </p>
@@ -88,7 +88,7 @@ export default function TermsPage() {
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-8">
             <h2 className="text-2xl font-bold text-gray-100 mb-4">Limitation of Liability</h2>
             <p className="text-gray-300 leading-relaxed">
-              In no event shall Career Platform or its suppliers be liable for any damages (including,
+              In no event shall MyNextRole or its suppliers be liable for any damages (including,
               without limitation, damages for loss of data or profit, or due to business interruption)
               arising out of the use or inability to use the materials on our platform.
             </p>
@@ -98,7 +98,7 @@ export default function TermsPage() {
             <h3 className="text-xl font-bold text-blue-300 mb-3">Contact Information</h3>
             <p className="text-gray-300">
               If you have any questions about these Terms of Service, please contact us at
-              legal@careerplatform.com
+              legal@mynextrole.com
             </p>
           </div>
         </div>

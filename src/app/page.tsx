@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
+import { Logo } from '@/components/Logo';
 
 export default function Homepage() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
@@ -258,9 +259,9 @@ export default function Homepage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
-              <h3 className="text-2xl font-bold text-blue-400 mb-4">
-                Career Platform
-              </h3>
+              <div className="mb-4">
+                <Logo size="lg" linkToHome={false} />
+              </div>
               <p className="text-gray-400 mb-4 max-w-md">
                 Helping recent grads and early career professionals answer the "what now?" question.
                 Because your first job doesn't have to be your forever job.
@@ -287,7 +288,7 @@ export default function Homepage() {
           </div>
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
-            <p>&copy; 2024 Career Platform. All rights reserved.</p>
+            <p>&copy; 2024 MyNextRole. All rights reserved.</p>
           </div>
         </div>
       </footer>

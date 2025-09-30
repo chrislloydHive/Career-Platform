@@ -341,13 +341,13 @@ export function EnhancedSearchForm({
                     type="button"
                     onClick={() => setSalaryRange(`${range.min}-${range.max}`)}
                     disabled={isLoading}
-                    className={`px-3 py-2 text-sm rounded-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`px-3 py-2 text-xs sm:text-sm rounded-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap overflow-hidden text-ellipsis ${
                       salaryRange === `${range.min}-${range.max}`
                         ? 'bg-blue-600 text-white border-blue-600'
                         : 'bg-gray-800 text-gray-300 border-gray-600 hover:border-blue-500'
                     }`}
                   >
-                    ${range.label}
+                    {range.label}
                   </button>
                 ))}
               </div>

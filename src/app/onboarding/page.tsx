@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { OnboardingData, ONBOARDING_STEPS, CAREER_GOALS } from '@/types/onboarding';
+import { Logo } from '@/components/Logo';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -95,8 +96,8 @@ export default function OnboardingPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-blue-400">Career Platform</h1>
-              <p className="text-gray-400">Getting Started</p>
+              <Logo size="md" linkToHome={false} />
+              <p className="text-gray-400 mt-1">Getting Started</p>
             </div>
             <div className="text-sm text-gray-400">
               Step {currentStep} of {ONBOARDING_STEPS.length}

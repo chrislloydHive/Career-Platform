@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
+import { Logo } from './Logo';
 
 interface NavigationProps {
   title?: string;
@@ -83,12 +84,9 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center gap-2 sm:gap-8 flex-1 min-w-0">
-            <Link href="/" className="flex items-center gap-1 sm:gap-2 group flex-shrink-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition-colors">
-                <span className="text-white font-bold text-xs sm:text-sm">LL</span>
-              </div>
-              <span className="text-gray-100 font-semibold text-sm sm:text-base hidden sm:block">Career Platform</span>
-            </Link>
+            <div className="flex-shrink-0">
+              <Logo size="sm" className="text-base sm:text-xl" />
+            </div>
 
             <nav className="flex items-center gap-0.5 sm:gap-1 overflow-visible flex-1">
               {navItems.map((item) => {

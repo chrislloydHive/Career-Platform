@@ -9,7 +9,7 @@ export default function AboutPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-100 mb-6">
-            About Career Platform
+            About MyNextRole
           </h1>
           <p className="text-xl text-gray-400">
             Empowering professionals to discover their ideal career path through AI-driven insights
@@ -20,7 +20,7 @@ export default function AboutPage() {
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-8 mb-8">
             <h2 className="text-2xl font-bold text-gray-100 mb-4">Our Mission</h2>
             <p className="text-gray-300 leading-relaxed mb-6">
-              Career Platform leverages artificial intelligence and behavioral science to help professionals
+              MyNextRole leverages artificial intelligence and behavioral science to help professionals
               make informed career decisions. We believe that everyone deserves to find work that aligns
               with their unique strengths, interests, and values.
             </p>
