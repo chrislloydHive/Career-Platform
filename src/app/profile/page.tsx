@@ -414,32 +414,94 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            {/* Compact Profile Summary */}
+            {/* Your Profile Summary */}
             <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-              <div className="flex items-start gap-3 mb-4">
-                <svg className="w-6 h-6 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3">Who You Are</h3>
+              <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-4">{profile.bio}</p>
+              <div className="flex flex-wrap gap-2">
+                {profile.skills.slice(0, 5).map((skill, idx) => (
+                  <span key={idx} className="px-2 sm:px-3 py-1 bg-blue-900/50 text-blue-400 rounded-full text-xs">
+                    {skill}
+                  </span>
+                ))}
+                {profile.skills.length > 5 && (
+                  <span className="px-2 sm:px-3 py-1 bg-gray-700 text-gray-400 rounded-full text-xs">
+                    +{profile.skills.length - 5} more
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Career Pattern Analysis */}
+            <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-600/30 p-4 sm:p-6">
+              <div className="flex items-start gap-3 mb-3">
+                <svg className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-100 mb-2">Your Profile</h3>
-                  {profile.bio && <p className="text-sm text-gray-300 mb-3">{profile.bio}</p>}
-                  {profile.skills.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {profile.skills.slice(0, 8).map((skill, idx) => (
-                        <span key={idx} className="px-2 py-0.5 bg-blue-900/50 text-blue-400 rounded text-xs">
-                          {skill}
-                        </span>
-                      ))}
-                      {profile.skills.length > 8 && (
-                        <span className="px-2 py-0.5 bg-gray-700 text-gray-400 rounded text-xs">
-                          +{profile.skills.length - 8}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Your Unique Combination</h3>
+                  <p className="text-sm text-gray-300 leading-relaxed">
+                    {profile.skills.length > 0 && profile.interests.length > 0 ? (
+                      <>Your background in <span className="text-blue-400 font-medium">{profile.skills[0]}</span> combined with your interest in <span className="text-purple-400 font-medium">{profile.interests[0]}</span> opens up opportunities in roles that blend technical skills with creative thinking.</>
+                    ) : (
+                      <>Upload your resume or share more about yourself to see personalized insights about your unique skill combinations.</>
+                    )}
+                  </p>
                 </div>
               </div>
             </div>
+
+            {/* Where People Like You Succeed */}
+            {profile.careerGoals && profile.careerGoals.length > 0 && (
+              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
+                <div className="flex items-start gap-3 mb-4">
+                  <svg className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Career Path Recommendations</h3>
+                    <p className="text-sm text-gray-400 mb-4">
+                      Based on your goals and background, here are paths that align with what you're looking for:
+                    </p>
+                    <div className="space-y-3">
+                      {profile.careerGoals.slice(0, 3).map((goal, idx) => (
+                        <div key={idx} className="bg-gray-900 border border-gray-700 rounded-lg p-3">
+                          <div className="flex items-start gap-2">
+                            <span className="text-green-400 mt-1">→</span>
+                            <span className="text-sm text-gray-300">{goal}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* What to Develop Next */}
+            {profile.strengths && profile.strengths.length > 0 && (
+              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
+                <div className="flex items-start gap-3 mb-4">
+                  <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Your Edge</h3>
+                    <p className="text-sm text-gray-400 mb-4">
+                      These strengths set you apart and will help you stand out in your target roles:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {profile.strengths.slice(0, 4).map((strength, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                          <span className="text-green-400 mt-0.5">✓</span>
+                          <span>{strength}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* AI-Generated Insights */}
             {profile.aiInsights.length === 0 ? (
@@ -447,7 +509,7 @@ export default function ProfilePage() {
                 <svg className="w-12 h-12 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                <h3 className="text-lg font-semibold text-gray-100 mb-2">No insights yet</h3>
+                <h3 className="text-lg font-semibold text-gray-100 mb-2">No AI insights yet</h3>
                 <p className="text-sm text-gray-400 mb-6">
                   Add your preferences, upload your resume, or take the assessment to start generating personalized insights and recommendations.
                 </p>
@@ -468,63 +530,119 @@ export default function ProfilePage() {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-100">AI Recommendations</h3>
-                  <span className="text-sm text-gray-500">{profile.aiInsights.length} insights</span>
-                </div>
-                <div className="space-y-3 sm:space-y-4">
-                  {profile.aiInsights.slice().reverse().map((insight, idx) => {
-                    // Parse insight if it's JSON
+                {/* Group insights by type */}
+                {(() => {
+                  const groupedInsights = profile.aiInsights.reduce((acc, insight) => {
                     let insightData;
                     try {
                       insightData = typeof insight.insight === 'string' ? JSON.parse(insight.insight) : insight.insight;
                     } catch {
-                      insightData = { content: insight.insight };
+                      insightData = { content: insight.insight, type: 'recommendation' };
                     }
+                    const type = insightData.type || 'recommendation';
+                    if (!acc[type]) acc[type] = [];
+                    acc[type].push({ ...insight, parsed: insightData });
+                    return acc;
+                  }, {} as Record<string, any[]>);
 
-                    const typeColors = {
-                      opportunity: 'border-green-600/30 bg-green-900/20',
-                      strength: 'border-blue-600/30 bg-blue-900/20',
-                      caution: 'border-yellow-600/30 bg-yellow-900/20',
-                      recommendation: 'border-purple-600/30 bg-purple-900/20',
-                    };
+                  const typeConfig = {
+                    opportunity: {
+                      title: 'Opportunities',
+                      description: 'Career paths and roles well-suited to your profile',
+                      color: 'border-green-600/30 bg-green-900/20',
+                      headerColor: 'text-green-400',
+                    },
+                    strength: {
+                      title: 'Strengths',
+                      description: 'What makes you stand out',
+                      color: 'border-blue-600/30 bg-blue-900/20',
+                      headerColor: 'text-blue-400',
+                    },
+                    recommendation: {
+                      title: 'Recommendations',
+                      description: 'Actions to take to reach your goals',
+                      color: 'border-purple-600/30 bg-purple-900/20',
+                      headerColor: 'text-purple-400',
+                    },
+                    caution: {
+                      title: 'Considerations',
+                      description: 'Things to be aware of as you plan your path',
+                      color: 'border-yellow-600/30 bg-yellow-900/20',
+                      headerColor: 'text-yellow-400',
+                    },
+                  };
 
-                    const typeIcons = {
-                      opportunity: '🚀',
-                      strength: '💪',
-                      caution: '⚠️',
-                      recommendation: '💡',
-                    };
+                  const typeOrder = ['opportunity', 'strength', 'recommendation', 'caution'];
 
-                    const typeColor = typeColors[insightData.type as keyof typeof typeColors] || 'border-gray-700 bg-gray-900';
-                    const typeIcon = typeIcons[insightData.type as keyof typeof typeIcons] || '📊';
+                  return typeOrder.map(type => {
+                    if (!groupedInsights[type] || groupedInsights[type].length === 0) return null;
+                    const config = typeConfig[type as keyof typeof typeConfig];
 
                     return (
-                      <div key={idx} className={`rounded-lg border p-4 sm:p-5 ${typeColor}`}>
-                        <div className="flex items-start gap-3">
-                          <span className="text-2xl flex-shrink-0">{typeIcon}</span>
-                          <div className="flex-1">
-                            {insightData.title && (
-                              <h4 className="font-semibold text-gray-100 mb-2">{insightData.title}</h4>
-                            )}
-                            <p className="text-sm text-gray-300 leading-relaxed mb-3">{insightData.content}</p>
-                            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                              <span>{new Date(insight.timestamp).toLocaleDateString()}</span>
-                              <span>•</span>
-                              <span className="capitalize">{insight.source.replace('_', ' ')}</span>
-                              <span>•</span>
-                              <span className="text-blue-400 font-medium">
-                                {Math.round(insight.confidence * 100)}% confidence
-                              </span>
+                      <div key={type} className="space-y-3">
+                        <div>
+                          <h3 className={`text-base sm:text-lg font-semibold ${config.headerColor} mb-1`}>
+                            {config.title}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-500">{config.description}</p>
+                        </div>
+                        <div className="space-y-3">
+                          {groupedInsights[type].slice().reverse().map((insight: any, idx: number) => (
+                            <div key={idx} className={`rounded-lg border p-4 ${config.color}`}>
+                              <div className="flex-1">
+                                {insight.parsed.title && (
+                                  <h4 className="font-semibold text-gray-100 mb-2 text-sm sm:text-base">{insight.parsed.title}</h4>
+                                )}
+                                <p className="text-sm text-gray-300 leading-relaxed mb-3">{insight.parsed.content}</p>
+                                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                                  <span>{new Date(insight.timestamp).toLocaleDateString()}</span>
+                                  <span>•</span>
+                                  <span className="capitalize">{insight.source.replace('_', ' ')}</span>
+                                  {insight.confidence && (
+                                    <>
+                                      <span>•</span>
+                                      <span className="text-blue-400 font-medium">
+                                        {Math.round(insight.confidence * 100)}% confidence
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          ))}
                         </div>
                       </div>
                     );
-                  })}
-                </div>
+                  });
+                })()}
               </>
             )}
+
+            {/* Next Steps */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-green-900/30 rounded-lg border border-blue-600/30 p-4 sm:p-6">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Recommended Next Steps</h3>
+                  <ul className="space-y-2 text-sm text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">1.</span>
+                      <span>Complete the <a href="/explore" className="text-blue-400 hover:text-blue-300 underline">career assessment</a> to refine your profile</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">2.</span>
+                      <span>Explore <a href="/careers" className="text-blue-400 hover:text-blue-300 underline">career paths</a> that match your profile</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">3.</span>
+                      <span>Update your <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('preferences'); }} className="text-blue-400 hover:text-blue-300 underline">preferences</a> to see more targeted recommendations</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
