@@ -8,7 +8,7 @@ import { CareerPreferencesEditor } from '@/components/CareerPreferencesEditor';
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'upload' | 'overview' | 'preferences' | 'history' | 'insights'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'overview' | 'preferences' | 'history' | 'insights'>('overview');
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
 
@@ -82,16 +82,6 @@ export default function ProfilePage() {
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         <div className="mb-4 sm:mb-6 flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide pb-2">
           <button
-            onClick={() => setActiveTab('upload')}
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-              activeTab === 'upload'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            Upload
-          </button>
-          <button
             onClick={() => setActiveTab('overview')}
             className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === 'overview'
@@ -131,15 +121,22 @@ export default function ProfilePage() {
           >
             <span className="hidden sm:inline">AI </span>Insights ({profile.aiInsights.length})
           </button>
+          <button
+            onClick={() => setActiveTab('upload')}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'upload'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            Upload
+          </button>
         </div>
 
         {activeTab === 'upload' && (
           <div className="space-y-4 sm:space-y-6">
             {/* Intro Section */}
             <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-6">
-              <h2 className="text-2xl font-bold text-gray-100 mb-4">
-                Step 1: Build Your Profile
-              </h2>
               <p className="text-gray-300 leading-relaxed mb-4">
                 Upload your resume, share your LinkedIn, and add any other documents (certifications, portfolios, transcripts, etc.).
                 The more we know about you, the better our AI can understand your skills, experience, and career potential.
@@ -278,31 +275,12 @@ export default function ProfilePage() {
 
         {activeTab === 'overview' && (
           <div className="space-y-4 sm:space-y-6">
-            {/* Assessment Progress */}
-            {profile.questionnaireInsights && (
-              <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border border-blue-600/30 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3">Assessment Progress</h3>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="flex-1">
-                    <div className="flex justify-between text-sm text-gray-300 mb-2">
-                      <span>Completion</span>
-                      <span>{profile.questionnaireInsights.completion_percentage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full transition-all"
-                        style={{ width: `${profile.questionnaireInsights.completion_percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="text-sm text-gray-400">
-                  {profile.questionnaireInsights.state?.responses &&
-                    `${Object.keys(profile.questionnaireInsights.state.responses).length} questions answered`
-                  }
-                </div>
-              </div>
-            )}
+            {/* Intro Section */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-6">
+              <p className="text-gray-300 leading-relaxed">
+                This is your current profile based on everything we know about you - your uploaded documents, assessment responses, and all your interactions with MyNextRole. This profile continuously evolves as you use the platform, getting more accurate with every conversation and choice you make.
+              </p>
+            </div>
 
             {/* Saved Assessments */}
             {profile.assessmentResults && profile.assessmentResults.length > 0 && (
@@ -488,15 +466,30 @@ export default function ProfilePage() {
         )}
 
         {activeTab === 'preferences' && (
-          <CareerPreferencesEditor
-            preferences={profile.careerPreferences}
-            onSave={handleSavePreferences}
-          />
+          <div className="space-y-4 sm:space-y-6">
+            {/* Intro Section */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-6">
+              <p className="text-gray-300 leading-relaxed">
+                Tell us what you're looking for in your next role. These preferences help our AI match you with the right opportunities and provide more relevant recommendations. You can update these anytime as your priorities change.
+              </p>
+            </div>
+            <CareerPreferencesEditor
+              preferences={profile.careerPreferences}
+              onSave={handleSavePreferences}
+            />
+          </div>
         )}
 
         {activeTab === 'history' && (
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Recent Interactions</h3>
+          <div className="space-y-4 sm:space-y-6">
+            {/* Intro Section */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-6">
+              <p className="text-gray-300 leading-relaxed">
+                Every action you take on MyNextRole helps our AI understand you better. This is your complete interaction history - assessments you've taken, jobs you've viewed, conversations you've had. We use this to continuously refine your profile and recommendations.
+              </p>
+            </div>
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Recent Interactions</h3>
             <div className="space-y-3 sm:space-y-4">
               {profile.interactionHistory.slice(-50).reverse().map((interaction, idx) => (
                 <div key={idx} className="border-l-2 border-gray-600 pl-3 sm:pl-4 py-2">
@@ -519,13 +512,21 @@ export default function ProfilePage() {
               {profile.interactionHistory.length === 0 && (
                 <p className="text-xs sm:text-sm text-gray-500 text-center py-8">No interactions yet</p>
               )}
+              </div>
             </div>
           </div>
         )}
 
         {activeTab === 'insights' && (
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">AI Insights</h3>
+          <div className="space-y-4 sm:space-y-6">
+            {/* Intro Section */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-6">
+              <p className="text-gray-300 leading-relaxed">
+                These are the key insights our AI has learned about you - your strengths, interests, work style preferences, and career patterns. Each insight includes a confidence level showing how certain we are based on the data you've shared. These insights power your job recommendations and help us give you better advice.
+              </p>
+            </div>
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">AI Insights</h3>
             <div className="space-y-3 sm:space-y-4">
               {profile.aiInsights.slice().reverse().map((insight, idx) => (
                 <div key={idx} className="bg-gray-900 border border-gray-700 rounded-lg p-3 sm:p-4">
