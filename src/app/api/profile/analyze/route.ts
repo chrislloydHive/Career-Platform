@@ -16,6 +16,23 @@ export async function POST(request: NextRequest) {
 
     const { documentUrls, linkedInUrl, additionalInfo } = await request.json();
 
+    console.log('[Analyze] Starting analysis for user:', session.user.id);
+    console.log('[Analyze] Input data:', {
+      hasDocuments: !!documentUrls?.length,
+      documentCount: documentUrls?.length || 0,
+      hasLinkedIn: !!linkedInUrl,
+      hasAdditionalInfo: !!additionalInfo,
+    });
+
+    // Check if we have any data to analyze
+    if (!linkedInUrl && !additionalInfo && (!documentUrls || documentUrls.length === 0)) {
+      console.error('[Analyze] No data provided for analysis');
+      return NextResponse.json(
+        { error: 'Please provide at least a LinkedIn URL, some information about yourself, or upload a document' },
+        { status: 400 }
+      );
+    }
+
     // Fetch document contents (for now, we'll just analyze the text provided)
     // In a production system, you'd want to parse PDFs/DOCX files
     // For now, we'll use the additional info and LinkedIn URL
@@ -69,6 +86,7 @@ Format your response as a structured JSON object with these fields:
 
 Only include information you can confidently infer from what was provided. Be honest about confidence level.`;
 
+    console.log('[Analyze] Calling Claude API...');
     const message = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2000,
@@ -80,7 +98,9 @@ Only include information you can confidently infer from what was provided. Be ho
       ],
     });
 
+    console.log('[Analyze] Claude API call successful');
     const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+    console.log('[Analyze] Response length:', responseText.length);
 
     // Parse JSON response
     let analysis;
@@ -88,13 +108,16 @@ Only include information you can confidently infer from what was provided. Be ho
       // Extract JSON from markdown code blocks if present
       const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) || responseText.match(/\{[\s\S]*\}/);
       const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : responseText;
+      console.log('[Analyze] Parsing JSON response...');
       analysis = JSON.parse(jsonStr);
+      console.log('[Analyze] Parsed analysis:', Object.keys(analysis));
     } catch (e) {
-      console.error('Failed to parse AI response:', responseText);
+      console.error('[Analyze] Failed to parse AI response:', responseText.substring(0, 500));
       throw new Error('Failed to parse AI analysis');
     }
 
     // Store analysis in user_profiles table
+    console.log('[Analyze] Storing analysis in database...');
     await sql`
       UPDATE user_profiles
       SET
@@ -108,6 +131,7 @@ Only include information you can confidently infer from what was provided. Be ho
         updated_at = NOW()
       WHERE user_id = ${session.user.id}
     `;
+    console.log('[Analyze] Database updated successfully');
 
     // Store AI insight
     await sql`
