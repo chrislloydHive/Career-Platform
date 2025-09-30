@@ -33,10 +33,10 @@ export async function GET() {
 
     // Fetch AI insights
     const aiInsights = await sql`
-      SELECT insight_type, content, confidence, created_at
+      SELECT insight, confidence, source, timestamp
       FROM ai_insights
       WHERE user_id = ${session.user.id}
-      ORDER BY created_at DESC
+      ORDER BY timestamp DESC
     `;
 
     // Fetch saved assessment results
