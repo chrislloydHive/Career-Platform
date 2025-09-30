@@ -11,6 +11,7 @@ import { SaveAssessmentDialog } from '@/components/SaveAssessmentDialog';
 import { ExitWarningDialog } from '@/components/ExitWarningDialog';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { discoverJobFunctions, JobFunction } from '@/lib/matching/job-function-discovery';
+import { UserProfile } from '@/types/user-profile';
 
 type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
   topCareers?: CareerFitScore[];
@@ -32,9 +33,26 @@ function ExplorePageContent() {
     jobSearch: false,
   });
   const [jobFunctions, setJobFunctions] = useState<JobFunction[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Load user profile to inform assessment
+  useEffect(() => {
+    async function loadUserProfile() {
+      try {
+        const response = await fetch('/api/profile');
+        if (response.ok) {
+          const data = await response.json();
+          setUserProfile(data.profile);
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+      }
+    }
+    loadUserProfile();
+  }, []);
 
   // Clear saved state if starting new assessment
   useEffect(() => {
@@ -673,6 +691,7 @@ function ExplorePageContent() {
         <AdaptiveQuestionnaire
           key={questionnaireKey}
           onComplete={handleComplete}
+          userProfile={userProfile || undefined}
         />
       </main>
 
