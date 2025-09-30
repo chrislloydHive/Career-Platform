@@ -18,6 +18,7 @@ type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & 
 };
 
 function ExplorePageContent() {
+  const [hasStarted, setHasStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [profile, setProfile] = useState<ExportedProfile | null>(null);
   const [questionnaireKey, setQuestionnaireKey] = useState(0);
@@ -670,29 +671,38 @@ function ExplorePageContent() {
       />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Intro Section */}
-        <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-100 mb-4">
-            Alright, let's figure this out together
-          </h2>
-          <div className="space-y-4 text-gray-300 leading-relaxed">
-            <p>
-              This isn't your typical "what's your favorite color?" career quiz. We're going to ask you some questions about what you actually enjoy doing, what you're good at, and what matters to you in a job.
-            </p>
-            <p>
-              <span className="text-blue-400 font-semibold">Here's how it works:</span> Answer honestly (not what sounds impressive), and we'll use AI to spot patterns you might not even see yourself. The more you answer, the better we get at matching you with roles that actually fit.
-            </p>
-            <p className="text-sm text-gray-400">
-              Takes about 10-15 minutes. You can save your progress and come back anytime.
-            </p>
+        {!hasStarted ? (
+          /* Intro Section - shown before starting */
+          <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-8">
+            <h2 className="text-2xl font-bold text-gray-100 mb-4">
+              Alright, let's figure this out together
+            </h2>
+            <div className="space-y-4 text-gray-300 leading-relaxed mb-6">
+              <p>
+                This isn't your typical "what's your favorite color?" career quiz. We're going to ask you some questions about what you actually enjoy doing, what you're good at, and what matters to you in a job.
+              </p>
+              <p>
+                <span className="text-blue-400 font-semibold">Here's how it works:</span> Answer honestly (not what sounds impressive), and we'll use AI to spot patterns you might not even see yourself. The more you answer, the better we get at matching you with roles that actually fit.
+              </p>
+              <p className="text-sm text-gray-400">
+                Takes about 10-15 minutes. You can save your progress and come back anytime.
+              </p>
+            </div>
+            <button
+              onClick={() => setHasStarted(true)}
+              className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-blue-600/25"
+            >
+              Start Assessment
+            </button>
           </div>
-        </div>
-
-        <AdaptiveQuestionnaire
-          key={questionnaireKey}
-          onComplete={handleComplete}
-          userProfile={userProfile || undefined}
-        />
+        ) : (
+          /* Show questionnaire after starting */
+          <AdaptiveQuestionnaire
+            key={questionnaireKey}
+            onComplete={handleComplete}
+            userProfile={userProfile || undefined}
+          />
+        )}
       </main>
 
     </div>
