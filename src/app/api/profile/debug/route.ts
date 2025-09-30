@@ -23,7 +23,7 @@ export async function GET() {
 
     // Check if profile exists
     const profileCheck = await sql`
-      SELECT user_id, name, email
+      SELECT user_id, name, bio, linkedin_url
       FROM user_profiles
       WHERE user_id = ${session.user.id}
     `;
