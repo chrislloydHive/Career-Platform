@@ -1829,7 +1829,11 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
             <button
               onClick={() => {
                 const element = document.getElementById('saved-for-later-section');
-                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (element) {
+                  const yOffset = -100; // Scroll 100px above the element to account for header
+                  const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
               }}
               className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors"
             >
