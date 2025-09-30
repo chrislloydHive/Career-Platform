@@ -1,17 +1,14 @@
-import { auth } from "@/lib/auth/config";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default auth((req) => {
+export function middleware(request: NextRequest) {
   console.log('[Middleware]', {
-    pathname: req.nextUrl.pathname,
-    hasAuth: !!req.auth,
-    hasUser: !!req.auth?.user,
-    userId: req.auth?.user?.id
+    pathname: request.nextUrl.pathname,
   });
 
-  // Allow all requests to pass through
+  // Temporarily bypass all auth checks
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: [
