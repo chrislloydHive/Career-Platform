@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
@@ -37,6 +37,22 @@ export default function ExplorePage() {
   });
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Clear saved state if starting new assessment
+  useEffect(() => {
+    const isNew = searchParams.get('new') === 'true';
+    if (isNew) {
+      // Clear the saved questionnaire state
+      fetch('/api/questionnaire', { method: 'DELETE' })
+        .then(() => {
+          console.log('Cleared saved state for new assessment');
+          // Remove the query parameter from URL
+          router.replace('/explore');
+        })
+        .catch(err => console.error('Failed to clear saved state:', err));
+    }
+  }, [searchParams, router]);
 
   const handleComplete = (exportedProfile: ExportedProfile) => {
     setProfile(exportedProfile);
