@@ -34,34 +34,35 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch document contents from Blob storage
+    // Note: Claude API only supports PDFs, not DOCX files
     console.log('[Analyze] Fetching document contents...');
     const documentContents: Array<{ type: string; source: { type: string; media_type: string; data: string } }> = [];
+    const unsupportedDocs: string[] = [];
 
     if (documentUrls && documentUrls.length > 0) {
       for (const doc of documentUrls) {
         try {
-          console.log('[Analyze] Fetching document:', doc.filename);
+          // Only process PDF files - Claude doesn't support DOCX
+          if (!doc.filename.toLowerCase().endsWith('.pdf')) {
+            console.log('[Analyze] Skipping unsupported file type:', doc.filename);
+            unsupportedDocs.push(doc.filename);
+            continue;
+          }
+
+          console.log('[Analyze] Fetching PDF document:', doc.filename);
           const response = await fetch(doc.url);
           const arrayBuffer = await response.arrayBuffer();
           const base64 = Buffer.from(arrayBuffer).toString('base64');
-
-          // Determine media type
-          let mediaType = 'application/pdf';
-          if (doc.filename.toLowerCase().endsWith('.pdf')) {
-            mediaType = 'application/pdf';
-          } else if (doc.filename.toLowerCase().match(/\.(doc|docx)$/)) {
-            mediaType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-          }
 
           documentContents.push({
             type: 'document',
             source: {
               type: 'base64',
-              media_type: mediaType,
+              media_type: 'application/pdf',
               data: base64,
             },
           });
-          console.log('[Analyze] Document fetched successfully:', doc.filename);
+          console.log('[Analyze] PDF fetched successfully:', doc.filename);
         } catch (error) {
           console.error('[Analyze] Failed to fetch document:', doc.filename, error);
         }
@@ -83,7 +84,11 @@ Here's what we know about the user:
     }
 
     if (documentContents.length > 0) {
-      textContent += `They have uploaded ${documentContents.length} document(s). Please analyze the content of these documents.\n\n`;
+      textContent += `They have uploaded ${documentContents.length} PDF document(s). Please analyze the content of these documents.\n\n`;
+    }
+
+    if (unsupportedDocs.length > 0) {
+      textContent += `Note: The following files could not be analyzed (only PDFs are supported): ${unsupportedDocs.join(', ')}\n\n`;
     }
 
     textContent += `Based on this information, extract and analyze:
