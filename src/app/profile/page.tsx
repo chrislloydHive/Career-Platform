@@ -102,16 +102,6 @@ export default function ProfilePage() {
             Preferences
           </button>
           <button
-            onClick={() => setActiveTab('history')}
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-              activeTab === 'history'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <span className="hidden sm:inline">Interaction </span>History
-          </button>
-          <button
             onClick={() => setActiveTab('insights')}
             className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === 'insights'
@@ -120,6 +110,16 @@ export default function ProfilePage() {
             }`}
           >
             <span className="hidden sm:inline">AI </span>Insights ({profile.aiInsights.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'history'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <span className="hidden sm:inline">Interaction </span>History
           </button>
           <button
             onClick={() => setActiveTab('upload')}
