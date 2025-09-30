@@ -76,16 +76,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const isLoggedIn = !!auth?.user;
       const { pathname } = request.nextUrl;
 
+      console.log('[Authorized Callback]', {
+        pathname,
+        isLoggedIn,
+        hasUser: !!auth?.user,
+        userId: auth?.user?.id
+      });
+
       const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup');
 
       if (isAuthPage) {
+        console.log('[Authorized] Auth page, allowing access');
         return true;
       }
 
       if (!isLoggedIn) {
+        console.log('[Authorized] Not logged in, denying access');
         return false;
       }
 
+      console.log('[Authorized] Logged in, allowing access');
       return true;
     }
   },
