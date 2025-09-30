@@ -24,14 +24,18 @@ export default function AssessmentsPage() {
 
   const loadAssessments = async () => {
     try {
+      console.log('[Assessments Page] Loading assessments...');
       const response = await fetch('/api/assessment-results');
+      console.log('[Assessments Page] Response status:', response.status);
       if (!response.ok) {
         throw new Error('Failed to load assessments');
       }
       const data = await response.json();
+      console.log('[Assessments Page] Received data:', data);
+      console.log('[Assessments Page] Setting assessments:', data.assessments?.length || 0, 'items');
       setAssessments(data.assessments || []);
     } catch (error) {
-      console.error('Error loading assessments:', error);
+      console.error('[Assessments Page] Error loading assessments:', error);
       setError('Failed to load assessments');
     } finally {
       setLoading(false);
