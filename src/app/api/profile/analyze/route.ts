@@ -33,33 +33,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch document contents (for now, we'll just analyze the text provided)
-    // In a production system, you'd want to parse PDFs/DOCX files
-    // For now, we'll use the additional info and LinkedIn URL
+    // Fetch document contents from Blob storage
+    console.log('[Analyze] Fetching document contents...');
+    const documentContents: Array<{ type: string; source: { type: string; media_type: string; data: string } }> = [];
 
-    let analysisPrompt = `You are analyzing a user's career profile to help them discover potential career paths.
+    if (documentUrls && documentUrls.length > 0) {
+      for (const doc of documentUrls) {
+        try {
+          console.log('[Analyze] Fetching document:', doc.filename);
+          const response = await fetch(doc.url);
+          const arrayBuffer = await response.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString('base64');
+
+          // Determine media type
+          let mediaType = 'application/pdf';
+          if (doc.filename.toLowerCase().endsWith('.pdf')) {
+            mediaType = 'application/pdf';
+          } else if (doc.filename.toLowerCase().match(/\.(doc|docx)$/)) {
+            mediaType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+          }
+
+          documentContents.push({
+            type: 'document',
+            source: {
+              type: 'base64',
+              media_type: mediaType,
+              data: base64,
+            },
+          });
+          console.log('[Analyze] Document fetched successfully:', doc.filename);
+        } catch (error) {
+          console.error('[Analyze] Failed to fetch document:', doc.filename, error);
+        }
+      }
+    }
+
+    let textContent = `You are analyzing a user's career profile to help them discover potential career paths.
 
 Here's what we know about the user:
 
 `;
 
     if (linkedInUrl) {
-      analysisPrompt += `LinkedIn Profile: ${linkedInUrl}\n\n`;
+      textContent += `LinkedIn Profile: ${linkedInUrl}\n\n`;
     }
 
     if (additionalInfo) {
-      analysisPrompt += `Additional Information:\n${additionalInfo}\n\n`;
+      textContent += `Additional Information:\n${additionalInfo}\n\n`;
     }
 
-    if (documentUrls && documentUrls.length > 0) {
-      analysisPrompt += `They have uploaded ${documentUrls.length} document(s) including:\n`;
-      documentUrls.forEach((doc: any) => {
-        analysisPrompt += `- ${doc.type}: ${doc.filename}\n`;
-      });
-      analysisPrompt += '\n';
+    if (documentContents.length > 0) {
+      textContent += `They have uploaded ${documentContents.length} document(s). Please analyze the content of these documents.\n\n`;
     }
 
-    analysisPrompt += `Based on this information, extract and analyze:
+    textContent += `Based on this information, extract and analyze:
 
 1. **Skills**: What technical and soft skills does this person have?
 2. **Strengths**: What are their key strengths and abilities?
@@ -87,13 +114,22 @@ Format your response as a structured JSON object with these fields:
 Only include information you can confidently infer from what was provided. Be honest about confidence level.`;
 
     console.log('[Analyze] Calling Claude API...');
+
+    // Build content array with text and documents
+    const content: any[] = [{ type: 'text', text: textContent }];
+
+    // Add document contents
+    for (const doc of documentContents) {
+      content.push(doc);
+    }
+
     const message = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2000,
       messages: [
         {
           role: 'user',
-          content: analysisPrompt,
+          content,
         },
       ],
     });
