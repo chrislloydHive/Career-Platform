@@ -128,7 +128,7 @@ Only include information you can confidently infer from what was provided. Be ho
         career_goals = ${JSON.stringify(analysis.careerGoals || [])},
         bio = ${analysis.bio || ''},
         linkedin_url = ${linkedInUrl || null},
-        updated_at = NOW()
+        last_updated = NOW()
       WHERE user_id = ${session.user.id}
     `;
     console.log('[Analyze] Database updated successfully');
