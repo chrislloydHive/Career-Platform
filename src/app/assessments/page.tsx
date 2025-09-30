@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 
+// Force dynamic rendering - this page needs authentication
+export const dynamic = 'force-dynamic';
+
 interface SavedAssessment {
   id: number;
   title: string;
