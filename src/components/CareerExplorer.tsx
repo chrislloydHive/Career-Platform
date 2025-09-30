@@ -263,8 +263,17 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
   return (
     <div className="bg-gray-900 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Uncommon Careers - Collapsible */}
-        <div className="mb-6">
+        {/* Jobs You Can Actually Get Container */}
+        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 mb-8">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-100 mb-2">Jobs You Can Actually Get</h1>
+            <p className="text-gray-400">
+              Entry-level roles, weird job titles you&apos;ve never heard of, and where to find them
+            </p>
+          </div>
+
+          {/* Uncommon Careers - Collapsible */}
+          <div className="mb-6">
           <button
             onClick={() => setShowUncommonCareers(!showUncommonCareers)}
             className="w-full bg-gradient-to-r from-purple-900/30 to-pink-900/30 hover:from-purple-900/40 hover:to-pink-900/40 rounded-xl border border-purple-600/40 p-4 transition-all flex items-center justify-between"
@@ -433,40 +442,42 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
             </div>
           )}
         </div>
-
-        {/* Header */}
-        <div className="mb-8 flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-100 mb-2">Jobs You Can Actually Get</h1>
-            <p className="text-gray-400">
-              Entry-level roles, weird job titles you&apos;ve never heard of, and where to find them
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <a
-              href="/careers/compare"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              Compare Paths
-            </a>
-            {onToggleComparison && (
-              <button
-                onClick={onToggleComparison}
-                className="px-4 py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                </svg>
-                Quick Compare
-              </button>
-            )}
-          </div>
         </div>
 
-        {/* Category Filter */}
+        {/* Find Your Next Role Container */}
+        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+          <div className="mb-6 flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-100 mb-2">Find Your Next Role</h1>
+              <p className="text-gray-400">
+                Search and filter through our database of entry-level careers
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <a
+                href="/careers/compare"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Compare Paths
+              </a>
+              {onToggleComparison && (
+                <button
+                  onClick={onToggleComparison}
+                  className="px-4 py-2 bg-gray-700 text-gray-300 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  Quick Compare
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Filter */}
         <div className="mb-6">
           <h2 className="text-sm font-medium text-gray-300 mb-3">Browse by Category</h2>
           <div className="flex flex-wrap gap-2">
@@ -959,6 +970,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
             </button>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
