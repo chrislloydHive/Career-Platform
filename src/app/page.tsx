@@ -112,7 +112,7 @@ export default function Homepage() {
               Here's How We Help
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Take assessment → Discover job functions → Get specific role recommendations → Search for jobs
+              Build your profile → AI analyzes → Take assessment (optional) → Get matched → Search for jobs
             </p>
           </div>
 
@@ -123,10 +123,10 @@ export default function Homepage() {
                 1
               </div>
               <h3 className="text-xl font-bold text-gray-100 mb-4">
-                Take Assessment
+                Build Your Profile
               </h3>
               <p className="text-gray-400 leading-relaxed">
-                Answer questions about what you actually like doing (not what your parents think you should do)
+                Upload your resume, share your LinkedIn, tell us about yourself. The more we know, the better we can help.
               </p>
             </div>
 
@@ -136,10 +136,10 @@ export default function Homepage() {
                 2
               </div>
               <h3 className="text-xl font-bold text-gray-100 mb-4">
-                Discover Job Functions
+                AI Analyzes You
               </h3>
               <p className="text-gray-400 leading-relaxed">
-                Learn about career paths you never knew existed (yes, "UX Researcher" is a real job)
+                Our AI reads everything you shared and builds a comprehensive profile of your skills, interests, and potential career paths.
               </p>
             </div>
 
@@ -149,10 +149,10 @@ export default function Homepage() {
                 3
               </div>
               <h3 className="text-xl font-bold text-gray-100 mb-4">
-                Get Specific Roles
+                Get Matched to Roles
               </h3>
               <p className="text-gray-400 leading-relaxed">
-                See actual job titles to search for, with salaries and requirements (the stuff that matters)
+                See job functions and specific titles that actually match your profile (not just what your degree says you should do).
               </p>
             </div>
 
@@ -165,7 +165,7 @@ export default function Homepage() {
                 Search for Jobs
               </h3>
               <p className="text-gray-400 leading-relaxed">
-                Start applying to roles that actually fit what you want to do with your life
+                Start applying to roles that fit. Your profile keeps learning from every interaction to get better recommendations.
               </p>
             </div>
           </div>
