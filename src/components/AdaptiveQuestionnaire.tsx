@@ -553,18 +553,22 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
     }
   };
 
-  const handleComeBackLater = async () => {
+  const handleComeBackLater = () => {
+    // First skip to next question immediately for responsive UI
     handleSkip();
-    // Immediately save the state with the skipped question
-    await saveState();
-    // Show feedback that it was saved
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
-    notification.textContent = '✓ Question saved for later';
-    document.body.appendChild(notification);
-    setTimeout(() => {
-      notification.remove();
-    }, 2000);
+
+    // Then save in background and show notification
+    saveState().then(() => {
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+      notification.textContent = '✓ Question saved for later';
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        notification.remove();
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to save skipped question:', err);
+    });
   };
 
   const handleAnswerSkippedQuestion = (question: AdaptiveQuestion) => {
