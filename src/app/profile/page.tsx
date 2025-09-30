@@ -28,17 +28,20 @@ export default function ProfilePage() {
     try {
       const response = await fetch('/api/profile');
       if (response.status === 401) {
-        // Redirect to login if not authenticated
+        // Redirect to login if not authenticated - keep loading state true during redirect
         window.location.href = '/api/auth/signin?callbackUrl=/profile';
-        return;
+        return; // Don't set isLoading to false - let the redirect happen
       }
       if (response.ok) {
         const data = await response.json();
         setProfile(data.profile);
+        setIsLoading(false);
+      } else {
+        // Only set loading to false for non-401 errors
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Failed to load profile:', error);
-    } finally {
       setIsLoading(false);
     }
   }
