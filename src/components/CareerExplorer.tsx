@@ -95,10 +95,6 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
   const [showHighDemand, setShowHighDemand] = useState(false);
   const [showNoExperience, setShowNoExperience] = useState(false);
   const [showEmergingCareers, setShowEmergingCareers] = useState(false);
-  const [uncommonCareersLimit, setUncommonCareersLimit] = useState(8);
-  const [highDemandLimit, setHighDemandLimit] = useState(8);
-  const [noExperienceLimit, setNoExperienceLimit] = useState(8);
-  const [emergingCareersLimit, setEmergingCareersLimit] = useState(8);
 
   useEffect(() => {
     async function loadUserCareers() {
@@ -317,7 +313,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           {showUncommonCareers && (
             <div className="mt-4 bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded-xl border border-purple-600/30 p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {UNCOMMON_CAREERS.slice(0, uncommonCareersLimit).map((career, index) => (
+                {UNCOMMON_CAREERS.slice(0, 4).map((career, index) => (
                   <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-purple-500/50 transition-colors">
                     <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
                     <p className="text-xs text-gray-400 mb-3">{career.description}</p>
@@ -325,6 +321,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                       onClick={() => {
                         setSearchQuery(career.title);
                         setShowSuggestions(false);
+                        document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
                       className="text-xs text-purple-400 hover:text-purple-300 font-medium"
                     >
@@ -333,16 +330,19 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                   </div>
                 ))}
               </div>
-              {uncommonCareersLimit < UNCOMMON_CAREERS.length && (
-                <div className="mt-4 text-center">
-                  <button
-                    onClick={() => setUncommonCareersLimit(prev => prev + 8)}
-                    className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
-                  >
-                    Show More Jobs
-                  </button>
-                </div>
-              )}
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => {
+                    // Set a category filter or search term that shows all uncommon careers
+                    setSearchQuery('');
+                    setSelectedCategory('all');
+                    document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  See All {UNCOMMON_CAREERS.length} Jobs →
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -375,7 +375,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           {showHighDemand && (
             <div className="mt-4 bg-gradient-to-r from-orange-900/20 to-red-900/20 rounded-xl border border-orange-600/30 p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {HIGH_DEMAND_CAREERS.slice(0, highDemandLimit).map((career, index) => (
+                {HIGH_DEMAND_CAREERS.slice(0, 4).map((career, index) => (
                   <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-orange-500/50 transition-colors">
                     <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
                     <p className="text-xs text-gray-400 mb-2">{career.description}</p>
@@ -386,6 +386,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                       onClick={() => {
                         setSearchQuery(career.title);
                         setShowSuggestions(false);
+                        document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
                       className="text-xs text-orange-400 hover:text-orange-300 font-medium"
                     >
@@ -394,16 +395,18 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                   </div>
                 ))}
               </div>
-              {highDemandLimit < HIGH_DEMAND_CAREERS.length && (
-                <div className="mt-4 text-center">
-                  <button
-                    onClick={() => setHighDemandLimit(prev => prev + 8)}
-                    className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
-                  >
-                    Show More Jobs
-                  </button>
-                </div>
-              )}
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('all');
+                    document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  See All {HIGH_DEMAND_CAREERS.length} Jobs →
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -436,7 +439,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           {showNoExperience && (
             <div className="mt-4 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-600/30 p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {NO_EXPERIENCE_CAREERS.slice(0, noExperienceLimit).map((career, index) => (
+                {NO_EXPERIENCE_CAREERS.slice(0, 4).map((career, index) => (
                   <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-colors">
                     <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
                     <p className="text-xs text-gray-400 mb-2">{career.description}</p>
@@ -447,6 +450,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                       onClick={() => {
                         setSearchQuery(career.title);
                         setShowSuggestions(false);
+                        document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
                       className="text-xs text-blue-400 hover:text-blue-300 font-medium"
                     >
@@ -455,16 +459,18 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                   </div>
                 ))}
               </div>
-              {noExperienceLimit < NO_EXPERIENCE_CAREERS.length && (
-                <div className="mt-4 text-center">
-                  <button
-                    onClick={() => setNoExperienceLimit(prev => prev + 8)}
-                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                  >
-                    Show More Jobs
-                  </button>
-                </div>
-              )}
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('all');
+                    document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  See All {NO_EXPERIENCE_CAREERS.length} Jobs →
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -497,7 +503,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           {showEmergingCareers && (
             <div className="mt-4 bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-xl border border-green-600/30 p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {EMERGING_CAREERS.slice(0, emergingCareersLimit).map((career, index) => (
+                {EMERGING_CAREERS.slice(0, 4).map((career, index) => (
                   <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-green-500/50 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-sm font-bold text-gray-100">{career.title}</h3>
@@ -508,6 +514,7 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                       onClick={() => {
                         setSearchQuery(career.title);
                         setShowSuggestions(false);
+                        document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
                       className="text-xs text-green-400 hover:text-green-300 font-medium"
                     >
@@ -516,23 +523,25 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                   </div>
                 ))}
               </div>
-              {emergingCareersLimit < EMERGING_CAREERS.length && (
-                <div className="mt-4 text-center">
-                  <button
-                    onClick={() => setEmergingCareersLimit(prev => prev + 8)}
-                    className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
-                  >
-                    Show More Jobs
-                  </button>
-                </div>
-              )}
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('all');
+                    document.getElementById('find-your-role')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  See All {EMERGING_CAREERS.length} Jobs →
+                </button>
+              </div>
             </div>
           )}
         </div>
         </div>
 
         {/* Find Your Next Role Container */}
-        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+        <div id="find-your-role" className="bg-gray-800 rounded-xl border border-gray-700 p-6">
           <div className="mb-6 flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-100 mb-2">Find Your Next Role</h1>
