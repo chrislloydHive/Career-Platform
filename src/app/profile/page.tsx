@@ -12,6 +12,12 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
 
+  // Share tab form state
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [linkedInUrl, setLinkedInUrl] = useState<string>('');
+  const [additionalDocs, setAdditionalDocs] = useState<File[]>([]);
+  const [additionalInfo, setAdditionalInfo] = useState<string>('');
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -45,6 +51,77 @@ export default function ProfilePage() {
     } catch (error) {
       console.error('Failed to save preferences:', error);
       throw error;
+    }
+  }
+
+  async function handleAnalyzeProfile() {
+    if (!resumeFile && !linkedInUrl && !additionalInfo) {
+      setUploadStatus('Please provide at least your resume, LinkedIn URL, or some information about yourself');
+      return;
+    }
+
+    setUploading(true);
+    setUploadStatus('Uploading files...');
+
+    try {
+      // Upload files to Vercel Blob
+      const formData = new FormData();
+      if (resumeFile) {
+        formData.append('resume', resumeFile);
+      }
+      additionalDocs.forEach((doc, index) => {
+        formData.append(`doc_${index}`, doc);
+      });
+      formData.append('linkedInUrl', linkedInUrl);
+      formData.append('additionalInfo', additionalInfo);
+
+      const uploadResponse = await fetch('/api/profile/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload files');
+      }
+
+      const uploadData = await uploadResponse.json();
+      setUploadStatus('Analyzing with AI...');
+
+      // Trigger AI analysis
+      const analyzeResponse = await fetch('/api/profile/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          documentUrls: uploadData.documentUrls,
+          linkedInUrl,
+          additionalInfo,
+        }),
+      });
+
+      if (!analyzeResponse.ok) {
+        throw new Error('Failed to analyze profile');
+      }
+
+      const analyzeData = await analyzeResponse.json();
+      setUploadStatus('Profile updated successfully!');
+
+      // Reload profile to show updated data
+      await loadProfile();
+
+      // Switch to overview tab
+      setActiveTab('overview');
+
+      // Clear form
+      setResumeFile(null);
+      setLinkedInUrl('');
+      setAdditionalDocs([]);
+      setAdditionalInfo('');
+
+    } catch (error) {
+      console.error('Failed to analyze profile:', error);
+      setUploadStatus('Failed to analyze profile. Please try again.');
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -166,6 +243,7 @@ export default function ProfilePage() {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
+                      setResumeFile(file);
                       setUploadStatus(`Selected: ${file.name}`);
                     }
                   }}
@@ -197,6 +275,8 @@ export default function ProfilePage() {
               <input
                 type="url"
                 placeholder="https://www.linkedin.com/in/yourprofile"
+                value={linkedInUrl}
+                onChange={(e) => setLinkedInUrl(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-900 text-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -219,6 +299,13 @@ export default function ProfilePage() {
                   multiple
                   className="hidden"
                   id="documents-upload"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    setAdditionalDocs(files);
+                    if (files.length > 0) {
+                      setUploadStatus(`Selected ${files.length} document(s)`);
+                    }
+                  }}
                 />
                 <label htmlFor="documents-upload" className="cursor-pointer">
                   <svg className="w-12 h-12 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,6 +331,8 @@ export default function ProfilePage() {
               <textarea
                 rows={6}
                 placeholder="I'm currently interested in... I've been working on... I'm good at... I want to explore careers in..."
+                value={additionalInfo}
+                onChange={(e) => setAdditionalInfo(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-900 text-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
             </div>
@@ -251,6 +340,7 @@ export default function ProfilePage() {
             {/* Analyze Button */}
             <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-xl border border-green-600/30 p-6">
               <button
+                onClick={handleAnalyzeProfile}
                 disabled={uploading}
                 className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/25"
               >
