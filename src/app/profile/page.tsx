@@ -168,7 +168,7 @@ export default function ProfilePage() {
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
             }`}
           >
-            Overview
+            Insights
           </button>
           <button
             onClick={() => setActiveTab('preferences')}
@@ -370,187 +370,121 @@ export default function ProfilePage() {
             {/* Intro Section */}
             <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-6">
               <p className="text-gray-300 leading-relaxed">
-                This is your current profile based on everything we know about you - your uploaded documents, assessment responses, and all your interactions with MyNextRole. This profile continuously evolves as you use the platform, getting more accurate with every conversation and choice you make.
+                Based on everything we know about you - your background, preferences, and interactions - here's what our AI sees and recommends. These insights update as you use the platform and we learn more about what you're looking for.
               </p>
             </div>
 
-            {/* Saved Assessments */}
-            {profile.assessmentResults && profile.assessmentResults.length > 0 && (
+            {/* Your Profile Summary */}
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3">Who You Are</h3>
+              <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-4">{profile.bio}</p>
+              <div className="flex flex-wrap gap-2">
+                {profile.skills.slice(0, 5).map((skill, idx) => (
+                  <span key={idx} className="px-2 sm:px-3 py-1 bg-blue-900/50 text-blue-400 rounded-full text-xs">
+                    {skill}
+                  </span>
+                ))}
+                {profile.skills.length > 5 && (
+                  <span className="px-2 sm:px-3 py-1 bg-gray-700 text-gray-400 rounded-full text-xs">
+                    +{profile.skills.length - 5} more
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Career Pattern Analysis - Placeholder for future AI generation */}
+            <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-600/30 p-4 sm:p-6">
+              <div className="flex items-start gap-3 mb-3">
+                <svg className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Your Unique Combination</h3>
+                  <p className="text-sm text-gray-300 leading-relaxed">
+                    {profile.skills.length > 0 && profile.interests.length > 0 ? (
+                      <>Your background in <span className="text-blue-400 font-medium">{profile.skills[0]}</span> combined with your interest in <span className="text-purple-400 font-medium">{profile.interests[0]}</span> opens up opportunities in roles that blend technical skills with creative thinking.</>
+                    ) : (
+                      <>Upload your resume or share more about yourself to see personalized insights about your unique skill combinations.</>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Where People Like You Succeed */}
+            {profile.careerGoals && profile.careerGoals.length > 0 && (
               <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Saved Assessments</h3>
-                <div className="space-y-3">
-                  {profile.assessmentResults.map((assessment: any) => (
-                    <div key={assessment.id} className="bg-gray-900 border border-gray-700 rounded-lg p-3">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-gray-100">{assessment.title}</h4>
-                        <span className="text-xs text-gray-500">
-                          {new Date(assessment.saved_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                      {assessment.description && (
-                        <p className="text-sm text-gray-400 mb-2">{assessment.description}</p>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <div className="text-xs text-gray-500">{assessment.completion_percentage}% complete</div>
-                        <a
-                          href={`/assessments/${assessment.id}`}
-                          className="text-xs text-blue-400 hover:text-blue-300"
-                        >
-                          View Results →
-                        </a>
-                      </div>
+                <div className="flex items-start gap-3 mb-4">
+                  <svg className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Career Path Recommendations</h3>
+                    <p className="text-sm text-gray-400 mb-4">
+                      Based on your goals and background, here are paths that align with what you're looking for:
+                    </p>
+                    <div className="space-y-3">
+                      {profile.careerGoals.slice(0, 3).map((goal, idx) => (
+                        <div key={idx} className="bg-gray-900 border border-gray-700 rounded-lg p-3">
+                          <div className="flex items-start gap-2">
+                            <span className="text-green-400 mt-1">→</span>
+                            <span className="text-sm text-gray-300">{goal}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
             )}
 
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 sm:mb-4">
-                <div className="flex-1">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-100">{profile.name}</h2>
-                  <p className="text-sm sm:text-base text-gray-400">{profile.location}</p>
-                  {profile.linkedInUrl && (
-                    <a
-                      href={profile.linkedInUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 mt-1"
-                    >
-                      <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                      </svg>
-                      LinkedIn Profile
-                    </a>
-                  )}
-                </div>
-              </div>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed">{profile.bio}</p>
-            </div>
-
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Education</h3>
-              <div className="space-y-4">
-                {profile.education.map((edu, idx) => (
-                  <div key={idx} className="border-l-2 border-blue-500 pl-4">
-                    <div className="font-medium text-gray-100">
-                      {edu.degree} {edu.major && `in ${edu.major}`} {edu.minor && `(${edu.minor})`}
-                    </div>
-                    <div className="text-sm text-gray-400">{edu.institution} • {edu.graduationYear}</div>
-                    {edu.honors && edu.honors.length > 0 && (
-                      <div className="text-sm text-blue-400 mt-1">{edu.honors.join(', ')}</div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Professional Experience</h3>
-              <div className="space-y-4 sm:space-y-6">
-                {profile.experience.map((exp, idx) => (
-                  <div key={idx} className="border-l-2 border-green-500 pl-3 sm:pl-4">
-                    <div className="text-sm sm:text-base font-medium text-gray-100">{exp.title}</div>
-                    <div className="text-xs sm:text-sm text-gray-400">{exp.company} • {exp.startDate} - {exp.endDate || 'Present'}</div>
-                    <ul className="mt-2 space-y-1">
-                      {exp.description.map((desc, i) => (
-                        <li key={i} className="text-xs sm:text-sm text-gray-300">• {desc}</li>
+            {/* What to Develop Next */}
+            {profile.strengths && profile.strengths.length > 0 && (
+              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
+                <div className="flex items-start gap-3 mb-4">
+                  <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Your Edge</h3>
+                    <p className="text-sm text-gray-400 mb-4">
+                      These strengths set you apart and will help you stand out in your target roles:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {profile.strengths.slice(0, 4).map((strength, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                          <span className="text-green-400 mt-0.5">✓</span>
+                          <span>{strength}</span>
+                        </div>
                       ))}
-                    </ul>
-                    {exp.skills && exp.skills.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
-                        {exp.skills.map((skill, i) => (
-                          <span key={i} className="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Core Skills</h3>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {profile.skills.map((skill, idx) => (
-                    <span key={idx} className="px-2 sm:px-3 py-1 bg-blue-900/50 text-blue-400 rounded-full text-xs sm:text-sm">
-                      {skill}
-                    </span>
-                  ))}
                 </div>
               </div>
+            )}
 
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Strengths</h3>
-                <ul className="space-y-2">
-                  {profile.strengths.map((strength, idx) => (
-                    <li key={idx} className="text-xs sm:text-sm text-gray-300 flex items-start gap-2">
-                      <span className="text-green-400 mt-1">✓</span>
-                      {strength}
+            {/* Next Steps */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-green-900/30 rounded-lg border border-blue-600/30 p-4 sm:p-6">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-2">Recommended Next Steps</h3>
+                  <ul className="space-y-2 text-sm text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">1.</span>
+                      <span>Complete the <a href="/explore" className="text-blue-400 hover:text-blue-300 underline">career assessment</a> to refine your profile</span>
                     </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Interests</h3>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {profile.interests.map((interest, idx) => (
-                    <span key={idx} className="px-2 sm:px-3 py-1 bg-purple-900/50 text-purple-400 rounded-full text-xs sm:text-sm">
-                      {interest}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Values</h3>
-                <ul className="space-y-2">
-                  {profile.values.map((value, idx) => (
-                    <li key={idx} className="text-xs sm:text-sm text-gray-300 flex items-start gap-2">
-                      <span className="text-yellow-400 mt-1">★</span>
-                      {value}
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">2.</span>
+                      <span>Explore <a href="/careers" className="text-blue-400 hover:text-blue-300 underline">career paths</a> that match your profile</span>
                     </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Career Goals</h3>
-              <ul className="space-y-2">
-                {profile.careerGoals.map((goal, idx) => (
-                  <li key={idx} className="text-xs sm:text-sm text-gray-300 flex items-start gap-2">
-                    <span className="text-blue-400 mt-1">→</span>
-                    {goal}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Preferred Industries</h3>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {profile.preferredIndustries.map((industry, idx) => (
-                    <span key={idx} className="px-2 sm:px-3 py-1 bg-green-900/50 text-green-400 rounded-full text-xs sm:text-sm">
-                      {industry}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-100 mb-3 sm:mb-4">Preferred Locations</h3>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {profile.preferredLocations.map((location, idx) => (
-                    <span key={idx} className="px-2 sm:px-3 py-1 bg-orange-900/50 text-orange-400 rounded-full text-xs sm:text-sm">
-                      {location}
-                    </span>
-                  ))}
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">3.</span>
+                      <span>Update your <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('preferences'); }} className="text-blue-400 hover:text-blue-300 underline">preferences</a> to see more targeted recommendations</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
