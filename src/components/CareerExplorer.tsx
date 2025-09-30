@@ -65,8 +65,9 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendationMetadata, setRecommendationMetadata] = useState<RecommendationMetadata | null>(null);
-  const [showUncommonCareers, setShowUncommonCareers] = useState(true);
-  const [showCompanyTypes, setShowCompanyTypes] = useState(true);
+  const [showUncommonCareers, setShowUncommonCareers] = useState(false);
+  const [showCompanyTypes, setShowCompanyTypes] = useState(false);
+  const [uncommonCareersLimit, setUncommonCareersLimit] = useState(8);
 
   useEffect(() => {
     async function loadUserCareers() {
@@ -280,88 +281,6 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           </div>
         </div>
 
-        {/* Careers You May Not Have Heard Of */}
-        {showUncommonCareers && (
-          <div className="mb-8 bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-xl border border-purple-600/40 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-100 mb-2">Wait, That's a Real Job?</h2>
-                <p className="text-gray-400">
-                  Careers you probably didn&apos;t know existed (and most don&apos;t need specific degrees)
-                </p>
-              </div>
-              <button
-                onClick={() => setShowUncommonCareers(false)}
-                className="text-gray-400 hover:text-gray-300"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {UNCOMMON_CAREERS.map((career, index) => (
-                <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-purple-500/50 transition-colors">
-                  <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
-                  <p className="text-xs text-gray-400 mb-3">{career.description}</p>
-                  <button
-                    onClick={() => {
-                      setSearchQuery(career.title);
-                      setShowSuggestions(false);
-                    }}
-                    className="text-xs text-purple-400 hover:text-purple-300 font-medium"
-                  >
-                    Learn more →
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Company Type Exploration */}
-        {showCompanyTypes && (
-          <div className="mb-8 bg-gradient-to-r from-blue-900/30 to-cyan-900/30 rounded-xl border border-blue-600/40 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-100 mb-2">Where Do You Want to Work?</h2>
-                <p className="text-gray-400">
-                  Different company types = completely different vibes (choose wisely)
-                </p>
-              </div>
-              <button
-                onClick={() => setShowCompanyTypes(false)}
-                className="text-gray-400 hover:text-gray-300"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {COMPANY_TYPES.map((company, index) => (
-                <div key={index} className="bg-gray-800/50 rounded-lg p-5 border border-gray-700">
-                  <h3 className="text-lg font-bold text-gray-100 mb-3">{company.type}</h3>
-                  <div className="space-y-2 text-sm">
-                    <div>
-                      <span className="text-green-400 font-medium">Pros:</span>
-                      <span className="text-gray-300 ml-2">{company.pros}</span>
-                    </div>
-                    <div>
-                      <span className="text-orange-400 font-medium">Cons:</span>
-                      <span className="text-gray-300 ml-2">{company.cons}</span>
-                    </div>
-                    <div className="pt-2 border-t border-gray-700">
-                      <span className="text-blue-400 font-medium text-xs">Good for:</span>
-                      <span className="text-gray-400 ml-2 text-xs">{company.good_for}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Category Filter */}
         <div className="mb-6">
           <h2 className="text-sm font-medium text-gray-300 mb-3">Browse by Category</h2>
@@ -548,6 +467,116 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
                 >
                   Clear all
                 </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Uncommon Careers - Collapsible */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowUncommonCareers(!showUncommonCareers)}
+            className="w-full bg-gradient-to-r from-purple-900/30 to-pink-900/30 hover:from-purple-900/40 hover:to-pink-900/40 rounded-xl border border-purple-600/40 p-4 transition-all flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <div className="text-left">
+                <h3 className="text-lg font-bold text-gray-100">Wait, That's a Real Job?</h3>
+                <p className="text-sm text-gray-400">Careers you probably didn't know existed (no degree required)</p>
+              </div>
+            </div>
+            <svg
+              className={`w-6 h-6 text-purple-400 transition-transform ${showUncommonCareers ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showUncommonCareers && (
+            <div className="mt-4 bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded-xl border border-purple-600/30 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {UNCOMMON_CAREERS.slice(0, uncommonCareersLimit).map((career, index) => (
+                  <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 hover:border-purple-500/50 transition-colors">
+                    <h3 className="text-sm font-bold text-gray-100 mb-2">{career.title}</h3>
+                    <p className="text-xs text-gray-400 mb-3">{career.description}</p>
+                    <button
+                      onClick={() => {
+                        setSearchQuery(career.title);
+                        setShowSuggestions(false);
+                      }}
+                      className="text-xs text-purple-400 hover:text-purple-300 font-medium"
+                    >
+                      Learn more →
+                    </button>
+                  </div>
+                ))}
+              </div>
+              {uncommonCareersLimit < UNCOMMON_CAREERS.length && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => setUncommonCareersLimit(prev => prev + 8)}
+                    className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+                  >
+                    Show More Jobs
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Company Types - Collapsible */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowCompanyTypes(!showCompanyTypes)}
+            className="w-full bg-gradient-to-r from-blue-900/30 to-cyan-900/30 hover:from-blue-900/40 hover:to-cyan-900/40 rounded-xl border border-blue-600/40 p-4 transition-all flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <div className="text-left">
+                <h3 className="text-lg font-bold text-gray-100">Where Do You Want to Work?</h3>
+                <p className="text-sm text-gray-400">Different company types = completely different vibes</p>
+              </div>
+            </div>
+            <svg
+              className={`w-6 h-6 text-blue-400 transition-transform ${showCompanyTypes ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showCompanyTypes && (
+            <div className="mt-4 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-600/30 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {COMPANY_TYPES.map((company, index) => (
+                  <div key={index} className="bg-gray-800/50 rounded-lg p-5 border border-gray-700">
+                    <h3 className="text-lg font-bold text-gray-100 mb-3">{company.type}</h3>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <span className="text-green-400 font-medium">Pros:</span>
+                        <span className="text-gray-300 ml-2">{company.pros}</span>
+                      </div>
+                      <div>
+                        <span className="text-orange-400 font-medium">Cons:</span>
+                        <span className="text-gray-300 ml-2">{company.cons}</span>
+                      </div>
+                      <div className="pt-2 border-t border-gray-700">
+                        <span className="text-blue-400 font-medium text-xs">Good for:</span>
+                        <span className="text-gray-400 ml-2 text-xs">{company.good_for}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
