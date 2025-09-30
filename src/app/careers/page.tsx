@@ -35,7 +35,7 @@ export default function CareersPage() {
     <div className="min-h-screen bg-gray-950">
       <Navigation
         title="Career Explorer"
-        subtitle="Research career paths and opportunities"
+        subtitle="Discover jobs you never knew existed (and how to get them)"
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

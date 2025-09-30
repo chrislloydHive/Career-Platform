@@ -227,7 +227,7 @@ export default function CareerTimelinePage() {
               <ul className="text-sm text-gray-300 space-y-1">
                 <li>• <strong>Open Positions:</strong> Current job postings from major job boards</li>
                 <li>• <strong>Hiring Companies:</strong> Companies actively recruiting for each role</li>
-                <li>• <strong>Experience Requirements:</strong> Actual years of experience from job postings</li>
+                <li>• <strong>Experience Requirements:</strong> Background and potential that companies are actually looking for</li>
                 <li>• <strong>Skill Gaps:</strong> Comparison between your skills and market requirements</li>
                 <li>• <strong>Salary Data:</strong> Current compensation ranges and trends</li>
               </ul>

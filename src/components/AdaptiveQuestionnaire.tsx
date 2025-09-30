@@ -16,8 +16,6 @@ import { NarrativeInsightGenerator, NarrativeInsight } from '@/lib/insights/narr
 import { NarrativeInsightCard } from './NarrativeInsightCard';
 import { ConfidenceEvolutionEngine, InsightEvolution, ConfidencePattern, EvolutionSummary } from '@/lib/insights/confidence-evolution';
 import { ConfidenceEvolutionPanel } from './ConfidenceEvolutionPanel';
-import { FutureSelfProjection } from '@/lib/future-modeling/future-self-projector';
-import { FutureCareerPathVisualizer } from './FutureCareerPathVisualizer';
 import { CareerSuggestion } from '@/lib/ai/career-suggestions-ai';
 import { ExpandableInsightCard } from './ExpandableInsightCard';
 
@@ -64,8 +62,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
   const [confidencePatterns, setConfidencePatterns] = useState<ConfidencePattern[]>([]);
   const [evolutionSummary, setEvolutionSummary] = useState<EvolutionSummary | null>(null);
   const [showConfidenceEvolution, setShowConfidenceEvolution] = useState(false);
-  const [futureProjection, setFutureProjection] = useState<FutureSelfProjection | null>(null);
-  const [showFutureProjection, setShowFutureProjection] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isLoading, setIsLoading] = useState(true);
   const [userCareers, setUserCareers] = useState<JobCategory[]>([]);
@@ -427,15 +423,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       }
     }
 
-    if (newInsights.length >= 4 && userProfile) {
-      const projection = engine.getFutureSelfProjection();
-      if (projection) {
-        setFutureProjection(projection);
-        if (!showFutureProjection && Object.keys(engine.getState().responses).length >= 8) {
-          setShowFutureProjection(true);
-        }
-      }
-    }
 
     updateCareerMatches(newInsights);
 
@@ -884,7 +871,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-white mb-2">
-              🎉 Assessment Complete!
+              Assessment Complete!
             </h2>
             <p className="text-green-100 text-lg">
               You&apos;ve discovered {insights.length + synthesizedInsights.length} career insights
@@ -1000,7 +987,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               onClick={quickSubmit}
               className="w-full mt-2 px-3 py-2 bg-black text-yellow-400 rounded font-bold hover:bg-gray-800 text-xs sm:text-sm"
             >
-              ⚡ Quick Submit
+              Quick Submit
             </button>
           </div>
         </div>
@@ -1116,11 +1103,11 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className="text-xs font-bold text-white/90 uppercase tracking-wider px-2 py-0.5 bg-white/20 rounded">
-                    {latestPattern.type === 'consistency' && '✓ Pattern Detected'}
-                    {latestPattern.type === 'preference' && '⚡ Strong Preference'}
-                    {latestPattern.type === 'value' && '★ Core Value'}
-                    {latestPattern.type === 'contradiction' && '⚠ Interesting Tension'}
-                    {latestPattern.type === 'motivation' && '💡 Hidden Driver'}
+                    {latestPattern.type === 'consistency' && 'Pattern Detected'}
+                    {latestPattern.type === 'preference' && 'Strong Preference'}
+                    {latestPattern.type === 'value' && 'Core Value'}
+                    {latestPattern.type === 'contradiction' && 'Interesting Tension'}
+                    {latestPattern.type === 'motivation' && 'Hidden Driver'}
                   </span>
                 </div>
                 <p className="text-base text-white font-semibold leading-snug mb-2">
@@ -2052,14 +2039,6 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
           />
         </div>
       )}
-
-      {/* Future Career Path Visualizer */}
-      {showFutureProjection && futureProjection && (
-        <div className="mb-6">
-          <FutureCareerPathVisualizer projection={futureProjection} />
-        </div>
-      )}
-
 
       {/* Authenticity Detection Panel */}
       {showAuthenticityInsights && authenticityProfile && (

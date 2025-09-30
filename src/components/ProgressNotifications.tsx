@@ -394,7 +394,7 @@ export function WeeklyProgressDigest() {
 
         {Array.isArray(digest.skillFocus) && digest.skillFocus.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-200 mb-2">🎯 Focus This Week</h3>
+            <h3 className="text-lg font-semibold text-gray-200 mb-2">Focus This Week</h3>
             <div className="flex flex-wrap gap-2">
               {digest.skillFocus.map((skill: string) => (
                 <span key={skill} className="px-3 py-1 bg-blue-900/30 text-blue-300 rounded-full text-sm">
@@ -406,7 +406,7 @@ export function WeeklyProgressDigest() {
         )}
 
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-200 mb-3">🚀 Top Opportunities</h3>
+          <h3 className="text-lg font-semibold text-gray-200 mb-3">Top Opportunities</h3>
           <div className="space-y-3">
             {Array.isArray(digest.topOpportunities) && digest.topOpportunities.map((opportunity: LearningOpportunity) => (
               <div key={opportunity.id} className="bg-gray-900/50 rounded-lg p-3 border border-gray-700">

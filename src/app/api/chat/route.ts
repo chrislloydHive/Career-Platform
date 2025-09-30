@@ -4,7 +4,7 @@ import { careerMatcher } from '@/lib/chat/career-matcher';
 import { careerChatAI } from '@/lib/ai/career-chat-ai';
 import { anthropicClient } from '@/lib/ai/anthropic-client';
 import { ChatQuery, ChatResponse } from '@/types/chat';
-import { getUserProfile, buildUserContextPrompt, addInteraction, getQuestionnaireInsights } from '@/lib/storage/user-profile-db';
+import { getUserProfile, buildUserContextPrompt, addInteraction, getQuestionnaireInsights, getLatestAssessmentResults } from '@/lib/storage/user-profile-db';
 import { auth } from '@/lib/auth/config';
 
 export async function POST(request: NextRequest) {
@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
 
     const userProfile = await getUserProfile(session.user.id);
     const questionnaireData = await getQuestionnaireInsights(session.user.id);
-    const userContext = userProfile ? buildUserContextPrompt(userProfile, questionnaireData || undefined) : '';
+    const assessmentResults = await getLatestAssessmentResults(session.user.id);
+    const userContext = userProfile ? buildUserContextPrompt(userProfile, questionnaireData || undefined, assessmentResults || undefined) : '';
 
     await addInteraction(session.user.id, 'chat_query', text);
 

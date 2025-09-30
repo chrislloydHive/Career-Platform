@@ -10,12 +10,12 @@ export function CareerChat() {
     {
       id: '1',
       role: 'assistant',
-      content: "Hi! I'm your AI career advisor. I'm here to help you discover careers that match your unique interests, skills, and goals.\n\nI can help you explore questions like:\n• What careers combine my interests in marketing and healthcare?\n• I want to work remotely but still help people—what are my options?\n• Show me roles where I can use my training and teaching background\n• What careers offer good work-life balance in tech?\n\nJust ask naturally, and I'll guide you toward careers that could be a great fit.",
+      content: "Hey! Okay so... you just took the assessment (or you're thinking about it), and now you're probably like \"cool, but what does a Marketing Coordinator actually DO all day?\"\n\nThat's literally what I'm here for. I've seen your assessment results, I know what job functions might fit you, and I can help you figure out:\n\n• What does [insert job title] actually involve day-to-day?\n• How do I search for jobs when I barely have experience?\n• Is this role actually entry-level or are they lying?\n• What should I put in my application when I'm underqualified?\n\nAsk me anything. I promise to be helpful AND make this less painful than it currently feels.",
       timestamp: new Date(),
       followUpQuestions: [
-        'What are your strongest skills or interests?',
-        'What matters most to you in a career?',
-        'Tell me about your background and experience',
+        'What does a [specific job title] actually do all day?',
+        'How do I apply for jobs when I feel underqualified?',
+        'What are the best entry-level roles in [your field]?',
       ],
     },
   ]);
@@ -159,7 +159,7 @@ export function CareerChat() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything about careers... I'll understand natural language!"
+            placeholder="What does a Marketing Coordinator actually do? How do I not sound underqualified?"
             className="flex-1 px-4 py-3 bg-gray-900 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isLoading}
           />

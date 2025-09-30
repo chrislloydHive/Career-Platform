@@ -257,7 +257,7 @@ interface QuestionnaireData {
   completion_percentage?: number;
 }
 
-export function buildUserContextPrompt(profile: UserProfile, questionnaireData?: QuestionnaireData): string {
+export function buildUserContextPrompt(profile: UserProfile, questionnaireData?: QuestionnaireData, assessmentResults?: { top_careers?: unknown; career_recommendations?: { topRecommendations?: Array<{ title: string; category: string; reasoning: string }> } }): string {
   let questionnaireSection = '';
 
   if (questionnaireData) {
@@ -302,6 +302,23 @@ ${gaps.length > 0 ? gaps.map((g) => `- ${g.gap} (${g.area}, ${g.importance} prio
 `;
   }
 
+  let assessmentSection = '';
+  if (assessmentResults?.career_recommendations?.topRecommendations && assessmentResults.career_recommendations.topRecommendations.length > 0) {
+    const topRecs = assessmentResults.career_recommendations.topRecommendations.slice(0, 5);
+    assessmentSection = `
+## RECOMMENDED JOB FUNCTIONS & ROLES (From Assessment Results)
+
+The user has received these personalized career recommendations based on their assessment:
+
+${topRecs.map((rec) => `
+**${rec.title}** (${rec.category})
+${rec.reasoning}
+`).join('\n')}
+
+IMPORTANT: When the user asks about specific job titles or roles, reference these recommendations and explain what the day-to-day work actually involves. Help them refine their job search based on these suggestions.
+`;
+  }
+
   return `
 # User Profile: ${profile.name}
 
@@ -310,7 +327,7 @@ ${profile.bio}
 
 ## Current Location
 ${profile.location}
-${questionnaireSection}
+${questionnaireSection}${assessmentSection}
 ## CAREER PREFERENCES (CRITICAL FOR RECOMMENDATIONS)
 
 ### Ideal Role
@@ -411,4 +428,28 @@ export function buildShortUserContext(profile: UserProfile): string {
   const recentInsights = profile.aiInsights.slice(-3).map(i => i.insight).join('; ');
 
   return `User: ${profile.name}, ${profile.location}. Skills: ${topSkills}. ${profile.careerPreferences.idealRole}. Values: ${topValues}. Recent insights: ${recentInsights || 'None yet'}`;
+}
+
+export async function getLatestAssessmentResults(userId: string) {
+  try {
+    const result = await sql`
+      SELECT
+        top_careers,
+        career_recommendations,
+        completion_percentage
+      FROM assessment_results
+      WHERE user_id = ${userId}
+      ORDER BY saved_at DESC
+      LIMIT 1
+    `;
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error fetching latest assessment results:', error);
+    return null;
+  }
 }

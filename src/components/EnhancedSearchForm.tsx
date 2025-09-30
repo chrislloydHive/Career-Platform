@@ -13,26 +13,26 @@ interface EnhancedSearchFormProps {
 }
 
 const JOB_TITLE_SUGGESTIONS = [
-  'Software Engineer',
-  'Senior Software Engineer',
-  'Frontend Developer',
-  'Backend Developer',
-  'Full Stack Developer',
-  'Product Manager',
-  'Senior Product Manager',
-  'Data Scientist',
-  'Data Engineer',
-  'DevOps Engineer',
-  'UX Designer',
-  'UI Designer',
-  'Engineering Manager',
-  'Technical Lead',
-  'Solutions Architect',
+  'Marketing Coordinator',
+  'Junior Data Analyst',
+  'Customer Success Associate',
+  'Social Media Coordinator',
+  'Content Creator',
+  'Sales Development Representative',
+  'Project Coordinator',
+  'Operations Associate',
   'Business Analyst',
-  'QA Engineer',
-  'Machine Learning Engineer',
-  'Cloud Architect',
-  'Cybersecurity Engineer',
+  'Junior Developer',
+  'UX Research Assistant',
+  'Account Coordinator',
+  'HR Coordinator',
+  'Junior Designer',
+  'Associate Product Manager',
+  'Research Assistant',
+  'Financial Analyst',
+  'Junior Software Engineer',
+  'Marketing Associate',
+  'Program Coordinator',
 ];
 
 const POPULAR_LOCATIONS = [
@@ -49,14 +49,12 @@ const POPULAR_LOCATIONS = [
 ];
 
 const SALARY_RANGES = [
-  { min: 0, max: 60000, label: '0-60k' },
-  { min: 60000, max: 80000, label: '60k-80k' },
-  { min: 80000, max: 100000, label: '80k-100k' },
-  { min: 100000, max: 120000, label: '100k-120k' },
-  { min: 120000, max: 150000, label: '120k-150k' },
-  { min: 150000, max: 200000, label: '150k-200k' },
-  { min: 200000, max: 300000, label: '200k-300k' },
-  { min: 300000, max: 999999, label: '300k+' },
+  { min: 0, max: 40000, label: '$30k-$40k' },
+  { min: 40000, max: 50000, label: '$40k-$50k' },
+  { min: 50000, max: 60000, label: '$50k-$60k' },
+  { min: 60000, max: 70000, label: '$60k-$70k' },
+  { min: 70000, max: 80000, label: '$70k-$80k' },
+  { min: 80000, max: 100000, label: '$80k-$100k' },
 ];
 
 export function EnhancedSearchForm({
@@ -88,7 +86,7 @@ export function EnhancedSearchForm({
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Advanced filters
-  const [experienceLevel, setExperienceLevel] = useState(initialValues?.experienceLevel || 'all');
+  const [experienceLevel, setExperienceLevel] = useState(initialValues?.experienceLevel || 'entry_level');
   const [industry, setIndustry] = useState(initialValues?.industry || 'all');
   const [employmentType, setEmploymentType] = useState(initialValues?.employmentType || 'all');
   const [freshnessFilter, setFreshnessFilter] = useState(initialValues?.freshnessFilter || 'all');
@@ -177,7 +175,7 @@ export function EnhancedSearchForm({
       } : undefined,
       keywords: keywords ? keywords.split(',').map(k => k.trim()).filter(Boolean) : undefined,
       // Advanced filters
-      experienceLevel: experienceLevel !== 'all' ? experienceLevel : undefined,
+      experienceLevel: experienceLevel !== 'all' ? experienceLevel as 'entry' | 'mid' | 'senior' | 'executive' : undefined,
       industry: industry !== 'all' ? industry : undefined,
       employmentType: employmentType !== 'all' ? employmentType : undefined,
       freshnessFilter: freshnessFilter !== 'all' ? freshnessFilter : undefined,
@@ -425,15 +423,13 @@ export function EnhancedSearchForm({
                 <label className="block text-xs font-medium text-gray-300 mb-1">Experience Level</label>
                 <select
                   value={experienceLevel}
-                  onChange={(e) => setExperienceLevel(e.target.value as 'all' | 'entry' | 'mid' | 'senior' | 'executive')}
+                  onChange={(e) => setExperienceLevel(e.target.value as 'entry_level' | 'early_career' | 'all')}
                   className="w-full px-3 py-2 text-sm bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-800"
                   disabled={isLoading}
                 >
-                  <option value="all">All Levels</option>
-                  <option value="entry">Entry Level</option>
-                  <option value="mid">Mid Level</option>
-                  <option value="senior">Senior Level</option>
-                  <option value="executive">Executive</option>
+                  <option value="entry_level">Entry Level (0-1 years)</option>
+                  <option value="early_career">Early Career (1-3 years)</option>
+                  <option value="all">All Entry Levels</option>
                 </select>
               </div>
 

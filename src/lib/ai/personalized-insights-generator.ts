@@ -98,7 +98,7 @@ TASK: Generate insights that make the person think "Wow, this system really unde
 
 STRUCTURE YOUR RESPONSE AS:
 1. DISCOVERY PHASE: Deep psychological insights about them
-2. IMPLICATION PHASE: What this means for their career trajectory
+2. IMPLICATION PHASE: What this means for getting started in their career
 3. OPPORTUNITY TEASE: Compelling hint at their career potential
 
 Focus on:

@@ -458,10 +458,10 @@ export class LearningOpportunityService {
 
   static getNotificationMessage(opportunity: LearningOpportunity): string {
     const messages = [
-      `🚀 New learning opportunity: "${opportunity.title}" - Perfect for developing ${opportunity.skillAreas.join(', ')}`,
-      `💡 Recommended for you: "${opportunity.title}" - ${opportunity.description}`,
-      `📚 Just found: "${opportunity.title}" by ${opportunity.provider} - Matches your learning goals`,
-      `🎯 Skill boost opportunity: "${opportunity.title}" - ${opportunity.duration} to enhance ${opportunity.skillAreas.join(', ')}`
+      `New learning opportunity: "${opportunity.title}" - Perfect for developing ${opportunity.skillAreas.join(', ')}`,
+      `Recommended for you: "${opportunity.title}" - ${opportunity.description}`,
+      `Just found: "${opportunity.title}" by ${opportunity.provider} - Matches your learning goals`,
+      `Skill boost opportunity: "${opportunity.title}" - ${opportunity.duration} to enhance ${opportunity.skillAreas.join(', ')}`
     ];
 
     return messages[Math.floor(Math.random() * messages.length)];

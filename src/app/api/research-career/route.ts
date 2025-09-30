@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const questionnaireData = await getQuestionnaireInsights(session.user.id);
     const userContext = userProfile
       ? (questionnaireData
-        ? buildUserContextPrompt(userProfile, questionnaireData || undefined)
+        ? buildUserContextPrompt(userProfile, questionnaireData || undefined, undefined)
         : buildShortUserContext(userProfile))
       : '';
 

@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       const questionnaireData = await getQuestionnaireInsights(session.user.id);
 
       if (userProfile) {
-        const userContext = buildUserContextPrompt(userProfile, questionnaireData || undefined);
+        const userContext = buildUserContextPrompt(userProfile, questionnaireData || undefined, undefined);
 
         const careersResult = await sql`
           SELECT * FROM career_research

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { SearchCriteria, ScoredJob } from '@/types';
 import { Navigation } from '@/components/Navigation';
 import { EnhancedSearchForm } from '@/components/EnhancedSearchForm';
@@ -12,7 +13,8 @@ import { ExportDialog } from '@/components/ExportDialog';
 import { getUserFriendlyError, retryWithBackoff } from '@/lib/feedback/error-handler';
 import { saveSearchToHistory, saveLastSearch, getLastSearch } from '@/lib/storage/search-history';
 
-export default function JobSearchPage() {
+function JobSearchContent() {
+  const searchParams = useSearchParams();
   const [jobs, setJobs] = useState<ScoredJob[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -37,14 +39,28 @@ export default function JobSearchPage() {
   } | null>(null);
 
   useEffect(() => {
-    const lastSearch = getLastSearch();
-    if (lastSearch) {
-      setInitialValues(lastSearch.criteria);
-      setJobs(lastSearch.jobs);
-      setJobsFound(lastSearch.jobs.length);
-      setSearchCriteria(lastSearch.criteria);
+    // Check for URL parameters first (from assessment results)
+    const searchQuery = searchParams.get('search');
+    const locationQuery = searchParams.get('location');
+
+    if (searchQuery) {
+      setInitialValues({
+        query: searchQuery,
+        location: locationQuery || '',
+        experienceLevel: 'entry',
+        sources: ['google_jobs'],
+      });
+    } else {
+      // Fall back to last search
+      const lastSearch = getLastSearch();
+      if (lastSearch) {
+        setInitialValues(lastSearch.criteria);
+        setJobs(lastSearch.jobs);
+        setJobsFound(lastSearch.jobs.length);
+        setSearchCriteria(lastSearch.criteria);
+      }
     }
-  }, []);
+  }, [searchParams]);
 
   const addToast = (toast: Toast) => {
     setToasts(prev => [...prev, toast]);
@@ -386,5 +402,17 @@ export default function JobSearchPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function JobSearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-400">Loading...</div>
+      </div>
+    }>
+      <JobSearchContent />
+    </Suspense>
   );
 }
