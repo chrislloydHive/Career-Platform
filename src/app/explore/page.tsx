@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
@@ -20,7 +20,7 @@ type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & 
   topCareers?: CareerFitScore[];
 };
 
-export default function ExplorePage() {
+function ExplorePageContent() {
   const [showResults, setShowResults] = useState(false);
   const [profile, setProfile] = useState<ExportedProfile | null>(null);
   const [questionnaireKey, setQuestionnaireKey] = useState(0);
@@ -687,5 +687,23 @@ export default function ExplorePage() {
       </main>
 
     </div>
+  );
+}
+
+export default function ExplorePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-950">
+        <Navigation
+          title="Self Discovery"
+          subtitle="Discover your hidden interests and strengths"
+        />
+        <main className="flex items-center justify-center h-64">
+          <div className="text-gray-400">Loading...</div>
+        </main>
+      </div>
+    }>
+      <ExplorePageContent />
+    </Suspense>
   );
 }
