@@ -440,13 +440,13 @@ export class InteractiveCareerGenerator {
           'Seek rapid feedback and iteration cycles'
         ]
       };
-    } else if (preference.speed === 'deliberate') {
+    } else if (preference.speed === 'gradual') {
       return {
         ...jobDescription,
-        overview: jobDescription.overview + ' Deliberate progression allows for deep mastery and thorough understanding.',
+        overview: jobDescription.overview + ' Gradual progression allows for deep mastery and thorough understanding.',
         dayInLife: jobDescription.dayInLife.map(scenario => ({
           ...scenario,
-          description: scenario.description + ' (Deliberate pace allows for comprehensive exploration)'
+          description: scenario.description + ' (Gradual pace allows for comprehensive exploration)'
         })),
         coreResponsibilities: [
           ...jobDescription.coreResponsibilities,
@@ -483,8 +483,8 @@ export class InteractiveCareerGenerator {
             ]
           };
         }
-      } else if (preference.speed === 'deliberate') {
-        // Deliberate timeline - longer learning times, more comprehensive methods
+      } else if (preference.speed === 'gradual') {
+        // Gradual timeline - longer learning times, more comprehensive methods
         const timeMatch = skill.timeToLearn.match(/(\d+)-?(\d+)?/);
         if (timeMatch) {
           const extendedTime = Math.ceil(parseInt(timeMatch[1]) * 1.5);
