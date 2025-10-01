@@ -35,7 +35,7 @@ export function StepTransition({ fromStep, toStep, show, onClose }: StepTransiti
           : 'We have your profile information',
         workflow.hasPreferences
           ? 'Your preferences will guide the assessment questions'
-          : 'We'll tailor questions to your experience level',
+          : "We'll tailor questions to your experience level",
         'Get ready to discover work that actually fits you',
       ],
       nextAction: 'Start Assessment',
@@ -51,8 +51,8 @@ export function StepTransition({ fromStep, toStep, show, onClose }: StepTransiti
       insights: [
         workflow.topCareerArchetypes && workflow.topCareerArchetypes.length > 0
           ? `Your top matches: ${workflow.topCareerArchetypes.slice(0, 2).join(', ')}`
-          : 'We've identified career paths that match your profile',
-        'Now let's explore these careers in detail',
+          : "We've identified career paths that match your profile",
+        "Now let's explore these careers in detail",
         'See salaries, day-to-day work, and growth paths',
       ],
       nextAction: 'Explore Careers',
@@ -69,7 +69,7 @@ export function StepTransition({ fromStep, toStep, show, onClose }: StepTransiti
         workflow.savedCareers > 0
           ? `You've saved ${workflow.savedCareers} career paths`
           : 'Based on the careers you explored',
-        'We'll search for real jobs that match',
+        "We'll search for real jobs that match",
         'Time to turn research into applications',
       ],
       nextAction: 'Search Jobs',
@@ -85,8 +85,8 @@ export function StepTransition({ fromStep, toStep, show, onClose }: StepTransiti
       insights: [
         workflow.savedJobs > 0
           ? `You've saved ${workflow.savedJobs} jobs to apply for`
-          : 'You've been searching for jobs',
-        'Let's make sure you're ready to impress',
+          : "You've been searching for jobs",
+        "Let's make sure you're ready to impress",
         'Resume tips, cover letters, and interview prep',
       ],
       nextAction: 'Prep Resources',
