@@ -69,7 +69,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       icon: BriefcaseIcon,
       step: 3,
       items: [
-        { href: '/careers', label: 'Career Explorer', icon: BriefcaseIcon },
+        { href: '/careers', label: 'Explore Careers', icon: BriefcaseIcon },
         { href: '/saved?from=explore', label: 'Saved', icon: BookmarkIcon },
       ]
     },
@@ -78,7 +78,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       icon: SearchIcon,
       step: 4,
       items: [
-        { href: '/jobs', label: 'Job Search', icon: SearchIcon },
+        { href: '/jobs', label: 'Search Jobs', icon: SearchIcon },
         { href: '/saved?from=search', label: 'Saved', icon: BookmarkIcon },
       ]
     },
