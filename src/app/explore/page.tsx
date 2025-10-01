@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
+import { ContextualChat } from '@/components/ContextualChat';
 import { AdaptiveQuestioningEngine } from '@/lib/adaptive-questions/adaptive-engine';
 import { CareerFitScore } from '@/lib/matching/realtime-career-matcher';
 import { SaveAssessmentDialog } from '@/components/SaveAssessmentDialog';
@@ -676,6 +677,9 @@ function ExplorePageContent() {
           onLeave={handleExitLeave}
           onCancel={handleExitCancel}
         />
+
+        {/* Contextual Chat */}
+        <ContextualChat context="assessment" />
       </div>
     );
   }
@@ -722,6 +726,8 @@ function ExplorePageContent() {
         )}
       </main>
 
+      {/* Contextual Chat */}
+      <ContextualChat context="assessment" />
     </div>
   );
 }

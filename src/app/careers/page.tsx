@@ -6,6 +6,7 @@ import { CareerExplorer } from '@/components/CareerExplorer';
 import { CareerDetailModal } from '@/components/CareerDetailModal';
 import { CareerComparisonTool } from '@/components/CareerComparisonTool';
 import { CareerResearchModal } from '@/components/CareerResearchModal';
+import { ContextualChat } from '@/components/ContextualChat';
 import { JobCategory, CareerCategory } from '@/types/career';
 
 export default function CareersPage() {
@@ -80,6 +81,12 @@ export default function CareersPage() {
         onClose={handleCloseResearch}
         onSaveCareer={handleCareerSaved}
         initialJobTitle={aiSearchQuery}
+      />
+
+      {/* Contextual Chat */}
+      <ContextualChat
+        context="careers"
+        contextData={{ careerTitle: selectedCareer?.title }}
       />
     </div>
   );

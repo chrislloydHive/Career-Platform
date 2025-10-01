@@ -83,14 +83,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       ]
     },
     { href: '/progress', label: 'Prep', icon: ProgressIcon, step: 5 },
-    {
-      label: 'Support',
-      icon: ChatIcon,
-      items: [
-        { href: '/chat', label: 'Career Chat', icon: ChatIcon },
-        { href: '/resources', label: 'Resources', icon: BookIcon },
-      ]
-    },
+    { href: '/resources', label: 'Resources', icon: BookIcon },
   ];
 
   return (

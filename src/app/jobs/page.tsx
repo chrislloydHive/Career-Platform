@@ -14,6 +14,7 @@ import { ToastContainer, Toast, createToast } from '@/components/Toast';
 import { ExportDialog } from '@/components/ExportDialog';
 import { getUserFriendlyError, retryWithBackoff } from '@/lib/feedback/error-handler';
 import { saveSearchToHistory, saveLastSearch, getLastSearch } from '@/lib/storage/search-history';
+import { ContextualChat } from '@/components/ContextualChat';
 
 function JobSearchContent() {
   const { data: session, status } = useSession();
@@ -442,6 +443,15 @@ function JobSearchContent() {
           </div>
         </div>
       </main>
+
+      {/* Contextual Chat */}
+      <ContextualChat
+        context="jobs"
+        contextData={{
+          searchQuery: searchCriteria?.query,
+          location: searchCriteria?.location,
+        }}
+      />
     </div>
   );
 }
