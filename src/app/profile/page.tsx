@@ -130,7 +130,9 @@ export default function ProfilePage() {
       });
 
       if (!uploadResponse.ok) {
-        throw new Error('Failed to upload files');
+        const errorData = await uploadResponse.json().catch(() => ({}));
+        const errorMsg = errorData.error || `Upload failed (${uploadResponse.status})`;
+        throw new Error(errorMsg);
       }
 
       const uploadData = await uploadResponse.json();

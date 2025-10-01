@@ -6,8 +6,11 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      console.error('Upload: No session found');
+      return NextResponse.json({ error: 'Please sign in to upload files' }, { status: 401 });
     }
+
+    console.log('Upload: Starting upload for user', session.user.id);
 
     const formData = await request.formData();
     const documentUrls: { type: string; url: string; filename: string }[] = [];
@@ -15,9 +18,11 @@ export async function POST(request: NextRequest) {
     // Upload resume
     const resume = formData.get('resume') as File | null;
     if (resume) {
+      console.log('Upload: Uploading resume:', resume.name, 'Size:', resume.size);
       const blob = await put(`profiles/${session.user.id}/resume_${Date.now()}_${resume.name}`, resume, {
         access: 'public',
       });
+      console.log('Upload: Resume uploaded successfully:', blob.url);
       documentUrls.push({
         type: 'resume',
         url: blob.url,
