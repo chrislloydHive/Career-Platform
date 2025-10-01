@@ -21,23 +21,38 @@ interface AssessmentResult {
   }>;
 }
 
+interface UserProfile {
+  bio?: string;
+  skills?: string[];
+  interests?: string[];
+  strengths?: string[];
+  careerGoals?: string[];
+  resumeUrl?: string;
+}
+
 export function AssessmentBasedRecommendations() {
   const { workflow } = useWorkflow();
   const [assessmentData, setAssessmentData] = useState<AssessmentResult | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    async function loadAssessmentResults() {
+    async function loadData() {
       if (!workflow.assessmentId) {
         setIsLoading(false);
         return;
       }
 
       try {
-        const response = await fetch(`/api/assessment-results/${workflow.assessmentId}`);
-        if (response.ok) {
-          const data = await response.json();
+        // Load both assessment results and user profile in parallel
+        const [assessmentResponse, profileResponse] = await Promise.all([
+          fetch(`/api/assessment-results/${workflow.assessmentId}`),
+          fetch('/api/profile'),
+        ]);
+
+        if (assessmentResponse.ok) {
+          const data = await assessmentResponse.json();
           // Extract topCareers from the assessment profile
           if (data.assessment?.profile?.topCareers) {
             setAssessmentData({
@@ -45,14 +60,19 @@ export function AssessmentBasedRecommendations() {
             });
           }
         }
+
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          setUserProfile(profileData.profile);
+        }
       } catch (error) {
-        console.error('Failed to load assessment results:', error);
+        console.error('Failed to load data:', error);
       } finally {
         setIsLoading(false);
       }
     }
 
-    loadAssessmentResults();
+    loadData();
   }, [workflow.assessmentId]);
 
   // No assessment completed yet
@@ -115,9 +135,30 @@ export function AssessmentBasedRecommendations() {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2">
               Your Top Career Matches
             </h2>
-            <p className="text-sm sm:text-base text-gray-300">
-              Based on your assessment, here are {topCareers.length} careers that match your profile. Each has been scored based on your answers.
+            <p className="text-sm sm:text-base text-gray-300 mb-3">
+              Based on your {workflow.hasResume ? 'profile and assessment' : 'assessment'}, here are {topCareers.length} careers that match {workflow.hasResume ? 'your background and' : 'your'} work style.
             </p>
+            {/* Show profile context if available */}
+            {userProfile && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {userProfile.strengths && userProfile.strengths.length > 0 && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-900/30 border border-blue-600/30 rounded-full text-xs text-blue-300">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Using your strengths: {userProfile.strengths.slice(0, 2).join(', ')}</span>
+                  </div>
+                )}
+                {userProfile.careerGoals && userProfile.careerGoals.length > 0 && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-900/30 border border-purple-600/30 rounded-full text-xs text-purple-300">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                    <span>Aligned with: {userProfile.careerGoals[0]}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
