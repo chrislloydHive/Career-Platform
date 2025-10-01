@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { SavedItem } from '@/types/saved-items';
@@ -16,7 +16,7 @@ interface SavedAssessment {
   created_at: string;
 }
 
-export default function SavedItemsPage() {
+function SavedItemsContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
 
@@ -346,5 +346,26 @@ export default function SavedItemsPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function SavedItemsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-950">
+        <Navigation
+          title="Saved Items"
+          subtitle="Your saved jobs and careers"
+        />
+        <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <p className="text-gray-400 mt-4">Loading...</p>
+          </div>
+        </main>
+      </div>
+    }>
+      <SavedItemsContent />
+    </Suspense>
   );
 }
