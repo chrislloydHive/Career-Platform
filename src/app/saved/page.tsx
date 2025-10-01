@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { SavedItem } from '@/types/saved-items';
 import { CareerDetailModal } from '@/components/CareerDetailModal';
@@ -16,10 +17,15 @@ interface SavedAssessment {
 }
 
 export default function SavedItemsPage() {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [assessments, setAssessments] = useState<SavedAssessment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'assessments' | 'jobs' | 'careers'>('all');
+  const [filter, setFilter] = useState<'all' | 'assessments' | 'jobs' | 'careers'>(
+    (tabParam as 'all' | 'assessments' | 'jobs' | 'careers') || 'all'
+  );
   const [selectedCareer, setSelectedCareer] = useState<JobCategory | null>(null);
   const [deletingAssessmentId, setDeletingAssessmentId] = useState<number | null>(null);
 
@@ -27,6 +33,13 @@ export default function SavedItemsPage() {
     loadSavedItems();
     loadAssessments();
   }, []);
+
+  // Update filter when URL parameter changes
+  useEffect(() => {
+    if (tabParam && ['all', 'assessments', 'jobs', 'careers'].includes(tabParam)) {
+      setFilter(tabParam as 'all' | 'assessments' | 'jobs' | 'careers');
+    }
+  }, [tabParam]);
 
   async function loadSavedItems() {
     try {
