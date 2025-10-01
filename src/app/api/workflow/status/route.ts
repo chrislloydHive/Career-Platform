@@ -52,8 +52,8 @@ export async function GET() {
       GROUP BY item_type
     `;
 
-    const savedCareers = savedItemsResult.rows.find((r: any) => r.item_type === 'career')?.count || 0;
-    const savedJobs = savedItemsResult.rows.find((r: any) => r.item_type === 'job')?.count || 0;
+    const savedCareers = parseInt(savedItemsResult.rows.find((r: any) => r.item_type === 'career')?.count || '0');
+    const savedJobs = parseInt(savedItemsResult.rows.find((r: any) => r.item_type === 'job')?.count || '0');
 
     // Check interaction history for exploration
     const interactionResult = await sql`
@@ -108,10 +108,10 @@ export async function GET() {
       assessmentDate: assessmentResult.rows[0]?.saved_at
         ? new Date(assessmentResult.rows[0].saved_at)
         : undefined,
-      careersExplored: parseInt(careersExplored),
-      savedCareers: parseInt(savedCareers),
-      jobSearchesPerformed: parseInt(jobSearchesPerformed),
-      savedJobs: parseInt(savedJobs),
+      careersExplored,
+      savedCareers,
+      jobSearchesPerformed,
+      savedJobs,
       prepResourcesViewed: false, // Could track this in interactions
       overallProgress: progress,
       currentStep,
