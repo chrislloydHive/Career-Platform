@@ -640,34 +640,24 @@ export class RealtimeCareerMatcher {
   }
 
   getAllCareers(): { title: string; category: string }[] {
-    if (this.userCareers && this.userCareers.length > 0) {
-      return this.userCareers.map(career => ({
-        title: career.title,
-        category: this.mapCategoryToDisplayName(career.category)
-      }));
-    }
-
-    const defaultCareers = [
-      { title: 'Digital Health Product Manager', category: 'Product' },
-      { title: 'Healthcare Data Analyst', category: 'Data & Analytics' },
-      { title: 'Patient Success Manager', category: 'Healthcare Operations' },
-      { title: 'Health Program Coordinator', category: 'Healthcare Operations' },
-      { title: 'Wellness Marketing Manager', category: 'Marketing' },
-      { title: 'UX Designer - Health Tech', category: 'Design' },
-      { title: 'Customer Success Manager', category: 'Customer Success' },
-      { title: 'Content Strategist', category: 'Marketing' },
-      { title: 'Operations Analyst', category: 'Operations' },
-      { title: 'Learning & Development Specialist', category: 'HR & Training' },
-      { title: 'Healthcare Consultant', category: 'Consulting' },
-      { title: 'Community Health Manager', category: 'Healthcare Operations' },
+    // Use broader career directions/archetypes instead of specific job titles
+    // These represent general career paths that users can explore
+    const careerDirections = [
+      { title: 'Analytical & Data-Driven Roles', category: 'Data & Analytics' },
+      { title: 'Creative & Design Work', category: 'Creative' },
+      { title: 'People & Relationships', category: 'People-Focused' },
+      { title: 'Technical & Engineering', category: 'Technology' },
+      { title: 'Strategy & Business', category: 'Strategy' },
+      { title: 'Communication & Marketing', category: 'Communication' },
+      { title: 'Helping & Healthcare', category: 'Service' },
+      { title: 'Leadership & Management', category: 'Leadership' },
+      { title: 'Operations & Process', category: 'Operations' },
+      { title: 'Teaching & Training', category: 'Education' },
+      { title: 'Creative Problem Solving', category: 'Innovation' },
+      { title: 'Building & Making Things', category: 'Creation' },
     ];
 
-    if (this.userProfile) {
-      const aiGeneratedCareers = this.generateCareersFromProfile();
-      return [...aiGeneratedCareers, ...defaultCareers].slice(0, 12);
-    }
-
-    return defaultCareers;
+    return careerDirections;
   }
 
   private mapCategoryToDisplayName(category: string): string {
@@ -682,64 +672,6 @@ export class RealtimeCareerMatcher {
       'wellness': 'Wellness'
     };
     return categoryMap[category] || category;
-  }
-
-  private generateCareersFromProfile(): { title: string; category: string }[] {
-    if (!this.userProfile) return [];
-
-    const careers: { title: string; category: string }[] = [];
-    const skills = this.userProfile.skills || [];
-    const interests = this.userProfile.interests || [];
-    const preferredIndustries = this.userProfile.preferredIndustries || [];
-
-    if (skills.some(s => s.toLowerCase().includes('data') || s.toLowerCase().includes('analyt'))) {
-      careers.push({ title: 'Data Analyst', category: 'Data & Analytics' });
-      careers.push({ title: 'Business Intelligence Analyst', category: 'Data & Analytics' });
-    }
-
-    if (skills.some(s => s.toLowerCase().includes('product') || s.toLowerCase().includes('management'))) {
-      careers.push({ title: 'Product Manager', category: 'Product' });
-      careers.push({ title: 'Technical Product Manager', category: 'Product' });
-    }
-
-    if (skills.some(s => s.toLowerCase().includes('design') || s.toLowerCase().includes('ux'))) {
-      careers.push({ title: 'UX Designer', category: 'Design' });
-      careers.push({ title: 'Product Designer', category: 'Design' });
-    }
-
-    if (interests.some(i => i.toLowerCase().includes('market') || i.toLowerCase().includes('brand'))) {
-      careers.push({ title: 'Marketing Manager', category: 'Marketing' });
-      careers.push({ title: 'Content Strategist', category: 'Marketing' });
-    }
-
-    if (preferredIndustries.some(i => i.toLowerCase().includes('health') || i.toLowerCase().includes('medical'))) {
-      careers.push({ title: 'Healthcare Product Manager', category: 'Healthcare' });
-      careers.push({ title: 'Health Program Coordinator', category: 'Healthcare' });
-    }
-
-    if (preferredIndustries.some(i => i.toLowerCase().includes('tech') || i.toLowerCase().includes('software'))) {
-      careers.push({ title: 'Software Engineer', category: 'Technology' });
-      careers.push({ title: 'Solutions Architect', category: 'Technology' });
-    }
-
-    if (interests.some(i => i.toLowerCase().includes('teach') || i.toLowerCase().includes('train'))) {
-      careers.push({ title: 'Learning & Development Specialist', category: 'Education' });
-      careers.push({ title: 'Corporate Trainer', category: 'Education' });
-    }
-
-    if (this.insights.some(ins => ins.insight.toLowerCase().includes('autonomous') || ins.insight.toLowerCase().includes('independent'))) {
-      careers.push({ title: 'Consultant', category: 'Consulting' });
-      careers.push({ title: 'Freelance Specialist', category: 'Consulting' });
-    }
-
-    if (this.insights.some(ins => ins.insight.toLowerCase().includes('people') || ins.insight.toLowerCase().includes('relationship'))) {
-      careers.push({ title: 'Customer Success Manager', category: 'Customer Success' });
-      careers.push({ title: 'Account Manager', category: 'Sales' });
-    }
-
-    return careers.filter((career, index, self) =>
-      index === self.findIndex((c) => c.title === career.title)
-    );
   }
 
   getCareerScore(title: string): CareerFitScore | undefined {

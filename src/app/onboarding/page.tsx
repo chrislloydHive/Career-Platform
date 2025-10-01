@@ -71,7 +71,7 @@ export default function OnboardingPage() {
     }
   };
 
-  const completeOnboarding = () => {
+  const completeOnboarding = async () => {
     const completedData = {
       ...onboardingData,
       completedAt: new Date(),
@@ -81,6 +81,18 @@ export default function OnboardingPage() {
 
     setOnboardingData(completedData);
     localStorage.setItem('onboardingData', JSON.stringify(completedData));
+
+    // Save onboarding data to database profile
+    try {
+      await fetch('/api/profile/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(completedData),
+      });
+    } catch (error) {
+      console.error('Failed to save onboarding data to profile:', error);
+      // Continue anyway - data is in localStorage
+    }
 
     // Redirect to main platform
     router.push('/explore');
@@ -525,6 +537,24 @@ function ProfileStep({
         resumeUrl: resumeData?.url || '',
         hasUploadedResume: true
       });
+
+      // Trigger AI analysis of the uploaded resume
+      if (resumeData?.url) {
+        try {
+          await fetch('/api/profile/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              documentUrls: [resumeData],
+              linkedInUrl: '',
+              additionalInfo: '',
+            }),
+          });
+        } catch (analyzeError) {
+          console.error('Failed to analyze resume:', analyzeError);
+          // Continue anyway - file was uploaded successfully
+        }
+      }
     } catch (error) {
       setUploadError('Upload failed. Please try again.');
       console.error('Upload error:', error);
