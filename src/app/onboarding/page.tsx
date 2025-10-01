@@ -179,30 +179,55 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
       </h2>
 
       <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-        We&apos;ll help you discover your ideal career path through personalized assessment and research.
-        This quick setup will take about 3-5 minutes and will help us provide better recommendations.
+        A guided 5-step journey from "I have no idea" to "I know exactly what I'm looking for."
+        This quick setup will take about 3-5 minutes and set you up for success.
       </p>
 
       <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 mb-8 text-left">
-        <h3 className="text-lg font-semibold text-gray-100 mb-4">What to Expect:</h3>
+        <h3 className="text-lg font-semibold text-gray-100 mb-4">Your Journey:</h3>
         <ul className="space-y-3 text-gray-300">
           <li className="flex items-start gap-3">
             <span className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
-            <span>Share your background and experience (optional)</span>
+            <div>
+              <span className="font-medium text-gray-100">Build Your Profile</span>
+              <p className="text-sm text-gray-400 mt-0.5">Share your background and upload your resume (optional)</p>
+            </div>
           </li>
           <li className="flex items-start gap-3">
-            <span className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">2</span>
-            <span>Upload resume or LinkedIn for better personalization (optional)</span>
+            <span className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">2</span>
+            <div>
+              <span className="font-medium text-gray-100">Discover Your Fit</span>
+              <p className="text-sm text-gray-400 mt-0.5">Take our assessment to uncover your work style and interests</p>
+            </div>
           </li>
           <li className="flex items-start gap-3">
-            <span className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">3</span>
-            <span>Tell us about your career goals</span>
+            <span className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold">3</span>
+            <div>
+              <span className="font-medium text-gray-100">Explore Careers</span>
+              <p className="text-sm text-gray-400 mt-0.5">Get personalized matches and research any career with AI</p>
+            </div>
           </li>
           <li className="flex items-start gap-3">
-            <span className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold">4</span>
-            <span>Start your personalized career discovery</span>
+            <span className="w-6 h-6 bg-yellow-600 rounded-full flex items-center justify-center text-white text-sm font-bold">4</span>
+            <div>
+              <span className="font-medium text-gray-100">Find Your Role</span>
+              <p className="text-sm text-gray-400 mt-0.5">Search real job openings matched to your interests</p>
+            </div>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center text-white text-sm font-bold">5</span>
+            <div>
+              <span className="font-medium text-gray-100">Prepare to Apply</span>
+              <p className="text-sm text-gray-400 mt-0.5">Get company research and interview prep for your targets</p>
+            </div>
           </li>
         </ul>
+      </div>
+
+      <div className="bg-blue-900/20 border border-blue-700/30 rounded-lg p-4 mb-8">
+        <p className="text-sm text-gray-300 text-center">
+          <span className="font-medium text-blue-300">Each step builds on the last.</span> Your profile informs your assessment, your assessment drives your matches, your matches guide your search.
+        </p>
       </div>
 
       <button
@@ -815,44 +840,53 @@ function CompletionStep({ onComplete }: { onComplete: () => void }) {
       </div>
 
       <h2 className="text-4xl font-bold text-gray-100 mb-6">
-        Your Platform is Ready!
+        Step 1 Complete: Your Profile is Ready!
       </h2>
 
       <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-        Thank you for sharing that information. We&apos;ve personalized your career discovery
-        platform based on your background and goals. You&apos;re ready to begin exploring!
+        Great start! We&apos;ve created your foundation. Now let&apos;s discover what makes you unique
+        and find careers that truly fit.
       </p>
 
       <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 mb-8">
-        <h3 className="text-lg font-semibold text-gray-100 mb-4">What&apos;s Next?</h3>
+        <h3 className="text-lg font-semibold text-gray-100 mb-4">Next: Step 2 - Discover Your Fit</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-          <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-700/30">
-            <h4 className="font-medium text-blue-300 mb-2">Start Self Discovery Assessment</h4>
+          <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-700/30">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">2</span>
+              <h4 className="font-medium text-purple-300">Take the Assessment</h4>
+            </div>
             <p className="text-sm text-gray-400">
-              Take our adaptive assessment to uncover your strengths, interests, and ideal career matches.
+              Uncover your work style, interests, and what motivates you. Get personalized career matches based on who you really are.
             </p>
           </div>
-          <div className="p-4 bg-green-900/20 rounded-lg border border-green-700/30">
-            <h4 className="font-medium text-green-300 mb-2">Explore Career Database</h4>
+          <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-700/30">
+            <h4 className="font-medium text-blue-300 mb-2">Building on Your Profile</h4>
             <p className="text-sm text-gray-400">
-              Browse career paths, industry insights, and salary data to understand your options.
+              The assessment will use what you&apos;ve shared to ask smarter questions and provide better recommendations tailored to your background.
             </p>
           </div>
         </div>
       </div>
 
+      <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-4 mb-8">
+        <p className="text-sm text-gray-300 text-center">
+          💡 <span className="font-medium">Pro tip:</span> Each step gets more personalized. The more you complete, the better your matches become.
+        </p>
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <button
           onClick={onComplete}
-          className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-colors shadow-lg"
+          className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-lg font-semibold transition-colors shadow-lg"
         >
-          Start Self Discovery Assessment
+          Start Assessment (Step 2)
         </button>
         <button
           onClick={() => window.location.href = '/careers'}
           className="px-8 py-4 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-gray-200 rounded-lg text-lg font-semibold transition-colors"
         >
-          Explore Career Database
+          Skip to Explore Careers
         </button>
       </div>
     </div>
