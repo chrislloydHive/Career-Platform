@@ -54,9 +54,11 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
   };
 
   const navItems = [
+    { href: '/profile', label: 'Profile', icon: UserIcon, step: 1 },
     {
       label: 'Discover',
       icon: CompassIcon,
+      step: 2,
       items: [
         { href: '/explore', label: 'Take Assessment', icon: CompassIcon },
         { href: '/saved?from=discover', label: 'Saved', icon: BookmarkIcon },
@@ -65,6 +67,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
     {
       label: 'Explore',
       icon: BriefcaseIcon,
+      step: 3,
       items: [
         { href: '/careers', label: 'Career Explorer', icon: BriefcaseIcon },
         { href: '/saved?from=explore', label: 'Saved', icon: BookmarkIcon },
@@ -73,12 +76,13 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
     {
       label: 'Search',
       icon: SearchIcon,
+      step: 4,
       items: [
         { href: '/jobs', label: 'Job Search', icon: SearchIcon },
         { href: '/saved?from=search', label: 'Saved', icon: BookmarkIcon },
       ]
     },
-    { href: '/progress', label: 'Prep', icon: ProgressIcon },
+    { href: '/progress', label: 'Prep', icon: ProgressIcon, step: 5 },
     {
       label: 'Support',
       icon: ChatIcon,
@@ -87,7 +91,6 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
         { href: '/resources', label: 'Resources', icon: BookIcon },
       ]
     },
-    { href: '/profile', label: 'Profile', icon: UserIcon },
   ];
 
   return (
@@ -107,6 +110,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   const isGroupActive = item.items?.some(subItem => isLinkActive(subItem.href)) || false;
                   const Icon = item.icon;
                   const isOpen = openDropdown === item.label;
+                  const hasStep = 'step' in item;
 
                   return (
                     <div key={item.label} className="relative dropdown-container">
@@ -121,6 +125,11 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                             : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                         }`}
                       >
+                        {hasStep && (
+                          <span className="hidden lg:flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex-shrink-0">
+                            {(item as any).step}
+                          </span>
+                        )}
                         <Icon className="w-4 h-4 flex-shrink-0" />
                         <span className="hidden lg:inline whitespace-nowrap">{item.label}</span>
                         <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,6 +166,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   // Regular link
                   const isActive = isLinkActive(item.href);
                   const Icon = item.icon;
+                  const hasStep = 'step' in item;
                   return (
                     <Link
                       key={item.href}
@@ -167,6 +177,11 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                           : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                       }`}
                     >
+                      {hasStep && (
+                        <span className="hidden lg:flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex-shrink-0">
+                          {(item as any).step}
+                        </span>
+                      )}
                       <Icon className="w-4 h-4 flex-shrink-0" />
                       <span className="hidden lg:inline whitespace-nowrap">{item.label}</span>
                     </Link>
@@ -217,6 +232,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   const isGroupActive = item.items?.some(subItem => isLinkActive(subItem.href)) || false;
                   const Icon = item.icon;
                   const isOpen = openDropdown === item.label;
+                  const hasStep = 'step' in item;
 
                   return (
                     <div key={item.label}>
@@ -229,6 +245,11 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                         }`}
                       >
                         <div className="flex items-center gap-3">
+                          {hasStep && (
+                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex-shrink-0">
+                              {(item as any).step}
+                            </span>
+                          )}
                           <Icon className="w-4 h-4" />
                           <span>{item.label}</span>
                         </div>
@@ -274,6 +295,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   // Regular link for mobile
                   const isActive = isLinkActive(item.href);
                   const Icon = item.icon;
+                  const hasStep = 'step' in item;
                   return (
                     <Link
                       key={item.href}
@@ -285,6 +307,11 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                           : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                       }`}
                     >
+                      {hasStep && (
+                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex-shrink-0">
+                          {(item as any).step}
+                        </span>
+                      )}
                       <Icon className="w-4 h-4" />
                       <span>{item.label}</span>
                     </Link>
