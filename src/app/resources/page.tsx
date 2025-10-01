@@ -4,6 +4,67 @@ import { Navigation } from '@/components/Navigation';
 import Link from 'next/link';
 
 export default function ResourcesPage() {
+  // Career browsing lists
+  const uncommonCareers = [
+    { title: 'Professional Cuddler', description: 'Get paid $80/hour to provide platonic therapeutic touch and comfort to clients' },
+    { title: 'Golf Ball Diver', description: 'Scuba dive in golf course ponds to retrieve balls, make $100K+ selling them back' },
+    { title: 'Pet Food Taster', description: 'Taste-test dog and cat food for quality control at major pet food companies' },
+    { title: 'Netflix Tagger', description: 'Watch shows all day and tag them with descriptors to improve recommendations' },
+    { title: 'Professional Sleeper', description: 'Sleep in store mattresses, hotels, or sleep studies—literally get paid to nap' },
+    { title: 'LEGO Designer', description: 'Get paid to build LEGO sets and design new products for the company' },
+    { title: 'Crime Scene Cleaner', description: 'Clean up after crime scenes and traumatic events—morbid but pays $35-80/hour' },
+    { title: 'Waterslide Tester', description: 'Travel to resorts and water parks to test slides for safety and fun factor' },
+    { title: 'Snake Milker', description: 'Extract venom from snakes for antivenin production—requires steady hands' },
+    { title: 'Island Caretaker', description: 'Live on tropical islands and maintain vacation properties—free housing included' },
+    { title: 'Panda Nanny', description: 'Take care of baby pandas at conservation centers in China' },
+    { title: 'Furniture Tester', description: 'Sit, sleep, and lounge on furniture all day to test comfort and durability' },
+  ];
+
+  const highDemandCareers = [
+    { title: 'Customer Success Associate', description: 'Companies are desperate for people who can keep customers happy', openings: '15,000+ open roles' },
+    { title: 'Sales Development Representative', description: 'Every company needs people reaching out to potential customers', openings: '20,000+ open roles' },
+    { title: 'Registered Nurse', description: 'Healthcare systems are experiencing critical shortages nationwide', openings: '200,000+ open roles' },
+    { title: 'Software Engineer', description: "Tech companies can't hire developers fast enough", openings: '150,000+ open roles' },
+    { title: 'Cybersecurity Analyst', description: 'Every company needs protection from hackers and data breaches', openings: '50,000+ open roles' },
+    { title: 'Product Manager', description: 'Companies need people who can ship products customers actually want', openings: '25,000+ open roles' },
+    { title: 'Data Analyst', description: 'Every team wants someone who can make sense of their data', openings: '16,000+ open roles' },
+    { title: 'DevOps Engineer', description: 'Keep software running smoothly—companies will pay big for this', openings: '40,000+ open roles' },
+    { title: 'Electrician', description: 'Skilled trades shortage means electricians can name their price', openings: '42,000+ open roles' },
+    { title: 'Plumber', description: "Pipes don't fix themselves—plumbers are in huge demand", openings: '36,000+ open roles' },
+    { title: 'HVAC Technician', description: 'Climate control specialists needed everywhere, year-round', openings: '34,000+ open roles' },
+    { title: 'Truck Driver', description: 'Supply chain needs drivers—often $70K+ with benefits', openings: '80,000+ open roles' },
+  ];
+
+  const noExperienceCareers = [
+    { title: 'Customer Service Representative', description: 'They train you—just need patience and good communication', training: 'Full training provided' },
+    { title: 'Sales Development Representative', description: 'Learn on the job, usually with a mentor and scripts', training: '2-4 week bootcamp' },
+    { title: 'Administrative Assistant', description: 'Organization and basic computer skills get you in the door', training: 'On-the-job training' },
+    { title: 'Social Media Coordinator', description: 'If you already use social media daily, you qualify', training: 'Learn as you go' },
+    { title: 'Recruiting Coordinator', description: 'They need people skills more than recruiting experience', training: '1-2 week onboarding' },
+    { title: 'Content Moderator', description: 'Review user content—just need attention to detail', training: 'Policy training included' },
+    { title: 'Operations Coordinator', description: "Organized? Good at spreadsheets? You're hired", training: 'Process training provided' },
+    { title: 'Bank Teller', description: 'Banks train you on everything—cash handling, customer service, systems', training: '2-3 week training program' },
+    { title: 'Warehouse Associate', description: 'Amazon and others hire constantly—they teach you the systems', training: 'Same-day onboarding' },
+    { title: 'Delivery Driver', description: 'Have a car and GPS? Companies like DoorDash start you immediately', training: 'App-based training' },
+    { title: 'IT Help Desk', description: 'Tech-savvy? Companies train you on troubleshooting and ticketing', training: 'Technical training provided' },
+    { title: 'Restaurant Server', description: 'No experience? Restaurants train you on menu and POS systems', training: 'Shadowing & training shifts' },
+  ];
+
+  const emergingCareers = [
+    { title: 'AI Prompt Engineer', description: 'Write prompts that make AI tools work better—coding optional', yearEmerged: '2023' },
+    { title: 'Creator Economy Manager', description: 'Help influencers and creators turn followers into income', yearEmerged: '2021' },
+    { title: 'Sustainability Coordinator', description: 'Make companies greener (finally getting real budgets)', yearEmerged: '2020' },
+    { title: 'Remote Work Coordinator', description: 'Keep distributed teams connected and productive', yearEmerged: '2020' },
+    { title: 'TikTok Marketing Specialist', description: 'Create viral content strategies for brands', yearEmerged: '2020' },
+    { title: 'Podcast Producer', description: 'Edit, produce, and grow audio content shows', yearEmerged: '2019' },
+    { title: 'AI Ethics Officer', description: 'Make sure companies use AI responsibly and without bias', yearEmerged: '2023' },
+    { title: 'Vertical Farm Technician', description: 'Grow food in indoor urban farms using hydroponics and automation', yearEmerged: '2020' },
+    { title: 'AI Training Data Specialist', description: 'Label and curate data sets to train machine learning models', yearEmerged: '2022' },
+    { title: 'Digital Fashion Designer', description: 'Design virtual clothing and accessories for avatars and games', yearEmerged: '2021' },
+    { title: 'Live Commerce Host', description: 'Sell products through live video shopping streams', yearEmerged: '2020' },
+    { title: 'Digital Wellness Coach', description: 'Help people manage screen time and develop healthy tech habits', yearEmerged: '2020' },
+  ];
+
   const resources = [
     {
       category: 'Day-in-the-Life Content',
@@ -172,6 +233,90 @@ export default function ResourcesPage() {
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Careers You Can Actually Get */}
+        <div className="mb-12">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-100 mb-3">Careers You Can Actually Get</h2>
+            <p className="text-gray-400 text-lg">Expand your possibilities—discover jobs you never knew existed</p>
+          </div>
+
+          {/* Uncommon Careers */}
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-100">Uncommon But Real Careers</h3>
+              <span className="text-sm text-gray-500">Yes, these actually exist</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {uncommonCareers.map((career, idx) => (
+                <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-purple-500 transition-colors">
+                  <h4 className="font-medium text-gray-100 mb-2">{career.title}</h4>
+                  <p className="text-sm text-gray-400 leading-relaxed">{career.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* High Demand Careers */}
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-100">High Demand Right Now</h3>
+              <span className="text-sm text-gray-500">Companies are actively hiring</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {highDemandCareers.map((career, idx) => (
+                <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-green-500 transition-colors">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="font-medium text-gray-100">{career.title}</h4>
+                    <span className="text-xs text-green-400 whitespace-nowrap ml-2">{career.openings}</span>
+                  </div>
+                  <p className="text-sm text-gray-400 leading-relaxed">{career.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* No Experience Required */}
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-100">No Experience Required</h3>
+              <span className="text-sm text-gray-500">They'll train you</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {noExperienceCareers.map((career, idx) => (
+                <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-blue-500 transition-colors">
+                  <h4 className="font-medium text-gray-100 mb-2">{career.title}</h4>
+                  <p className="text-sm text-gray-400 mb-2">{career.description}</p>
+                  <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-900/30 border border-blue-700/50 rounded text-xs text-blue-300">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {career.training}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Emerging Careers */}
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-100">Emerging Careers</h3>
+              <span className="text-sm text-gray-500">Jobs that didn't exist 5 years ago</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {emergingCareers.map((career, idx) => (
+                <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-yellow-500 transition-colors">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="font-medium text-gray-100">{career.title}</h4>
+                    <span className="text-xs text-yellow-400 whitespace-nowrap ml-2">{career.yearEmerged}</span>
+                  </div>
+                  <p className="text-sm text-gray-400 leading-relaxed">{career.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="mb-8 bg-blue-900/20 border border-blue-700/50 rounded-lg p-6">
           <div className="flex items-start gap-3">
             <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

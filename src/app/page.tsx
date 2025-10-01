@@ -106,63 +106,82 @@ export default function Homepage() {
             <h2 className="text-4xl font-bold text-gray-100 mb-4">
               Here's How We Help
             </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Build your profile → AI analyzes → Take assessment → Get matched → Find jobs
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              A guided 5-step journey from "I have no idea" to "I know exactly what I'm looking for"
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Step 1 */}
-            <div className="bg-gray-800 rounded-xl border border-gray-700 p-8 text-center hover:border-blue-600/50 transition-colors">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {/* Step 1 - Profile */}
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-blue-600/50 transition-colors">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4 text-white font-bold text-lg">
                 1
               </div>
-              <h3 className="text-xl font-bold text-gray-100 mb-4">
+              <h3 className="text-lg font-bold text-gray-100 mb-3">
                 Build Your Profile
               </h3>
-              <p className="text-gray-400 leading-relaxed">
-                Upload your resume, share your LinkedIn, tell us about yourself. The more we know, the better we can help.
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Upload your resume or tell us about yourself. AI analyzes your background, skills, and experience to create your foundation.
               </p>
             </div>
 
-            {/* Step 2 */}
-            <div className="bg-gray-800 rounded-xl border border-gray-700 p-8 text-center hover:border-blue-600/50 transition-colors">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-lg">
+            {/* Step 2 - Discover */}
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-purple-600/50 transition-colors">
+              <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mb-4 text-white font-bold text-lg">
                 2
               </div>
-              <h3 className="text-xl font-bold text-gray-100 mb-4">
-                AI Analyzes You
+              <h3 className="text-lg font-bold text-gray-100 mb-3">
+                Discover Your Fit
               </h3>
-              <p className="text-gray-400 leading-relaxed">
-                Our AI reads everything you shared and builds a comprehensive profile of your skills, interests, and potential career paths.
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Take our assessment to uncover your work style, interests, and what actually motivates you beyond just skills.
               </p>
             </div>
 
-            {/* Step 3 */}
-            <div className="bg-gray-800 rounded-xl border border-gray-700 p-8 text-center hover:border-blue-600/50 transition-colors">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-lg">
+            {/* Step 3 - Explore */}
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-green-600/50 transition-colors">
+              <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mb-4 text-white font-bold text-lg">
                 3
               </div>
-              <h3 className="text-xl font-bold text-gray-100 mb-4">
-                Get Matched to Roles
+              <h3 className="text-lg font-bold text-gray-100 mb-3">
+                Explore Careers
               </h3>
-              <p className="text-gray-400 leading-relaxed">
-                See job functions and specific titles that actually match your profile (not just what your degree says you should do).
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Get personalized career matches based on your profile and assessment. Research any career with AI to learn salary, day-to-day work, and how to break in.
               </p>
             </div>
 
-            {/* Step 4 */}
-            <div className="bg-gray-800 rounded-xl border border-gray-700 p-8 text-center hover:border-green-600/50 transition-colors">
-              <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-lg">
+            {/* Step 4 - Search */}
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-yellow-600/50 transition-colors">
+              <div className="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center mb-4 text-white font-bold text-lg">
                 4
               </div>
-              <h3 className="text-xl font-bold text-gray-100 mb-4">
-                Find Jobs
+              <h3 className="text-lg font-bold text-gray-100 mb-3">
+                Find Your Role
               </h3>
-              <p className="text-gray-400 leading-relaxed">
-                Start applying to roles that fit. Your profile keeps learning from every interaction to get better recommendations.
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Search real job openings matched to careers you've explored. Save roles that interest you and track your applications.
               </p>
             </div>
+
+            {/* Step 5 - Prep */}
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-orange-600/50 transition-colors">
+              <div className="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center mb-4 text-white font-bold text-lg">
+                5
+              </div>
+              <h3 className="text-lg font-bold text-gray-100 mb-3">
+                Prepare to Apply
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Get company research, tailored resume tips, and interview prep specific to the roles you're targeting.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-gray-500 text-sm max-w-2xl mx-auto">
+              Each step builds on the last—your profile informs your assessment, your assessment drives your matches, your matches guide your search. It all works together.
+            </p>
           </div>
         </div>
       </section>
