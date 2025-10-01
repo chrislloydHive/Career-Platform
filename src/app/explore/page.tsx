@@ -13,12 +13,16 @@ import { ExitWarningDialog } from '@/components/ExitWarningDialog';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { discoverJobFunctions, JobFunction } from '@/lib/matching/job-function-discovery';
 import { UserProfile } from '@/types/user-profile';
+import { WorkflowProgress } from '@/components/WorkflowProgress';
+import { StepTransition } from '@/components/StepTransition';
+import { useWorkflow } from '@/contexts/WorkflowContext';
 
 type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & {
   topCareers?: CareerFitScore[];
 };
 
 function ExplorePageContent() {
+  const { workflow, refreshWorkflow } = useWorkflow();
   const [hasStarted, setHasStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [profile, setProfile] = useState<ExportedProfile | null>(null);
@@ -38,6 +42,7 @@ function ExplorePageContent() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -178,7 +183,14 @@ function ExplorePageContent() {
       setShowSaveDialog(false);
       setHasUnsavedResults(false); // Mark as saved
 
-      setTimeout(() => setSaveMessage(null), 3000);
+      // Refresh workflow status
+      await refreshWorkflow();
+
+      // Show transition to next step after brief delay
+      setTimeout(() => {
+        setSaveMessage(null);
+        setShowTransition(true);
+      }, 2000);
     } catch (error) {
       console.error('Error saving assessment:', error);
       setSaveMessage('Failed to save assessment. Please try again.');
@@ -213,6 +225,9 @@ function ExplorePageContent() {
         />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Workflow Progress */}
+          <WorkflowProgress />
+
           {/* Save Assessment Actions */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
@@ -678,6 +693,14 @@ function ExplorePageContent() {
           onCancel={handleExitCancel}
         />
 
+        {/* Step Transition */}
+        <StepTransition
+          fromStep={2}
+          toStep={3}
+          show={showTransition}
+          onClose={() => setShowTransition(false)}
+        />
+
         {/* Contextual Chat */}
         <ContextualChat context="assessment" />
       </div>
@@ -693,28 +716,59 @@ function ExplorePageContent() {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!hasStarted ? (
-          /* Intro Section - shown before starting */
-          <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-8">
-            <h2 className="text-2xl font-bold text-gray-100 mb-4">
-              Alright, let's figure this out together
-            </h2>
-            <div className="space-y-4 text-gray-300 leading-relaxed mb-6">
-              <p>
-                This isn't your typical "what's your favorite color?" career quiz. We're going to ask you some questions about what you actually enjoy doing, what you're good at, and what matters to you in a job.
-              </p>
-              <p>
-                <span className="text-blue-400 font-semibold">Here's how it works:</span> Answer honestly (not what sounds impressive), and we'll use AI to spot patterns you might not even see yourself. The more you answer, the better we get at matching you with roles that actually fit.
-              </p>
-              <p className="text-sm text-gray-400">
-                Takes about 10-15 minutes. You can save your progress and come back anytime.
-              </p>
+          <div className="space-y-6">
+            {/* Show what we know from profile */}
+            {workflow.profileCompleted && (
+              <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-xl border border-green-600/30 p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-100 mb-2">
+                      Building on Your Profile
+                    </h3>
+                    <p className="text-gray-300 mb-3">
+                      We already know your background from Step 1, so we'll tailor these questions to your experience and interests.
+                    </p>
+                    {workflow.hasResume && (
+                      <div className="flex items-center gap-2 text-sm text-green-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Resume analyzed</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Intro Section */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl border border-blue-600/30 p-8">
+              <h2 className="text-2xl font-bold text-gray-100 mb-4">
+                Alright, let's figure this out together
+              </h2>
+              <div className="space-y-4 text-gray-300 leading-relaxed mb-6">
+                <p>
+                  This isn't your typical "what's your favorite color?" career quiz. We're going to ask you some questions about what you actually enjoy doing, what you're good at, and what matters to you in a job.
+                </p>
+                <p>
+                  <span className="text-blue-400 font-semibold">Here's how it works:</span> Answer honestly (not what sounds impressive), and we'll use AI to spot patterns you might not even see yourself. The more you answer, the better we get at matching you with roles that actually fit.
+                </p>
+                <p className="text-sm text-gray-400">
+                  Takes about 10-15 minutes. You can save your progress and come back anytime.
+                </p>
+              </div>
+              <button
+                onClick={() => setHasStarted(true)}
+                className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-blue-600/25"
+              >
+                Start Assessment
+              </button>
             </div>
-            <button
-              onClick={() => setHasStarted(true)}
-              className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-blue-600/25"
-            >
-              Start Assessment
-            </button>
           </div>
         ) : (
           /* Show questionnaire after starting */

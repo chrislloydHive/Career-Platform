@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/SessionProvider";
+import { WorkflowProvider } from "@/contexts/WorkflowContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,7 +27,9 @@ export default function RootLayout({
         className={`${inter.className} antialiased bg-gray-950 text-gray-100`}
       >
         <SessionProvider>
-          {children}
+          <WorkflowProvider>
+            {children}
+          </WorkflowProvider>
         </SessionProvider>
       </body>
     </html>
