@@ -640,24 +640,24 @@ export class RealtimeCareerMatcher {
   }
 
   getAllCareers(): { title: string; category: string }[] {
-    // Use broader career directions/archetypes instead of specific job titles
-    // These represent general career paths that users can explore
-    const careerDirections = [
-      { title: 'Analytical & Data-Driven Roles', category: 'Data & Analytics' },
-      { title: 'Creative & Design Work', category: 'Creative' },
-      { title: 'People & Relationships', category: 'People-Focused' },
-      { title: 'Technical & Engineering', category: 'Technology' },
-      { title: 'Strategy & Business', category: 'Strategy' },
-      { title: 'Communication & Marketing', category: 'Communication' },
-      { title: 'Helping & Healthcare', category: 'Service' },
-      { title: 'Leadership & Management', category: 'Leadership' },
-      { title: 'Operations & Process', category: 'Operations' },
-      { title: 'Teaching & Training', category: 'Education' },
-      { title: 'Creative Problem Solving', category: 'Innovation' },
-      { title: 'Building & Making Things', category: 'Creation' },
+    // Human-centric archetypes based on fundamental traits and work styles
+    // These focus on how people naturally work and what energizes them
+    const careerArchetypes = [
+      { title: 'The Analyzer', category: 'Thinker' },
+      { title: 'The Creator', category: 'Maker' },
+      { title: 'The Connector', category: 'People Person' },
+      { title: 'The Builder', category: 'Maker' },
+      { title: 'The Organizer', category: 'Systematizer' },
+      { title: 'The Helper', category: 'Caregiver' },
+      { title: 'The Visionary', category: 'Strategist' },
+      { title: 'The Influencer', category: 'Communicator' },
+      { title: 'The Solver', category: 'Problem Solver' },
+      { title: 'The Guide', category: 'Teacher' },
+      { title: 'The Protector', category: 'Guardian' },
+      { title: 'The Explorer', category: 'Adventurer' },
     ];
 
-    return careerDirections;
+    return careerArchetypes;
   }
 
   private mapCategoryToDisplayName(category: string): string {

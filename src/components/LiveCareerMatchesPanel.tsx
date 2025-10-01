@@ -175,13 +175,13 @@ export function LiveCareerMatchesPanel({
       <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-lg sm:rounded-xl border-2 border-blue-500/30 shadow-2xl overflow-hidden">
         <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-4 sm:px-5 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base sm:text-lg font-bold text-white">Career Directions</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Your Work Style</h3>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full" />
               <span className="text-xs text-white/90 font-medium hidden sm:inline">Updating</span>
             </div>
           </div>
-          <p className="text-xs text-blue-100 mt-1 mb-2 hidden sm:block">Discovering your best fit career paths</p>
+          <p className="text-xs text-blue-100 mt-1 mb-2 hidden sm:block">Discovering what energizes you at work</p>
           <button
             onClick={() => setShowDataQualityDetail(!showDataQualityDetail)}
             className="w-full flex items-center justify-between text-xs pt-2 border-t border-white/10 hover:bg-white/5 -mx-4 sm:-mx-5 px-4 sm:px-5 py-2 transition-colors"
@@ -352,7 +352,7 @@ export function LiveCareerMatchesPanel({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <p className="text-xs sm:text-sm text-gray-400">Keep answering to discover your career directions!</p>
+              <p className="text-xs sm:text-sm text-gray-400">Keep answering to discover your work style!</p>
             </div>
           ) : (
             topCareers.map((career, index) => {
