@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { AdaptiveQuestionnaire } from '@/components/AdaptiveQuestionnaire';
@@ -22,6 +23,7 @@ type ExportedProfile = ReturnType<AdaptiveQuestioningEngine['exportProfile']> & 
 };
 
 function ExplorePageContent() {
+  const { data: session } = useSession();
   const { workflow, refreshWorkflow } = useWorkflow();
   const [hasStarted, setHasStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -43,9 +45,11 @@ function ExplorePageContent() {
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
+  const [guestQuestionCount, setGuestQuestionCount] = useState(0);
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isGuest = !session;
 
   // Load user profile to inform assessment
   useEffect(() => {
