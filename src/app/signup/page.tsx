@@ -91,6 +91,9 @@ export default function SignupPage() {
         return;
       }
 
+      // Clear any old data
+      localStorage.removeItem('onboardingData');
+
       // Store user info for immediate login
       localStorage.setItem('currentUser', JSON.stringify({ email, name }));
 
