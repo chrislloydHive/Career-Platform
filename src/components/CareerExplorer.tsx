@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import type { JobCategory, CareerCategory, ExperienceLevel } from '@/types/career';
 import type { SavedItem } from '@/types/saved-items';
+import { CareerSearchExplainer } from './CareerSearchExplainer';
 
 interface CareerRecommendation {
   jobTitle: string;
@@ -887,48 +888,17 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           )}
         </div>
 
-        {/* Results */}
-        <div className="mb-4">
-          <p className="text-gray-400">
-            Found <span className="text-gray-100 font-semibold">{filteredCareers.length}</span> career
-            {filteredCareers.length !== 1 ? 's' : ''}
-          </p>
-        </div>
-
-        {/* No Exact Match - AI Research Suggestion */}
-        {searchQuery.trim() && !hasExactMatch && (
-          <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-6 mb-6">
-            <div className="flex items-start gap-4">
-              <svg className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-100 mb-2">
-                  No exact match for &quot;{searchQuery}&quot;
-                </h3>
-                <p className="text-gray-300 mb-4">
-                  {filteredCareers.length > 0
-                    ? `We found ${filteredCareers.length} similar career${filteredCareers.length !== 1 ? 's' : ''}, but not an exact match for "${searchQuery}".`
-                    : `We couldn't find any careers matching "${searchQuery}".`
-                  } Would you like to use AI to research this specific career title?
-                  {filterKeywords && <span className="block mt-1 text-sm text-blue-300">Filters: {filterKeywords}</span>}
-                </p>
-                <button
-                  onClick={() => {
-                    const query = filterKeywords ? `${searchQuery} (${filterKeywords})` : searchQuery;
-                    onTriggerAIResearch?.(query);
-                  }}
-                  className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium inline-flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  Research &quot;{searchQuery}&quot; with AI
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Search Explainer - Replaces confusing "Found X careers" and "No exact match" */}
+        <CareerSearchExplainer
+          searchQuery={searchQuery}
+          savedCareersCount={userCareers.length}
+          filteredCareersCount={filteredCareers.length}
+          hasExactMatch={hasExactMatch}
+          onResearchWithAI={() => {
+            const query = filterKeywords ? `${searchQuery} (${filterKeywords})` : searchQuery;
+            onTriggerAIResearch?.(query);
+          }}
+        />
 
         {/* AI Recommendations Panel */}
         {showRecommendations && recommendations.length > 0 && (
@@ -1167,23 +1137,22 @@ export function CareerExplorer({ onCareerSelect, onTriggerAIResearch, onToggleCo
           })}
         </div>
 
-        {/* Empty State */}
-        {filteredCareers.length === 0 && (
-          <div className="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Empty State - Only show for filtered results */}
+        {filteredCareers.length === 0 && (experienceLevel !== 'all' || selectedCategory !== 'all') && (
+          <div className="bg-gray-800 rounded-lg p-8 text-center border border-gray-700">
+            <svg className="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <h3 className="text-xl font-semibold text-gray-300 mb-2">No careers found</h3>
-            <p className="text-gray-400 mb-4">
-              Try adjusting your filters or search terms
+            <h3 className="text-lg font-semibold text-gray-300 mb-2">No matches with these filters</h3>
+            <p className="text-gray-400 text-sm mb-4">
+              Try removing some filters to see more careers
             </p>
             <button
               onClick={() => {
-                setSearchQuery('');
                 setExperienceLevel('all');
                 setSelectedCategory('all');
               }}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors text-sm"
             >
               Clear Filters
             </button>
