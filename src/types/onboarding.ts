@@ -2,6 +2,7 @@ export interface OnboardingData {
   // Step 1: Welcome - no data collected
 
   // Step 2: Background
+  bio?: string;
   workExperience: {
     yearsOfExperience?: string;
     currentRole?: string;
@@ -18,6 +19,10 @@ export interface OnboardingData {
     willingToRelocate?: boolean;
     preferredLocations?: string[];
   };
+  skills?: string;
+  interests?: string;
+  careerGoals?: string;
+  preferredIndustries?: string;
 
   // Step 3: Resume/LinkedIn
   resumeUrl?: string;
