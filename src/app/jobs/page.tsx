@@ -417,6 +417,7 @@ function JobSearchContent() {
               error={error}
               onClearError={() => setError(null)}
               initialValues={initialValues}
+              requiresAuth={!session}
             />
 
             {jobs.length === 0 && (
