@@ -44,20 +44,13 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
     }
   };
 
-  const savedItems = [
-    { href: '/saved', label: 'All Saved', icon: BookmarkIcon },
-    { href: '/saved?tab=assessments', label: 'Assessments', icon: DocumentIcon },
-    { href: '/saved?tab=jobs', label: 'Jobs', icon: SearchIcon },
-    { href: '/saved?tab=careers', label: 'Careers', icon: BriefcaseIcon },
-  ];
-
   const navItems = [
     {
       label: 'Discover',
       icon: CompassIcon,
       items: [
         { href: '/explore', label: 'Take Assessment', icon: CompassIcon },
-        ...savedItems,
+        { href: '/saved', label: 'Saved', icon: BookmarkIcon },
       ]
     },
     {
@@ -65,7 +58,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       icon: BriefcaseIcon,
       items: [
         { href: '/careers', label: 'Career Explorer', icon: BriefcaseIcon },
-        ...savedItems,
+        { href: '/saved', label: 'Saved', icon: BookmarkIcon },
       ]
     },
     {
@@ -73,7 +66,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       icon: SearchIcon,
       items: [
         { href: '/jobs', label: 'Job Search', icon: SearchIcon },
-        ...savedItems,
+        { href: '/saved', label: 'Saved', icon: BookmarkIcon },
       ]
     },
     { href: '/progress', label: 'Prep', icon: ProgressIcon },
