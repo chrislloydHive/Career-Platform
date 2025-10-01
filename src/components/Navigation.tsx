@@ -126,7 +126,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                         }`}
                       >
                         {hasStep && (
-                          <span className="hidden lg:flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex-shrink-0">
+                          <span className="hidden lg:flex items-center justify-center w-5 h-5 rounded border border-blue-500 bg-transparent text-blue-400 text-xs font-bold flex-shrink-0">
                             {(item as any).step}
                           </span>
                         )}
@@ -178,7 +178,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                       }`}
                     >
                       {hasStep && (
-                        <span className="hidden lg:flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex-shrink-0">
+                        <span className="hidden lg:flex items-center justify-center w-5 h-5 rounded border border-blue-500 bg-transparent text-blue-400 text-xs font-bold flex-shrink-0">
                           {(item as any).step}
                         </span>
                       )}
@@ -246,7 +246,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                       >
                         <div className="flex items-center gap-3">
                           {hasStep && (
-                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex-shrink-0">
+                            <span className="flex items-center justify-center w-5 h-5 rounded border border-blue-500 bg-transparent text-blue-400 text-xs font-bold flex-shrink-0">
                               {(item as any).step}
                             </span>
                           )}
@@ -308,7 +308,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                       }`}
                     >
                       {hasStep && (
-                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex-shrink-0">
+                        <span className="flex items-center justify-center w-5 h-5 rounded border border-blue-500 bg-transparent text-blue-400 text-xs font-bold flex-shrink-0">
                           {(item as any).step}
                         </span>
                       )}
