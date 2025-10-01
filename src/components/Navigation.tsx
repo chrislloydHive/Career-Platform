@@ -45,30 +45,11 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
   };
 
   const navItems = [
-    {
-      label: 'Discover',
-      icon: CompassIcon,
-      items: [
-        { href: '/explore', label: 'Self Discovery', icon: CompassIcon },
-        { href: '/assessments', label: 'Assessments', icon: DocumentIcon },
-      ]
-    },
-    {
-      label: 'Explore',
-      icon: BriefcaseIcon,
-      items: [
-        { href: '/careers', label: 'Career Explorer', icon: BriefcaseIcon },
-        { href: '/jobs', label: 'Job Search', icon: SearchIcon },
-      ]
-    },
-    {
-      label: 'Manage',
-      icon: BookmarkIcon,
-      items: [
-        { href: '/saved', label: 'Saved', icon: BookmarkIcon },
-        { href: '/progress', label: 'Progress', icon: ProgressIcon },
-      ]
-    },
+    { href: '/explore', label: 'Discover', icon: CompassIcon },
+    { href: '/careers', label: 'Explore', icon: BriefcaseIcon },
+    { href: '/jobs', label: 'Search', icon: SearchIcon },
+    { href: '/progress', label: 'Prep', icon: ProgressIcon },
+    { href: '/saved', label: 'Saved', icon: BookmarkIcon },
     {
       label: 'Support',
       icon: ChatIcon,
