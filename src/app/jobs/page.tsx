@@ -76,6 +76,20 @@ function JobSearchContent() {
   };
 
   const handleSearch = async (criteria: SearchCriteria) => {
+    // Require authentication for job search
+    if (!session) {
+      setError('Please sign in to search for jobs');
+      addToast(
+        createToast(
+          'warning',
+          'Sign In Required',
+          'Create a free account to search for jobs and save your favorites',
+          5000
+        )
+      );
+      return;
+    }
+
     setError(null);
     setIsSearching(true);
     setSearchProgress(0);
@@ -359,6 +373,41 @@ function JobSearchContent() {
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Workflow Progress */}
         <WorkflowProgress />
+
+        {/* Guest User Prompt */}
+        {!session && (
+          <div className="mb-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-700/50 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-100 mb-2">
+                  Sign Up to Search Jobs
+                </h3>
+                <p className="text-gray-300 mb-4">
+                  Create a free account to search thousands of jobs, save your favorites, and get personalized recommendations based on your skills and interests.
+                </p>
+                <div className="flex gap-3">
+                  <Link
+                    href="/signup"
+                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                  >
+                    Sign Up Free
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="px-5 py-2 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-gray-200 rounded-lg font-medium transition-colors"
+                  >
+                    Log In
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-1 space-y-4 sm:space-y-6">
