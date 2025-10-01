@@ -157,7 +157,7 @@ export default function OnboardingPage() {
           )}
 
           {currentStep === 5 && (
-            <CompletionStep onComplete={completeOnboarding} />
+            <CompletionStep onComplete={completeOnboarding} data={onboardingData} />
           )}
         </div>
       </main>
@@ -639,7 +639,8 @@ function ProfileStep({
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Upload failed (${response.status})`);
       }
 
       const result = await response.json();
@@ -918,7 +919,33 @@ function GoalsStep({
   );
 }
 
-function CompletionStep({ onComplete }: { onComplete: () => void }) {
+function CompletionStep({ onComplete, data }: { onComplete: () => void; data: Partial<OnboardingData> }) {
+  const [insights, setInsights] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const generateInsights = async () => {
+      try {
+        const response = await fetch('/api/profile/insights', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setInsights(result.insights);
+        }
+      } catch (error) {
+        console.error('Failed to generate insights:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    generateInsights();
+  }, [data]);
+
   return (
     <div className="text-center">
       <div className="w-24 h-24 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-8">
@@ -931,10 +958,29 @@ function CompletionStep({ onComplete }: { onComplete: () => void }) {
         Step 1 Complete: Your Profile is Ready!
       </h2>
 
-      <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-        Great start! We&apos;ve created your foundation. Now let&apos;s discover what makes you unique
-        and find careers that truly fit.
-      </p>
+      {loading ? (
+        <div className="mb-8 p-6 bg-gray-800 rounded-lg border border-gray-700">
+          <div className="flex items-center justify-center gap-3">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+            <p className="text-gray-300">Analyzing your profile...</p>
+          </div>
+        </div>
+      ) : insights ? (
+        <div className="mb-8 p-6 bg-blue-900/20 rounded-lg border border-blue-700/30 text-left">
+          <h3 className="text-lg font-semibold text-blue-300 mb-3 flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            Initial Thoughts About Your Profile
+          </h3>
+          <p className="text-gray-300 whitespace-pre-line">{insights}</p>
+        </div>
+      ) : (
+        <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+          Great start! We&apos;ve created your foundation. Now let&apos;s discover what makes you unique
+          and find careers that truly fit.
+        </p>
+      )}
 
       <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 mb-8">
         <h3 className="text-lg font-semibold text-gray-100 mb-4">Next: Step 2 - Discover Your Fit</h3>
