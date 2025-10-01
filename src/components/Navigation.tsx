@@ -18,6 +18,15 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Helper to check if a link is active (handles both pathname and query params)
+  const isLinkActive = (href: string) => {
+    if (href.includes('?')) {
+      // For links with query params, check if we're on the same page with same params
+      return typeof window !== 'undefined' && window.location.pathname + window.location.search === href;
+    }
+    return pathname === href;
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,7 +59,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       icon: CompassIcon,
       items: [
         { href: '/explore', label: 'Take Assessment', icon: CompassIcon },
-        { href: '/saved', label: 'Saved', icon: BookmarkIcon },
+        { href: '/saved?from=discover', label: 'Saved', icon: BookmarkIcon },
       ]
     },
     {
@@ -58,7 +67,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       icon: BriefcaseIcon,
       items: [
         { href: '/careers', label: 'Career Explorer', icon: BriefcaseIcon },
-        { href: '/saved', label: 'Saved', icon: BookmarkIcon },
+        { href: '/saved?from=explore', label: 'Saved', icon: BookmarkIcon },
       ]
     },
     {
@@ -66,7 +75,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
       icon: SearchIcon,
       items: [
         { href: '/jobs', label: 'Job Search', icon: SearchIcon },
-        { href: '/saved', label: 'Saved', icon: BookmarkIcon },
+        { href: '/saved?from=search', label: 'Saved', icon: BookmarkIcon },
       ]
     },
     { href: '/progress', label: 'Prep', icon: ProgressIcon },
@@ -95,7 +104,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
               {navItems.map((item) => {
                 if ('items' in item) {
                   // Dropdown group
-                  const isGroupActive = item.items?.some(subItem => pathname === subItem.href) || false;
+                  const isGroupActive = item.items?.some(subItem => isLinkActive(subItem.href)) || false;
                   const Icon = item.icon;
                   const isOpen = openDropdown === item.label;
 
@@ -122,7 +131,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                       {isOpen && (
                         <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl min-w-48 z-[60]">
                           {item.items?.map((subItem) => {
-                            const isActive = pathname === subItem.href;
+                            const isActive = isLinkActive(subItem.href);
                             const SubIcon = subItem.icon;
                             return (
                               <Link
@@ -146,7 +155,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   );
                 } else {
                   // Regular link
-                  const isActive = pathname === item.href;
+                  const isActive = isLinkActive(item.href);
                   const Icon = item.icon;
                   return (
                     <Link
@@ -205,7 +214,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
               {navItems.map((item) => {
                 if ('items' in item) {
                   // Dropdown group for mobile
-                  const isGroupActive = item.items?.some(subItem => pathname === subItem.href) || false;
+                  const isGroupActive = item.items?.some(subItem => isLinkActive(subItem.href)) || false;
                   const Icon = item.icon;
                   const isOpen = openDropdown === item.label;
 
@@ -236,7 +245,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                       {isOpen && (
                         <div className="mt-1 ml-4 space-y-1">
                           {item.items?.map((subItem) => {
-                            const isActive = pathname === subItem.href;
+                            const isActive = isLinkActive(subItem.href);
                             const SubIcon = subItem.icon;
                             return (
                               <Link
@@ -263,7 +272,7 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   );
                 } else {
                   // Regular link for mobile
-                  const isActive = pathname === item.href;
+                  const isActive = isLinkActive(item.href);
                   const Icon = item.icon;
                   return (
                     <Link
