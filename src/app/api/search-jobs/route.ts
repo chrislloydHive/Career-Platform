@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth/config';
 import { JobSearchEngine } from '@/lib/job-search-engine';
 import { JobScorer } from '@/lib/scoring';
 import { createScoringCriteriaFromSearch, createErrorResponse, createSuccessResponse } from '@/types';
@@ -13,6 +14,18 @@ const DEFAULT_TIMEOUT_MS = 90000;
 const MAX_TIMEOUT_MS = 180000;
 
 export async function POST(request: NextRequest) {
+  // Require authentication for job search
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      createErrorResponse({
+        name: 'AuthenticationError',
+        message: 'Please sign in to search for jobs',
+      }),
+      { status: 401 }
+    );
+  }
+
   const startTime = Date.now();
   const searchId = `search_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
