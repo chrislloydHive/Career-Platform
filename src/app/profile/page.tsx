@@ -265,7 +265,7 @@ export default function ProfilePage() {
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
             }`}
           >
-            Share
+            Upload
           </button>
         </div>
 
