@@ -21,31 +21,39 @@ export async function POST(request: NextRequest) {
     const resumeUrl = onboardingData.resumeUrl || null;
     const linkedinUrl = onboardingData.linkedinUrl || null;
 
-    // Build bio from onboarding data
-    const bioParts = [];
-    if (workExperience.currentRole) {
-      bioParts.push(`${workExperience.currentRole}${workExperience.currentCompany ? ` at ${workExperience.currentCompany}` : ''}`);
-    }
-    if (workExperience.yearsOfExperience) {
-      bioParts.push(`${workExperience.yearsOfExperience} of experience`);
-    }
-    if (education.highestDegree && education.fieldOfStudy) {
-      bioParts.push(`${education.highestDegree} in ${education.fieldOfStudy}`);
-    }
-    if (location.currentLocation) {
-      bioParts.push(`based in ${location.currentLocation}`);
+    // Use user-provided bio or build from onboarding data
+    let bio = onboardingData.bio || '';
+    if (!bio) {
+      const bioParts = [];
+      if (workExperience.currentRole) {
+        bioParts.push(`${workExperience.currentRole}${workExperience.currentCompany ? ` at ${workExperience.currentCompany}` : ''}`);
+      }
+      if (workExperience.yearsOfExperience) {
+        bioParts.push(`${workExperience.yearsOfExperience} of experience`);
+      }
+      if (education.highestDegree && education.fieldOfStudy) {
+        bioParts.push(`${education.highestDegree} in ${education.fieldOfStudy}`);
+      }
+      if (location.currentLocation) {
+        bioParts.push(`based in ${location.currentLocation}`);
+      }
+      bio = bioParts.join(' • ') || 'Career explorer seeking new opportunities';
     }
 
-    const bio = bioParts.join(' • ') || 'Career explorer seeking new opportunities';
+    // Use user-provided skills or build from industry and education
+    let skills: string[] = [];
+    if (onboardingData.skills) {
+      skills = onboardingData.skills.split(',').map((s: string) => s.trim()).filter(Boolean);
+    } else {
+      if (workExperience.industry) skills.push(workExperience.industry);
+      if (education.fieldOfStudy) skills.push(education.fieldOfStudy);
+    }
 
-    // Build skills array from industry and field of study
-    const skills: string[] = [];
-    if (workExperience.industry) skills.push(workExperience.industry);
-    if (education.fieldOfStudy) skills.push(education.fieldOfStudy);
-
-    // Build interests from career goal
-    const interests: string[] = [];
-    if (primaryGoal) {
+    // Use user-provided interests or build from career goal
+    let interests: string[] = [];
+    if (onboardingData.interests) {
+      interests = onboardingData.interests.split(',').map((s: string) => s.trim()).filter(Boolean);
+    } else if (primaryGoal) {
       // Map goal IDs to readable interests
       const goalMap: Record<string, string> = {
         'find-new-career': 'Career exploration',
@@ -59,11 +67,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Build career goals
-    const careerGoals: string[] = [];
-    if (primaryGoal && timeframe) {
+    // Use user-provided career goals or build from primary goal
+    let careerGoals: string[] = [];
+    if (onboardingData.careerGoals) {
+      careerGoals = onboardingData.careerGoals.split(',').map((s: string) => s.trim()).filter(Boolean);
+    } else if (primaryGoal && timeframe) {
       careerGoals.push(`${primaryGoal.replace(/-/g, ' ')} (${timeframe.replace(/_/g, ' ')})`);
     }
+
+    // Parse user-provided preferred industries
+    const preferredIndustries: string[] = onboardingData.preferredIndustries
+      ? onboardingData.preferredIndustries.split(',').map((s: string) => s.trim()).filter(Boolean)
+      : [];
 
     // Check if profile exists
     const existing = await sql`
@@ -81,6 +96,7 @@ export async function POST(request: NextRequest) {
           skills = ${JSON.stringify(skills)},
           interests = ${JSON.stringify(interests)},
           career_goals = ${JSON.stringify(careerGoals)},
+          preferred_industries = ${JSON.stringify(preferredIndustries)},
           last_updated = CURRENT_TIMESTAMP
         WHERE user_id = ${session.user.id}
       `;
@@ -106,7 +122,7 @@ export async function POST(request: NextRequest) {
           ${JSON.stringify(interests)},
           ${JSON.stringify([])},
           ${JSON.stringify(careerGoals)},
-          ${JSON.stringify([])},
+          ${JSON.stringify(preferredIndustries)},
           ${JSON.stringify([])},
           ${JSON.stringify({
             idealRole: '',

@@ -250,6 +250,7 @@ function BackgroundStep({
   onSkip: () => void;
 }) {
   const [formData, setFormData] = useState({
+    bio: data.bio || '',
     workExperience: {
       yearsOfExperience: data.workExperience?.yearsOfExperience || '',
       currentRole: data.workExperience?.currentRole || '',
@@ -265,7 +266,11 @@ function BackgroundStep({
       currentLocation: data.location?.currentLocation || '',
       willingToRelocate: data.location?.willingToRelocate || false,
       preferredLocations: data.location?.preferredLocations || []
-    }
+    },
+    skills: data.skills || '',
+    interests: data.interests || '',
+    careerGoals: data.careerGoals || '',
+    preferredIndustries: data.preferredIndustries || ''
   });
 
   const handleSubmit = () => {
@@ -447,6 +452,89 @@ function BackgroundStep({
               <label htmlFor="relocate" className="text-gray-300">
                 I&apos;m willing to relocate for the right opportunity
               </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Bio */}
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+          <h3 className="text-lg font-semibold text-gray-100 mb-4">About You</h3>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Bio (Optional)
+            </label>
+            <textarea
+              value={formData.bio}
+              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+              placeholder="Tell us a bit about yourself, your background, and what you're looking for..."
+              rows={4}
+              className="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* Skills & Interests */}
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+          <h3 className="text-lg font-semibold text-gray-100 mb-4">Skills & Interests</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Skills
+              </label>
+              <input
+                type="text"
+                value={formData.skills}
+                onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                placeholder="e.g. Python, Project Management, Data Analysis"
+                className="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">Separate with commas</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Interests
+              </label>
+              <input
+                type="text"
+                value={formData.interests}
+                onChange={(e) => setFormData({ ...formData, interests: e.target.value })}
+                placeholder="e.g. Technology, Healthcare, Education"
+                className="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">Separate with commas</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Career Goals & Preferences */}
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+          <h3 className="text-lg font-semibold text-gray-100 mb-4">Career Aspirations</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Career Goals
+              </label>
+              <input
+                type="text"
+                value={formData.careerGoals}
+                onChange={(e) => setFormData({ ...formData, careerGoals: e.target.value })}
+                placeholder="e.g. Leadership role, Work-life balance, High salary"
+                className="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">Separate with commas</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Preferred Industries
+              </label>
+              <input
+                type="text"
+                value={formData.preferredIndustries}
+                onChange={(e) => setFormData({ ...formData, preferredIndustries: e.target.value })}
+                placeholder="e.g. Tech, Finance, Nonprofit"
+                className="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">Separate with commas</p>
             </div>
           </div>
         </div>
