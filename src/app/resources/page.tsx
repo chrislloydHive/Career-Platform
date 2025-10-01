@@ -1,9 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import Link from 'next/link';
 
 export default function ResourcesPage() {
+  const [expandedUncommon, setExpandedUncommon] = useState(false);
+  const [expandedHighDemand, setExpandedHighDemand] = useState(false);
+  const [expandedNoExperience, setExpandedNoExperience] = useState(false);
+  const [expandedEmerging, setExpandedEmerging] = useState(false);
   // Career browsing lists
   const uncommonCareers = [
     { title: 'Professional Cuddler', description: 'Get paid $80/hour to provide platonic therapeutic touch and comfort to clients' },
@@ -234,36 +239,70 @@ export default function ResourcesPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Careers You Can Actually Get */}
-        <div className="mb-12">
+        <div className="mb-12 bg-gray-900/50 border border-gray-800 rounded-xl p-6 sm:p-8">
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-100 mb-3">Careers You Can Actually Get</h2>
             <p className="text-gray-400 text-lg">Expand your possibilities—discover jobs you never knew existed</p>
           </div>
 
           {/* Uncommon Careers */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-100">Uncommon But Real Careers</h3>
-              <span className="text-sm text-gray-500">Yes, these actually exist</span>
-            </div>
+          <div className="mb-8">
+            <button
+              onClick={() => setExpandedUncommon(!expandedUncommon)}
+              className="w-full flex items-center justify-between mb-4 hover:opacity-80 transition-opacity"
+            >
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-semibold text-gray-100">Uncommon But Real Careers</h3>
+                <span className="text-sm text-gray-500">Yes, these actually exist</span>
+              </div>
+              <svg
+                className={`w-5 h-5 text-gray-400 transition-transform ${expandedUncommon ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {uncommonCareers.map((career, idx) => (
+              {uncommonCareers.slice(0, expandedUncommon ? uncommonCareers.length : 4).map((career, idx) => (
                 <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-purple-500 transition-colors">
                   <h4 className="font-medium text-gray-100 mb-2">{career.title}</h4>
                   <p className="text-sm text-gray-400 leading-relaxed">{career.description}</p>
                 </div>
               ))}
             </div>
+            {!expandedUncommon && uncommonCareers.length > 4 && (
+              <button
+                onClick={() => setExpandedUncommon(true)}
+                className="mt-4 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Show {uncommonCareers.length - 4} more →
+              </button>
+            )}
           </div>
 
           {/* High Demand Careers */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-100">High Demand Right Now</h3>
-              <span className="text-sm text-gray-500">Companies are actively hiring</span>
-            </div>
+          <div className="mb-8">
+            <button
+              onClick={() => setExpandedHighDemand(!expandedHighDemand)}
+              className="w-full flex items-center justify-between mb-4 hover:opacity-80 transition-opacity"
+            >
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-semibold text-gray-100">High Demand Right Now</h3>
+                <span className="text-sm text-gray-500">Companies are actively hiring</span>
+              </div>
+              <svg
+                className={`w-5 h-5 text-gray-400 transition-transform ${expandedHighDemand ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {highDemandCareers.map((career, idx) => (
+              {highDemandCareers.slice(0, expandedHighDemand ? highDemandCareers.length : 3).map((career, idx) => (
                 <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-green-500 transition-colors">
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-medium text-gray-100">{career.title}</h4>
@@ -273,16 +312,37 @@ export default function ResourcesPage() {
                 </div>
               ))}
             </div>
+            {!expandedHighDemand && highDemandCareers.length > 3 && (
+              <button
+                onClick={() => setExpandedHighDemand(true)}
+                className="mt-4 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Show {highDemandCareers.length - 3} more →
+              </button>
+            )}
           </div>
 
           {/* No Experience Required */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-100">No Experience Required</h3>
-              <span className="text-sm text-gray-500">They'll train you</span>
-            </div>
+          <div className="mb-8">
+            <button
+              onClick={() => setExpandedNoExperience(!expandedNoExperience)}
+              className="w-full flex items-center justify-between mb-4 hover:opacity-80 transition-opacity"
+            >
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-semibold text-gray-100">No Experience Required</h3>
+                <span className="text-sm text-gray-500">They'll train you</span>
+              </div>
+              <svg
+                className={`w-5 h-5 text-gray-400 transition-transform ${expandedNoExperience ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {noExperienceCareers.map((career, idx) => (
+              {noExperienceCareers.slice(0, expandedNoExperience ? noExperienceCareers.length : 3).map((career, idx) => (
                 <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-blue-500 transition-colors">
                   <h4 className="font-medium text-gray-100 mb-2">{career.title}</h4>
                   <p className="text-sm text-gray-400 mb-2">{career.description}</p>
@@ -295,16 +355,37 @@ export default function ResourcesPage() {
                 </div>
               ))}
             </div>
+            {!expandedNoExperience && noExperienceCareers.length > 3 && (
+              <button
+                onClick={() => setExpandedNoExperience(true)}
+                className="mt-4 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Show {noExperienceCareers.length - 3} more →
+              </button>
+            )}
           </div>
 
           {/* Emerging Careers */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-100">Emerging Careers</h3>
-              <span className="text-sm text-gray-500">Jobs that didn't exist 5 years ago</span>
-            </div>
+          <div>
+            <button
+              onClick={() => setExpandedEmerging(!expandedEmerging)}
+              className="w-full flex items-center justify-between mb-4 hover:opacity-80 transition-opacity"
+            >
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-semibold text-gray-100">Emerging Careers</h3>
+                <span className="text-sm text-gray-500">Jobs that didn't exist 5 years ago</span>
+              </div>
+              <svg
+                className={`w-5 h-5 text-gray-400 transition-transform ${expandedEmerging ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {emergingCareers.map((career, idx) => (
+              {emergingCareers.slice(0, expandedEmerging ? emergingCareers.length : 3).map((career, idx) => (
                 <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-yellow-500 transition-colors">
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-medium text-gray-100">{career.title}</h4>
@@ -314,6 +395,14 @@ export default function ResourcesPage() {
                 </div>
               ))}
             </div>
+            {!expandedEmerging && emergingCareers.length > 3 && (
+              <button
+                onClick={() => setExpandedEmerging(true)}
+                className="mt-4 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Show {emergingCareers.length - 3} more →
+              </button>
+            )}
           </div>
         </div>
 
