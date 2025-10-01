@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/config';
-import { db } from '@/lib/db';
-import { userProfiles, interactionHistory } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { sql } from '@vercel/postgres';
+import { getUserProfile } from '@/lib/storage/user-profile-db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,6 +18,8 @@ export async function POST(request: NextRequest) {
     const location = onboardingData.location || {};
     const primaryGoal = onboardingData.primaryGoal || '';
     const timeframe = onboardingData.timeframe || '';
+    const resumeUrl = onboardingData.resumeUrl || null;
+    const linkedinUrl = onboardingData.linkedinUrl || null;
 
     // Build bio from onboarding data
     const bioParts = [];
@@ -61,52 +62,79 @@ export async function POST(request: NextRequest) {
     // Build career goals
     const careerGoals: string[] = [];
     if (primaryGoal && timeframe) {
-      careerGoals.push(`${primaryGoal.replace('-', ' ')} (${timeframe.replace('_', ' ')})`);
+      careerGoals.push(`${primaryGoal.replace(/-/g, ' ')} (${timeframe.replace(/_/g, ' ')})`);
     }
 
     // Check if profile exists
-    const existingProfiles = await db.select()
-      .from(userProfiles)
-      .where(eq(userProfiles.userId, session.user.id))
-      .limit(1);
+    const existing = await sql`
+      SELECT user_id FROM user_profiles WHERE user_id = ${session.user.id}
+    `;
 
-    if (existingProfiles.length > 0) {
+    if (existing.rows.length > 0) {
       // Update existing profile with onboarding data
-      await db.update(userProfiles)
-        .set({
-          bio,
-          skills,
-          interests,
-          careerGoals,
-          onboardingData: onboardingData,
-          updatedAt: new Date(),
-        })
-        .where(eq(userProfiles.userId, session.user.id));
+      await sql`
+        UPDATE user_profiles SET
+          location = ${location.currentLocation || ''},
+          bio = ${bio},
+          linkedin_url = ${linkedinUrl},
+          resume_url = ${resumeUrl},
+          skills = ${JSON.stringify(skills)},
+          interests = ${JSON.stringify(interests)},
+          career_goals = ${JSON.stringify(careerGoals)},
+          last_updated = CURRENT_TIMESTAMP
+        WHERE user_id = ${session.user.id}
+      `;
     } else {
       // Create new profile with onboarding data
-      await db.insert(userProfiles).values({
-        userId: session.user.id,
-        bio,
-        skills,
-        interests,
-        careerGoals,
-        strengths: [],
-        aiInsights: [],
-        interactionHistory: [],
-        onboardingData: onboardingData,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      await sql`
+        INSERT INTO user_profiles (
+          user_id, name, location, bio, linkedin_url, resume_url,
+          education, experience, skills, strengths, interests, values,
+          career_goals, preferred_industries, preferred_locations,
+          career_preferences
+        ) VALUES (
+          ${session.user.id},
+          ${session.user.name || 'User'},
+          ${location.currentLocation || ''},
+          ${bio},
+          ${linkedinUrl},
+          ${resumeUrl},
+          ${JSON.stringify([])},
+          ${JSON.stringify([])},
+          ${JSON.stringify(skills)},
+          ${JSON.stringify([])},
+          ${JSON.stringify(interests)},
+          ${JSON.stringify([])},
+          ${JSON.stringify(careerGoals)},
+          ${JSON.stringify([])},
+          ${JSON.stringify([])},
+          ${JSON.stringify({
+            idealRole: '',
+            whatMatters: [],
+            workEnvironment: [],
+            dealBreakers: [],
+            motivations: [],
+            skillsToLeverage: [],
+            skillsToGrow: [],
+            cultureFit: [],
+            workLifeBalance: 'balanced',
+            compensationPriority: 'competitive',
+            customNotes: ''
+          })}
+        )
+      `;
     }
 
     // Log interaction
-    await db.insert(interactionHistory).values({
-      userId: session.user.id,
-      action: 'Completed Onboarding',
-      context: `Primary goal: ${primaryGoal}, Timeframe: ${timeframe}`,
-      aiLearning: 'Initial profile created from onboarding information',
-      timestamp: new Date(),
-    });
+    await sql`
+      INSERT INTO interaction_history (user_id, action, context, ai_learning)
+      VALUES (
+        ${session.user.id},
+        ${'Completed Onboarding'},
+        ${`Primary goal: ${primaryGoal}, Timeframe: ${timeframe}`},
+        ${'Initial profile created from onboarding information'}
+      )
+    `;
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
