@@ -15,6 +15,7 @@ import { ExportDialog } from '@/components/ExportDialog';
 import { getUserFriendlyError, retryWithBackoff } from '@/lib/feedback/error-handler';
 import { saveSearchToHistory, saveLastSearch, getLastSearch } from '@/lib/storage/search-history';
 import { ContextualChat } from '@/components/ContextualChat';
+import { WorkflowProgress } from '@/components/WorkflowProgress';
 
 function JobSearchContent() {
   const { data: session, status } = useSession();
@@ -356,6 +357,9 @@ function JobSearchContent() {
       />
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* Workflow Progress */}
+        <WorkflowProgress />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-1 space-y-4 sm:space-y-6">
             <EnhancedSearchForm
