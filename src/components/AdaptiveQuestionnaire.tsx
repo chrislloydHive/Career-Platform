@@ -1220,7 +1220,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Main Content */}
-        <div className="flex-1 max-w-full lg:max-w-4xl">
+        <div className="flex-1 min-w-0">
       {/* Header with Adaptive Intelligence Indicator */}
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
