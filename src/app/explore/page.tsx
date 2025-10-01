@@ -35,6 +35,8 @@ function ExplorePageContent() {
   });
   const [jobFunctions, setJobFunctions] = useState<JobFunction[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -70,7 +72,7 @@ function ExplorePageContent() {
     }
   }, [searchParams, router]);
 
-  const handleComplete = (exportedProfile: ExportedProfile) => {
+  const handleComplete = async (exportedProfile: ExportedProfile) => {
     setProfile(exportedProfile);
 
     // Discover job functions based on profile
@@ -79,6 +81,28 @@ function ExplorePageContent() {
 
     setShowResults(true);
     setHasUnsavedResults(true);
+
+    // Generate AI summary
+    setIsGeneratingSummary(true);
+    try {
+      const response = await fetch('/api/assessment/generate-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          profile: exportedProfile,
+          topCareers: exportedProfile.topCareers,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAiSummary(data.summary);
+      }
+    } catch (error) {
+      console.error('Failed to generate AI summary:', error);
+    } finally {
+      setIsGeneratingSummary(false);
+    }
   };
 
   const toggleInsightExpansion = (index: number) => {
@@ -222,42 +246,35 @@ function ExplorePageContent() {
             </Link>
           </div>
 
-          {/* Comprehensive Assessment Overview */}
+          {/* AI-Generated Personal Summary */}
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-100 mb-4">Alright, Here's What We Found Out About You</h2>
-              <div className="max-w-4xl mx-auto space-y-4">
-                <p className="text-lg text-gray-300 leading-relaxed">
-                  Based on your answers, we&apos;ve spotted {profile.synthesizedInsights.length} patterns that basically screamed &ldquo;{profile.completion >= 80 ? 'I know exactly what I want' : 'I\'m figuring this out and that\'s totally fine'}.&rdquo;
-                  {profile.completion >= 80 ? (
-                    <span> You&apos;ve got strong vibes in {profile.patterns.consistencyPatterns?.length || 0} areas, which means you&apos;re actually way more decisive than you think.</span>
-                  ) : (
-                    <span> You&apos;re {profile.completion}% of the way there, and honestly? We&apos;ve already learned enough to point you in the right direction.</span>
-                  )}
-                </p>
+              <h2 className="text-3xl font-bold text-gray-100 mb-6">Your Career Assessment</h2>
 
-                <p className="text-gray-400 leading-relaxed">
-                  {profile.synthesizedInsights.length > 0 && (
-                    <>
-                      Plot twist: your answers show {profile.synthesizedInsights.find(i => i.type === 'cross-domain') ? 'you\'re into multiple things (which is good because job titles are made up anyway)' : 'you know what you like, and that focus is actually your superpower'}.
-                      {profile.patterns.hiddenMotivations?.length > 0 && (
-                        <span> We also uncovered {profile.patterns.hiddenMotivations.length} things that really matter to you deep down—the stuff that&apos;ll make you not hate Mondays.</span>
-                      )}
-                      {profile.topCareers && profile.topCareers.length > 0 && (
-                        <span> Oh, and we found {profile.topCareers.length} job titles that fit you anywhere from {Math.round(Math.min(...profile.topCareers.map(c => c.currentScore)) * 100)}% to {Math.round(Math.max(...profile.topCareers.map(c => c.currentScore)) * 100)}% (no job is perfect, but these are pretty close).</span>
-                      )}
-                    </>
-                  )}
-                </p>
-
-                {profile.patterns.valueHierarchy?.coreMotivation && (
-                  <div className="bg-blue-900/20 rounded-lg p-4 border border-blue-600/30 mt-6">
-                    <p className="text-blue-100 italic text-center">
-                      <span className="text-blue-400 font-medium">The thing that actually drives you:</span> &ldquo;{profile.patterns.valueHierarchy.coreMotivation}&rdquo;
-                    </p>
+              {isGeneratingSummary ? (
+                <div className="max-w-4xl mx-auto">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                    <p className="text-gray-400">Analyzing your unique patterns...</p>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : aiSummary ? (
+                <div className="max-w-4xl mx-auto">
+                  <div className="prose prose-invert prose-lg max-w-none">
+                    {aiSummary.split('\n\n').map((paragraph, idx) => (
+                      <p key={idx} className="text-gray-300 leading-relaxed mb-4 text-left">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="max-w-4xl mx-auto space-y-4">
+                  <p className="text-lg text-gray-300 leading-relaxed">
+                    Based on your answers, we&apos;ve spotted {profile.synthesizedInsights.length} patterns that basically screamed &ldquo;{profile.completion >= 80 ? 'I know exactly what I want' : 'I\'m figuring this out and that\'s totally fine'}.&rdquo;
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
