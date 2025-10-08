@@ -101,23 +101,56 @@ export default function OnboardingPage() {
   const currentStepData = ONBOARDING_STEPS.find(step => step.id === currentStep);
   const progress = (currentStep / ONBOARDING_STEPS.length) * 100;
 
+  const stepNavigation = [
+    { id: 1, label: 'Welcome', available: true },
+    { id: 2, label: 'Background', available: currentStep >= 2 },
+    { id: 3, label: 'Profile', available: currentStep >= 3 },
+    { id: 4, label: 'Goals', available: currentStep >= 4 },
+    { id: 5, label: 'Complete', available: currentStep >= 5 },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col">
-      {/* Header with Progress */}
-      <header className="border-b border-gray-800 bg-gray-900/50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <Logo size="md" linkToHome={false} />
-              <p className="text-gray-400 mt-1">Getting Started</p>
-            </div>
-            <div className="text-sm text-gray-400">
+      {/* Header with Navigation */}
+      <header className="border-b border-gray-800 bg-gray-900/50 sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          {/* Top Row: Logo and Step Counter */}
+          <div className="flex items-center justify-between mb-3">
+            <Logo size="sm" linkToHome={false} />
+            <div className="text-xs sm:text-sm text-gray-400">
               Step {currentStep} of {ONBOARDING_STEPS.length}
             </div>
           </div>
 
+          {/* Step Navigation - Always visible on mobile */}
+          <nav className="flex items-center justify-between gap-1 mb-3">
+            {stepNavigation.map((step) => (
+              <button
+                key={step.id}
+                onClick={() => step.available && setCurrentStep(step.id)}
+                disabled={!step.available}
+                className={`flex-1 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  currentStep === step.id
+                    ? 'bg-blue-600 text-white'
+                    : step.available
+                    ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    : 'text-gray-600 cursor-not-allowed'
+                }`}
+              >
+                <span className="block truncate">{step.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Current Step Name - Mobile/Desktop */}
+          <div className="text-center">
+            <h2 className="text-sm sm:text-base font-semibold text-gray-100">
+              {ONBOARDING_STEPS.find(s => s.id === currentStep)?.title || 'Getting Started'}
+            </h2>
+          </div>
+
           {/* Progress Bar */}
-          <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-gray-700 rounded-full h-2 mt-3">
             <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
