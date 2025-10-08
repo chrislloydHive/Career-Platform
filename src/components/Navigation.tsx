@@ -127,8 +127,8 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   href={firstItem?.href || '#'}
                   className={`flex-1 min-w-0 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors text-center ${
                     isGroupActive
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      ? 'bg-blue-600 text-white border border-blue-600'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white border border-gray-700'
                   }`}
                 >
                   <span className="block truncate">{item.label}</span>
@@ -142,8 +142,8 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   href={item.href}
                   className={`flex-1 min-w-0 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors text-center ${
                     isActive
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      ? 'bg-blue-600 text-white border border-blue-600'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white border border-gray-700'
                   }`}
                 >
                   <span className="block truncate">{item.label}</span>
