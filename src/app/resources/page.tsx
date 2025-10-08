@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Navigation } from '@/components/Navigation';
-import { WorkflowProgress } from '@/components/WorkflowProgress';
 import Link from 'next/link';
 
 export default function ResourcesPage() {
@@ -240,7 +239,6 @@ export default function ResourcesPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Workflow Progress */}
-        <WorkflowProgress />
 
         {/* Careers You Can Actually Get */}
         <div className="mb-12 bg-gray-900/50 border border-gray-800 rounded-xl p-6 sm:p-8">

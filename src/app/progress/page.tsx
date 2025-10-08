@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { ProgressTracker } from '@/components/ProgressTracker';
 import { ProgressNotifications, WeeklyProgressDigest } from '@/components/ProgressNotifications';
-import { WorkflowProgress } from '@/components/WorkflowProgress';
 
 export default function ProgressPage() {
   return (
@@ -16,7 +15,6 @@ export default function ProgressPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Workflow Progress */}
-        <WorkflowProgress />
 
         {/* Header */}
         <div className="mb-8">

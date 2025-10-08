@@ -89,14 +89,79 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
   return (
     <header className="bg-gray-900 border-b border-gray-700 sticky top-0 z-50 shadow-sm relative">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16">
+        {/* Mobile: Logo + Menu */}
+        <div className="flex md:hidden items-center justify-between h-14 border-b border-gray-800">
+          <div className="flex-shrink-0">
+            <Logo size="sm" className="text-base" />
+          </div>
+
+          <div className="flex items-center gap-2">
+            {actions}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+              title="Menu"
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile: Step Navigation */}
+        <nav className="md:hidden flex items-center justify-between gap-1 py-2 overflow-x-auto">
+          {navItems.filter(item => 'step' in item).map((item) => {
+            if ('items' in item) {
+              const isGroupActive = item.items?.some(subItem => isLinkActive(subItem.href)) || false;
+              const firstItem = item.items?.[0];
+              return (
+                <Link
+                  key={item.label}
+                  href={firstItem?.href || '#'}
+                  className={`flex-1 min-w-0 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors text-center ${
+                    isGroupActive
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  <span className="block truncate">{item.label}</span>
+                </Link>
+              );
+            } else {
+              const isActive = isLinkActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex-1 min-w-0 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors text-center ${
+                    isActive
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  <span className="block truncate">{item.label}</span>
+                </Link>
+              );
+            }
+          })}
+        </nav>
+
+        {/* Desktop: Single row with logo, nav, and actions */}
+        <div className="hidden md:flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center gap-2 sm:gap-8 flex-1 min-w-0">
             <div className="flex-shrink-0">
               <Logo size="sm" className="text-base sm:text-xl" />
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-0.5 sm:gap-1 overflow-visible flex-1">
+            <nav className="flex items-center gap-0.5 sm:gap-1 overflow-visible flex-1">
               {navItems.map((item) => {
                 if ('items' in item) {
                   // Dropdown group
@@ -187,27 +252,10 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
           <div className="flex items-center gap-2 flex-shrink-0 ml-2">
             {actions}
 
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
-              title="Menu"
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
-            </button>
-
             {/* Desktop logout button */}
             <button
               onClick={handleLogout}
-              className="hidden md:block p-1.5 sm:p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
               title="Logout"
             >
               <LogoutIcon className="w-4 h-4" />
@@ -215,17 +263,16 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Navigation Menu - Only non-step items */}
         {mobileMenuOpen && (
           <div className="md:hidden py-3 border-t border-gray-700">
             <nav className="space-y-1">
-              {navItems.map((item) => {
+              {navItems.filter(item => !('step' in item)).map((item) => {
                 if ('items' in item) {
                   // Dropdown group for mobile
                   const isGroupActive = item.items?.some(subItem => isLinkActive(subItem.href)) || false;
                   const Icon = item.icon;
                   const isOpen = openDropdown === item.label;
-                  const hasStep = 'step' in item;
 
                   return (
                     <div key={item.label}>
@@ -238,11 +285,6 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          {hasStep && (
-                            <span className="flex items-center justify-center w-5 h-5 rounded border border-blue-500 bg-transparent text-blue-400 text-xs font-bold flex-shrink-0">
-                              {(item as any).step}
-                            </span>
-                          )}
                           <Icon className="w-4 h-4" />
                           <span>{item.label}</span>
                         </div>
@@ -288,7 +330,6 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                   // Regular link for mobile
                   const isActive = isLinkActive(item.href);
                   const Icon = item.icon;
-                  const hasStep = 'step' in item;
                   return (
                     <Link
                       key={item.href}
@@ -300,11 +341,6 @@ export function Navigation({ title, subtitle, actions }: NavigationProps) {
                           : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                       }`}
                     >
-                      {hasStep && (
-                        <span className="flex items-center justify-center w-5 h-5 rounded border border-blue-500 bg-transparent text-blue-400 text-xs font-bold flex-shrink-0">
-                          {(item as any).step}
-                        </span>
-                      )}
                       <Icon className="w-4 h-4" />
                       <span>{item.label}</span>
                     </Link>

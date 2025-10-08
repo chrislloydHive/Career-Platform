@@ -15,7 +15,6 @@ import { ExportDialog } from '@/components/ExportDialog';
 import { getUserFriendlyError, retryWithBackoff } from '@/lib/feedback/error-handler';
 import { saveSearchToHistory, saveLastSearch, getLastSearch } from '@/lib/storage/search-history';
 import { ContextualChat } from '@/components/ContextualChat';
-import { WorkflowProgress } from '@/components/WorkflowProgress';
 
 function JobSearchContent() {
   const { data: session, status } = useSession();
@@ -372,7 +371,6 @@ function JobSearchContent() {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Workflow Progress */}
-        <WorkflowProgress />
 
         {/* Guest User Prompt */}
         {!session && (

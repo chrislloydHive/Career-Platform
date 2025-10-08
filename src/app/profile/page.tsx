@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { UserProfile, CareerPreferences } from '@/types/user-profile';
 import { CareerPreferencesEditor } from '@/components/CareerPreferencesEditor';
-import { WorkflowProgress } from '@/components/WorkflowProgress';
 import { useWorkflow } from '@/contexts/WorkflowContext';
 
 export default function ProfilePage() {
@@ -226,7 +225,6 @@ export default function ProfilePage() {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Workflow Progress */}
-        <WorkflowProgress />
 
         <div className="mb-4 sm:mb-6 flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide pb-2">
           <button

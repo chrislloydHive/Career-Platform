@@ -9,7 +9,6 @@ import { CareerDetailModal } from '@/components/CareerDetailModal';
 import { CareerComparisonTool } from '@/components/CareerComparisonTool';
 import { CareerResearchModal } from '@/components/CareerResearchModal';
 import { ContextualChat } from '@/components/ContextualChat';
-import { WorkflowProgress } from '@/components/WorkflowProgress';
 import { AssessmentBasedRecommendations } from '@/components/AssessmentBasedRecommendations';
 import { JobCategory, CareerCategory } from '@/types/career';
 
@@ -52,7 +51,6 @@ export default function CareersPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Workflow Progress */}
-        <WorkflowProgress />
 
         {showComparison ? (
           <div>
