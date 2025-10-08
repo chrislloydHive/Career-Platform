@@ -1218,9 +1218,9 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
         </div>
       )} */}
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 w-full lg:max-w-4xl">
       {/* Header with Adaptive Intelligence Indicator */}
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
@@ -1595,7 +1595,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       )}
 
       {/* 8 Exploration Areas Progress */}
-      <div className="mb-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-lg border border-blue-500/30 p-4 max-w-4xl mx-auto">
+      <div className="mb-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-lg border border-blue-500/30 p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-bold text-gray-100">8 Exploration Areas</h3>
           <span className="text-xs text-gray-500">{explorationProgress.filter(a => a.depth > 0).length}/8 started</span>
@@ -1627,7 +1627,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
       </div>
 
       {/* Question Card */}
-      <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-4 sm:p-6 lg:p-8 mb-6 relative max-w-4xl mx-auto">
+      <div className="bg-gray-800 rounded-lg border border-blue-700/30 p-4 sm:p-6 lg:p-8 mb-6 relative">
         {/* Processing Overlay */}
         {isProcessing && (
           <div className="absolute inset-0 bg-gray-900/95 rounded-lg z-10 flex flex-col items-center justify-center backdrop-blur-sm">
@@ -1845,7 +1845,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       {/* Skipped Questions - Come Back Later - RIGHT BELOW QUESTION */}
       {skippedQuestions.length > 0 && (
-        <div id="saved-for-later-section" className="mb-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border-2 border-blue-500/50 p-6 scroll-mt-4 max-w-4xl mx-auto">
+        <div id="saved-for-later-section" className="mb-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border-2 border-blue-500/50 p-6 scroll-mt-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-100 flex items-center gap-2">
               <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1877,7 +1877,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       {/* Latest Insights - Compact Preview Above the Fold */}
       {(insights.length > 0 || synthesizedInsights.length > 0) && (
-        <div className="mb-6 bg-gradient-to-br from-blue-900/20 via-blue-800/10 to-blue-900/20 rounded-xl border-2 border-blue-500/30 p-5 relative max-w-4xl mx-auto">
+        <div className="mb-6 bg-gradient-to-br from-blue-900/20 via-blue-800/10 to-blue-900/20 rounded-xl border-2 border-blue-500/30 p-5 relative">
           <div className="flex items-center justify-between mb-4 relative z-10">
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -1930,7 +1930,7 @@ export function AdaptiveQuestionnaire({ onComplete, onInsightDiscovered, userPro
 
       {/* Dynamic Adaptation Indicator */}
       {insights.length > 0 && (
-        <div className="mb-6 bg-blue-900/20 border border-blue-700/50 rounded-lg p-4 max-w-4xl mx-auto">
+        <div className="mb-6 bg-blue-900/20 border border-blue-700/50 rounded-lg p-4">
           <div className="flex items-start gap-3">
             <div className="p-2 bg-blue-500/20 rounded-lg">
               <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
